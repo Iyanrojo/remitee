@@ -497,6 +497,9 @@ body.wide .app{max-width:1040px}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;padding:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.8rem;line-height:1}
 .lb-nav.prev{left:max(10px,env(safe-area-inset-left,0px))} .lb-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
 @media (prefers-reduced-motion:reduce){.lightbox{animation:none}}
+.hero-title .rot{display:inline-block;min-height:2em;transition:opacity .7s ease, filter .7s ease, transform .7s ease}
+.hero-title .rot.out{opacity:0;filter:blur(6px);transform:translateY(.12em)}
+@media (prefers-reduced-motion:reduce){.hero-title .rot{transition:none}}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -1305,6 +1308,22 @@ function showFlow(){
 }
 
 /* ---- Landing y alta ---- */
+// Frases que se van alternando en el titular
+const TAGLINES = () => lang === "en"
+  ? ["slow-cooked","in its purest form","between people","with commitment","made human","handwritten","with no rush","with a real stamp","worth the wait","worth keeping","with soul","for real","without screens","in paper and ink","to read again","that leaves a mark","there and back","without algorithms","with calm","from the heart"]
+  : ["a fuego lento","en estado puro","entre personas","con compromiso","humanizada","de puño y letra","sin prisas","con sello propio","que merece la espera","para guardar","con alma","de verdad","sin pantallas","en papel y tinta","para releer","que deja huella","de ida y vuelta","sin algoritmos","con calma","de corazón"];
+let rotTimer = 0;
+function startRotator(){
+  clearInterval(rotTimer);
+  const el = $("#rot"); if (!el) return;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const T = TAGLINES(); let i = 0;
+  rotTimer = setInterval(() => {
+    if (!el.isConnected){ clearInterval(rotTimer); return; }
+    el.classList.add("out");
+    setTimeout(() => { i = (i + 1) % T.length; el.textContent = T[i] + "."; el.classList.remove("out"); }, 700);
+  }, 3200);
+}
 let altaStep = 0, authMode = "signup";
 function landing(){
   const phrases = lang==="en"
@@ -1314,7 +1333,7 @@ function landing(){
     <section class="hero">
       <div class="hero-text">
         <span class="kicker">${L("Correspondencia entre desconocidos","Letters between strangers")}</span>
-        <h2 class="mega hero-title">${L("Mensajería a<br><em>fuego lento.</em>","Mail,<br><em>slow-cooked.</em>")}</h2>
+        <h2 class="mega hero-title">${L("Mensajería","Mail,")}<br><em class="rot" id="rot" aria-live="off">${TAGLINES()[0]}.</em></h2>
         <p class="hero-sub">${L("Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.","Remitee connects people who want to write to each other by post. No chat, no rush, and nobody ever knows your address. Here things take a few days. That's the beauty of it.")}</p>
         <div class="hero-cta"><button id="start">${L("Crear mi perfil","Create my profile")}</button><button class="plain" id="how">${L("Cómo funciona","How it works")}</button></div>
         <button class="linkbtn loginlink" id="loginLink">${L("¿Ya tienes cuenta? Entra","Already have an account? Sign in")}</button>
@@ -1375,7 +1394,7 @@ function landing(){
       <button id="start2">${L("Empezar ahora","Start now")}</button>
     </section>
   </div>`;
-  startFlow($(".privacy .flowcard"));
+  startFlow($(".privacy .flowcard")); startRotator();
   const v = $("#heroVid"); if (v){ const show = () => { $("#vph").hidden = true; v.classList.add("ready"); };
     if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
   const go = mode => { authMode = mode; altaStep = 1; alta(); window.scrollTo(0,0); };
