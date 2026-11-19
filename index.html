@@ -75,7 +75,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .modal h3{font-family:var(--head);font-weight:700;font-size:1.5rem;margin:0}
 
 /* Lista de cartas */
-.list{display:grid;gap:10px}
+.list{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+.item{min-width:0}
 .item{display:flex;gap:14px;align-items:center;background:var(--surface);border-radius:var(--r);padding:14px 16px;cursor:pointer;border:0;width:100%;text-align:left;color:var(--ink);font-weight:400}
 .item .txt{flex:1;min-width:0}
 .item .n{font-family:var(--head);font-weight:600;font-size:1.02rem}
@@ -541,6 +542,37 @@ body.wide .app{max-width:1040px}
   .tabs .badge{top:2px;left:auto;right:6px}
   .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
 }
+.ring{position:relative;display:inline-grid;place-items:center;flex:none}
+.ring svg{position:absolute;inset:0;width:100%;height:100%}
+.rg-bg{fill:none;stroke:var(--line);stroke-width:4}
+.rg-fg{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.ring.warn .rg-fg{stroke:var(--warm)}
+.ring.them .rg-fg{stroke:var(--muted);opacity:.6}
+.rg-n{position:relative;display:flex;align-items:baseline;gap:1px;line-height:1}
+.rg-n b{font-family:var(--head);font-weight:700;font-size:.95rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.rg-n small{font-size:.62rem;color:var(--muted)}
+.ring.warn .rg-n b{color:var(--warm)}
+.dl.has-ring{display:flex;gap:14px;align-items:center}
+.dl.has-ring .dl-t{display:grid;gap:3px;min-width:0}
+.dl.has-ring .ring .rg-n b{font-size:1.15rem}
+.flow svg{overflow:visible}
+.fig-body{fill:var(--accent)} .fig-head{fill:var(--accent)}
+.fig.b .fig-body,.fig.b .fig-head{fill:#f1a98a}
+.fig-eye{fill:#fff} .fig.b .fig-eye{fill:#3a2a2a}
+.fig-smile{fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round} .fig.b .fig-smile{stroke:#3a2a2a}
+.fig-sh{fill:var(--ink);opacity:.08}
+.fig-in{transform-box:fill-box;transform-origin:50% 100%}
+.fl-route,.fl-direct{fill:none;stroke:var(--accent);stroke-width:1.6;opacity:0;transition:opacity .6s}
+.fl-direct{stroke-width:1.8}
+.fl-office{transition:opacity .6s} .fl-office rect{fill:var(--accent-soft)} .fl-office path{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linejoin:round}
+#fl-offlbl{transition:opacity .6s}
+.fl-match{opacity:0}
+.fl-mline{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round}
+.fl-hbg{fill:var(--surface);stroke:var(--accent);stroke-width:1.5} .fl-hrt{fill:var(--accent)}
+.fl-chip rect{fill:var(--accent-soft)} .fl-chip text{font-size:9px;font-weight:600;text-anchor:middle;fill:var(--accent);font-family:var(--body)}
+.fl-env rect{fill:var(--surface);stroke:var(--ink);stroke-width:1.5} .fl-env path{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.fl-env{transition:opacity .3s}
+.flow .fl-txt{transition:opacity .26s ease} .flow .fl-txt.fade{opacity:0}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -1071,6 +1103,25 @@ function matchModal(p, iFirst){
   o.querySelector("#mtPh").onclick = () => { const it = profilePhotoItem(p); if (it) openLightbox([it, ...(p.gallery||[])]); else if ((p.gallery||[]).length) openLightbox(p.gallery); };
 }
 
+/* ---- Contador circular del plazo (como un temporizador) ---- */
+function ringInfo(c){
+  if (c.closed || incoming(c)) return null;
+  const d = daysLeft(c.deadline), hours = Math.max(0, (c.deadline - now) / 36e5);
+  const mine = c.turn === "me";
+  const total = c.letters.length ? REPLY_DAYS + (mine ? 2 : 5) : FIRST_DAYS;
+  const frac = Math.max(0, Math.min(1, hours / 24 / total));
+  const tone = !mine ? "them" : d <= 2 ? "warn" : "mine";
+  return {d, frac, tone, mine};
+}
+function ringHTML(c, size = 44){
+  const r = ringInfo(c); if (!r) return "";
+  const R = 18, C = 2 * Math.PI * R;
+  const label = r.mine ? L(`Te quedan ${r.d} ${r.d===1?"día":"días"}`,`${r.d} ${r.d===1?"day":"days"} left for you`) : L(`A ${c.p.alias} le quedan ${r.d} ${r.d===1?"día":"días"}`,`${c.p.alias} has ${r.d} ${r.d===1?"day":"days"} left`);
+  return `<span class="ring ${r.tone}" style="width:${size}px;height:${size}px" role="img" aria-label="${esc(label)}" title="${esc(label)}">
+    <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="${R}" class="rg-bg"/><circle cx="22" cy="22" r="${R}" class="rg-fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-r.frac)).toFixed(1)}" transform="rotate(-90 22 22)"/></svg>
+    <span class="rg-n"><b>${r.d}</b><small>${L("d","d")}</small></span></span>`;
+}
+
 function lastLine(c){
   if (c.closed==="me") return L("Cerrada · no respondiste a tiempo","Closed · you didn't reply in time");
   if (c.closed==="them") return L(`Cerrada · ${c.p.alias} no escribió a tiempo`,`Closed · ${c.p.alias} didn't write in time`);
@@ -1086,13 +1137,17 @@ function cartas(){
   if (openId){ return ventana(chats.find(c => c.p.id === openId)); }
   $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias abiertas.","Your open correspondences.")}</p>${suspBanner()}` + (chats.length
     ? `<div class="list">${chats.map(c=>{ const urgent = !c.closed && c.turn==="me" && !incoming(c) && daysLeft(c.deadline)<=2;
-        return `<button class="item ${c.closed?"closed":""}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s ${urgent?"urgent":""}">${esc(lastLine(c))}</div></div>${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
+        return `<button class="item ${c.closed?"closed":""}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s ${urgent?"urgent":""}">${esc(lastLine(c))}</div></div>${ringHTML(c)}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
     : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = +b.dataset.id; cartas(); });
   bindSim();
 }
 
 function deadlineBox(c){
+  const box = deadlineBoxInner(c), ring = ringHTML(c, 56);
+  return ring ? box.replace(/^<div class="dl ([^"]*)">/, (m, cls) => `<div class="dl ${cls} has-ring">${ring}<div class="dl-t">`).replace(/<\/div>$/, "</div></div>") : box;
+}
+function deadlineBoxInner(c){
   if (c.closed==="me") return `<div class="dl bad"><b>${L("Correspondencia cerrada","Correspondence closed")}</b>${L(`No enviaste tu carta a tiempo. Tu cuenta ha quedado suspendida ${SUSPEND_DAYS} días.`,`You didn't send your letter in time. Your account has been suspended for ${SUSPEND_DAYS} days.`)}</div>`;
   if (c.closed==="them") return `<div class="dl bad"><b>${L("Correspondencia cerrada","Correspondence closed")}</b>${L(`${esc(c.p.alias)} no escribió en su plazo. Su cuenta queda suspendida. Tú no pierdes nada.`,`${esc(c.p.alias)} didn't write within their deadline. Their account is suspended. You lose nothing.`)}</div>`;
   const d = daysLeft(c.deadline), inc = incoming(c);
@@ -1376,28 +1431,38 @@ function perfil(){
   $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[]}); location.hash=""; route(); };
 }
 
-/* ---- Animación: cómo viajan las cartas ---- */
+/* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
 const FLOW = () => [
-  {from:0,to:0,match:true,txt:L("Primero, haces match con alguien que comparte tus intereses y tus idiomas. Si los dos os elegís, se abre la correspondencia.","First, you match with someone who shares your interests and languages. If you both choose each other, the correspondence opens.")},
-  {from:0,to:1,txt:L("Escribes tu carta y la envías a nuestra oficina, con el código de la otra persona.","You write your letter and send it to our office, with the other person's code.")},
-  {from:1,to:2,txt:L("En la oficina la metemos en un sobre nuevo y la enviamos a su dirección.","At our office we put it in a new envelope and send it to their address.")},
-  {from:2,to:1,txt:L("Su respuesta hace el mismo camino: primero llega a nuestra oficina…","Their reply takes the same route: first it reaches our office…")},
-  {from:1,to:0,txt:L("…y de ahí, a tu buzón. Ninguno conoce la dirección del otro.","…and from there, your mailbox. Neither knows the other's address.")},
-  {from:0,to:2,direct:true,txt:L("Cuando los dos decidáis compartir direcciones, ya podéis escribiros directamente.","Once you both decide to share addresses, you can write to each other directly.")}
+  {k:"match", t:3400, txt:L("Dos personas que comparten intereses se eligen. Es un match.","Two people who share interests choose each other. It's a match.")},
+  {k:"write", t:2200, txt:L("Quien completa el match escribe la primera carta, a mano y sin prisa.","Whoever completes the match writes the first letter, by hand and with no rush.")},
+  {k:"go",    t:4600, txt:L("La carta pasa por nuestra oficina y sigue su camino. Nadie ve tu dirección.","The letter passes through our office and carries on. Nobody sees your address.")},
+  {k:"back",  t:4600, txt:L("La respuesta vuelve por el mismo camino. Y así, carta a carta.","The reply comes back the same way. And so on, letter by letter.")},
+  {k:"direct",t:3600, txt:L("Si un día los dos queréis, compartís direcciones y os escribís directamente.","If one day you both want to, you share addresses and write to each other directly.")}
 ];
+function figureSVG(id, x, cls, label){
+  return `<g id="${id}" class="fig ${cls}" transform="translate(${x} 96)">
+    <g class="fig-in"><ellipse cx="0" cy="30" rx="16" ry="3" class="fig-sh"/>
+      <path d="M-15 28 Q-16 2 0 2 Q16 2 15 28 Z" class="fig-body"/>
+      <circle cx="0" cy="-10" r="11" class="fig-head"/>
+      <circle cx="-3.5" cy="-11" r="1.3" class="fig-eye"/><circle cx="3.5" cy="-11" r="1.3" class="fig-eye"/>
+      <path d="M-3.5 -6 Q0 -3 3.5 -6" class="fig-smile"/></g>
+    <text y="50" class="fl-lbl">${label}</text></g>`;
+}
 function flowHTML(){
   const F = FLOW();
-  return `<div class="flow" aria-label="${L("Cómo viajan las cartas","How letters travel")}">
-  <svg viewBox="0 0 340 150" role="img" aria-hidden="true">
-    <path class="fl-line" d="M58 92 H152"/><path class="fl-line" d="M188 92 H282"/>
-    <path class="fl-arc" id="fl-arc" d="M40 70 Q170 -6 300 70"/>
-    <g id="fl-heart" class="fl-heart"><circle cx="170" cy="32" r="15"/><path d="M170 40 C162 34 158 30 158 26 a5.5 5.5 0 0 1 12 -2 a5.5 5.5 0 0 1 12 2 c0 4 -4 8 -12 14z"/></g>
-    <g class="fl-node" transform="translate(40 92)"><circle r="22" class="fl-me"/><text y="5" class="fl-init">${L("Tú","You")}</text></g>
-    <g class="fl-node" id="fl-office" transform="translate(170 92)"><rect x="-22" y="-22" width="44" height="44" rx="10" class="fl-off"/>
-      <path d="M-11 9 V-3 L0 -11 L11 -3 V9 Z M-4 9 V1 H4 V9" class="fl-house"/></g>
-    <g class="fl-node" transform="translate(300 92)"><circle r="22" class="fl-them"/><text y="5" class="fl-init">L</text></g>
-    <text x="40" y="134" class="fl-lbl">${L("Tú","You")}</text><text x="170" y="134" class="fl-lbl">${L("Oficina Remitee","Remitee office")}</text><text x="300" y="134" class="fl-lbl">Lince</text>
-    <g id="fl-env"><rect x="-13" y="-9" width="26" height="18" rx="3" class="fl-envr"/><path d="M-12 -8 L0 1 L12 -8" class="fl-envf"/></g>
+  return `<div class="flow" aria-label="${L("Cómo funciona Remitee","How Remitee works")}">
+  <svg viewBox="0 0 340 160" role="img" aria-hidden="true">
+    <path id="fl-route" class="fl-route" d="M86 112 C 120 150, 150 148, 170 132 C 190 116, 222 150, 254 112"/>
+    <path id="fl-direct" class="fl-direct" d="M86 86 Q170 18 254 86"/>
+    <g id="fl-office" class="fl-office" transform="translate(170 132)"><rect x="-17" y="-17" width="34" height="34" rx="9"/><path d="M-8 7 V-2 L0 -8 L8 -2 V7 Z M-3 7 V1 H3 V7"/></g>
+    <text x="170" y="160" class="fl-lbl" id="fl-offlbl">${L("Oficina Remitee","Remitee office")}</text>
+    ${figureSVG("fl-a", 64, "a", L("Tú","You"))}
+    ${figureSVG("fl-b", 276, "b", "Lince")}
+    <g id="fl-match" class="fl-match"><path id="fl-mline" class="fl-mline" d="M88 78 Q170 40 252 78"/>
+      <g id="fl-heart" transform="translate(170 50)"><circle r="14" class="fl-hbg"/><path d="M0 7 C-7 2 -10 -1 -10 -4.5 a4.8 4.8 0 0 1 10 -1.8 a4.8 4.8 0 0 1 10 1.8 c0 3.5 -3 6.5 -10 11.5z" class="fl-hrt"/></g>
+      <g class="fl-chip" transform="translate(120 30)"><rect x="-20" y="-9" width="40" height="18" rx="9"/><text y="3.5">${L("cine","film")}</text></g>
+      <g class="fl-chip c2" transform="translate(220 30)"><rect x="-22" y="-9" width="44" height="18" rx="9"/><text y="3.5">${L("viajes","travel")}</text></g></g>
+    <g id="fl-env" class="fl-env"><rect x="-12" y="-8.5" width="24" height="17" rx="3"/><path d="M-11 -7.5 L0 1 L11 -7.5"/></g>
   </svg>
   <p class="fl-txt" id="fl-txt" aria-live="polite"></p>
   <div class="fl-dots">${F.map((_,i)=>`<span data-i="${i}"></span>`).join("")}</div></div>`;
@@ -1406,24 +1471,53 @@ let flowRaf = 0;
 function startFlow(root){
   cancelAnimationFrame(flowRaf);
   if (!root) return;
-  const F = FLOW(), X = [40,170,300], env = root.querySelector("#fl-env"), txt = root.querySelector("#fl-txt");
-  if (!env) return;
-  const dots = [...root.querySelectorAll(".fl-dots span")], office = root.querySelector("#fl-office"), arc = root.querySelector("#fl-arc");
+  const F = FLOW(), q = sel => root.querySelector(sel);
+  const env = q("#fl-env"), txt = q("#fl-txt"); if (!env) return;
+  const route = q("#fl-route"), direct = q("#fl-direct"), office = q("#fl-office"), offlbl = q("#fl-offlbl"), match = q("#fl-match");
+  const A = q("#fl-a .fig-in"), B = q("#fl-b .fig-in"), heart = q("#fl-heart"), mline = q("#fl-mline");
+  const dots = [...root.querySelectorAll(".fl-dots span")];
   const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const MOVE = 1800, HOLD = 1300, PH = MOVE + HOLD; let t0 = performance.now(), last = -1;
-  const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
-  function frame(t){
+  const RL = route.getTotalLength(), DL = direct.getTotalLength(), ML = mline.getTotalLength();
+  route.style.strokeDasharray = direct.style.strokeDasharray = "3 6";
+  mline.style.strokeDasharray = ML; 
+  const total = F.reduce((a,f) => a + f.t, 0);
+  const ease = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+  const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v));
+  let t0 = performance.now(), last = -1;
+  const setTxt = s => { txt.classList.add("fade"); setTimeout(() => { txt.textContent = s; txt.classList.remove("fade"); }, 260); };
+  function frame(now){
     if (!root.isConnected || !env.isConnected) return;
-    const el = Math.max(0, t - t0), i = Math.floor(el / PH) % F.length, f = F[i];
-    const k = reduce ? 1 : ease(Math.min(1, (el % PH) / MOVE));
-    const x = X[f.from] + (X[f.to]-X[f.from])*k, y = f.direct ? 70 - Math.sin(Math.PI*k)*42 : 70;
-    env.style.opacity = f.match ? 0 : 1;
-    env.setAttribute("transform", `translate(${x} ${y})`);
-    if (i !== last){ last = i; txt.textContent = f.txt; dots.forEach((d,j)=>d.classList.toggle("on", j===i));
-      office.classList.toggle("dim", !!(f.direct || f.match)); arc.classList.toggle("show", !!(f.direct || f.match));
-      const ht = root.querySelector("#fl-heart"); if (ht) ht.classList.toggle("show", !!f.match); }
+    let el = reduce ? 0 : (now - t0) % total, i = 0;
+    while (el > F[i].t){ el -= F[i].t; i++; }
+    const f = F[i], k = el / f.t;
+    if (i !== last){ last = i; setTxt(f.txt); dots.forEach((d,j) => d.classList.toggle("on", j===i)); }
+    // Monigotes: en el match se acercan y se inclinan el uno hacia el otro
+    const lean = f.k === "match" ? Math.sin(Math.PI * clamp(k*1.25)) : 0;
+    A.setAttribute("transform", `translate(${(lean*10).toFixed(2)} ${(-Math.abs(Math.sin(now/380))*1.5*(f.k==="match"?1:.4)).toFixed(2)}) rotate(${(lean*8).toFixed(2)})`);
+    B.setAttribute("transform", `translate(${(-lean*10).toFixed(2)} ${(-Math.abs(Math.sin(now/420+1))*1.5*(f.k==="match"?1:.4)).toFixed(2)}) rotate(${(-lean*8).toFixed(2)})`);
+    match.style.opacity = f.k === "match" ? clamp(k*4) * (1 - clamp((k-.85)*7)) : 0;
+    mline.style.strokeDashoffset = ML * (1 - ease(clamp(k*1.6)));
+    const hk = clamp((k-.35)*3); heart.setAttribute("transform", `translate(170 50) scale(${(hk ? .6 + .4*ease(hk) + Math.sin(now/220)*.04*hk : 0).toFixed(3)})`);
+    // Rutas
+    const showRoute = f.k === "go" || f.k === "back" || f.k === "write";
+    route.style.opacity = showRoute ? 1 : f.k === "direct" ? .15 : 0;
+    office.style.opacity = offlbl.style.opacity = f.k === "direct" ? .25 : f.k === "match" ? .35 : 1;
+    direct.style.opacity = f.k === "direct" ? 1 : 0;
+    route.style.strokeDashoffset = -(now/40 % 9);
+    // El sobre
+    let pt = null, sc = 1, op = 1;
+    if (f.k === "write"){ const pp = route.getPointAtLength(0); pt = {x:pp.x, y:pp.y - 10*(1-ease(clamp(k*1.4)))}; op = clamp(k*2); sc = .6 + .4*ease(clamp(k*1.4)); }
+    else if (f.k === "go"){ pt = route.getPointAtLength(RL * ease(k)); }
+    else if (f.k === "back"){ pt = route.getPointAtLength(RL * (1 - ease(k))); }
+    else if (f.k === "direct"){ pt = direct.getPointAtLength(DL * ease(clamp(k*1.15))); }
+    else op = 0;
+    // Pausa breve en la oficina
+    if ((f.k === "go" || f.k === "back") && Math.abs(k - .5) < .06) sc = 1.12;
+    if (pt){ env.setAttribute("transform", `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)}) scale(${sc.toFixed(3)})`); }
+    env.style.opacity = op;
     flowRaf = requestAnimationFrame(frame);
   }
+  txt.textContent = F[0].txt;
   flowRaf = requestAnimationFrame(frame);
 }
 function showFlow(){
