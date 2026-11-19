@@ -512,6 +512,19 @@ body.wide .app{max-width:1040px}
 .fl-heart circle{fill:var(--surface);stroke:var(--accent);stroke-width:1.5}
 .fl-heart path{fill:var(--accent)}
 #fl-env{transition:opacity .3s}
+.card.swipe{gap:14px;padding:22px 20px 20px}
+.sw-top{display:grid;justify-items:center;gap:12px}
+.sw-top .ph.big{width:140px;height:140px}
+.sw-id{display:grid;justify-items:center;gap:2px}
+.sw-id .name{font-size:1.7rem}
+.more{border-top:1px solid var(--line);padding-top:10px;text-align:center}
+.more summary{cursor:pointer;list-style:none;font-weight:600;font-size:.88rem;color:var(--accent);padding:4px}
+.more summary::-webkit-details-marker{display:none}
+.more summary::after{content:" ▾";font-size:.8em}
+.more[open] summary::after{content:" ▴"}
+.more-in{display:grid;gap:14px;padding-top:10px;animation:moreIn .35s ease}
+@keyframes moreIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.more-in{animation:none}}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -991,17 +1004,27 @@ function descubrir(){
   const shared = common(p);
   $("#view").innerHTML = head + `
     <div class="views">${backBtn()}<span>${plus?L("Remitee Plus · perfiles ilimitados","Remitee Plus · unlimited profiles"):L(`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`,`Profile ${viewsUsed+1} of ${VIEW_LIMIT} today`)}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
-    <article class="card">
-      <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?L("La foto se muestra si hay match","The photo is shown if you match"):L("Ha elegido no mostrar foto","Has chosen not to show a photo")}</div></div>
-      <div><p class="name">${esc(p.alias)}</p>${p.real ? "" : `<span class="exbadge">${L("Perfil de ejemplo","Example profile")}</span>`}<div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(p.zona)}</div></div>
+    <article class="card swipe">
+      <div class="sw-top">
+        ${photo(p,"big",false)}
+        <div class="sw-id"><p class="name">${esc(p.alias)}</p>
+          <div class="where">${esc(p.edad)} ${L("años","years old")} · ${esc(p.zona)}</div>
+          ${p.real ? "" : `<span class="exbadge">${L("Perfil de ejemplo","Example profile")}</span>`}</div>
+      </div>
+      <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
+      <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
+      <details class="more" id="more"><summary>${L("Ver perfil completo","See full profile")}</summary>
+        <div class="more-in">
+          <div class="where">${esc(p.prof)}</div>
+          <p class="bio">${esc(p.bio)}</p>
+      ${langsHTML(p)}
       ${statsHTML(p.corr||0, p.places||[], p.rAvg, p.rN)}
       <div class="rate-row">${ratingHTML(p.rAvg, p.rN)}</div>
-      ${langsHTML(p)}
       <div class="trust">${trust(p)}</div>
-      <p class="bio">${esc(p.bio)}</p>
-      <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
       <div class="maplock">${LOCK}<span>${(p.gallery||[]).length ? L(`Su mapa de cartas y ${p.gallery.length} fotos de sus intereses se muestran cuando hay match`,`Their letter map and ${p.gallery.length} photos of their interests are shown once you match`) : L("Su mapa de cartas se muestra cuando hay match","Their letter map is shown once you match")}</span></div>
-      <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
+          <div class="phnote">${p.showFoto?L("La foto se muestra si hay match","The photo is shown if you match"):L("Ha elegido no mostrar foto","Has chosen not to show a photo")}</div>
+        </div>
+      </details>
       <div class="actions"><button class="plain" id="no">${L("Pasar","Pass")}</button><button id="yes" ${suspended()?"disabled":""}>${L("Quiero escribirle","I want to write")}</button></div>
     </article>
     <p class="hint">${L("Si los dos os elegís, hay match. Escribe primero quien completa el match.","If you both choose each other, it's a match. Whoever completes the match writes first.")}</p>${sim()}`;
