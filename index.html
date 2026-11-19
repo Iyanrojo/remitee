@@ -35,9 +35,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .logo{font-family:var(--head);font-weight:700;font-size:1.45rem;letter-spacing:-.02em;margin:0}
 .logo span{color:var(--accent)}
 
-.logo .ebar{position:relative;display:inline-block;font-weight:inherit;padding-right:.62em}
-.logo .ebar .bar{position:absolute;left:var(--bar-x,.38em);bottom:var(--bar-y,.41em);width:.5em;height:var(--bar-h,.1em);background:currentColor}
-.logo .ebar .dot{position:absolute;left:.86em;bottom:calc(var(--bar-y,.41em) + var(--bar-h,.1em)/2 - .1em);width:.2em;height:.2em;border-radius:50%;background:var(--accent)}
 .logo .slogan{display:block;font-family:var(--body);font-size:.68rem;font-weight:500;letter-spacing:.02em;color:var(--muted);margin-top:-2px}
 .theme-btn{width:38px;height:38px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center}
 .theme-btn svg{width:18px;height:18px}
@@ -460,7 +457,7 @@ body.wide .app{max-width:1040px}
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo" aria-label="remitee">remite<b class="ebar" aria-hidden="true">e<i class="bar"></i><i class="dot"></i></b><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo">remitee<span>.</span><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
