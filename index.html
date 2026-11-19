@@ -506,6 +506,7 @@ body.wide .app{max-width:1040px}
 .hero-title .rot{display:inline-block;transition:opacity .7s ease}
 .hero-title .rot.out{opacity:0}
 @media (prefers-reduced-motion:reduce){.hero-title .rot{transition:none}}
+.exbadge{display:inline-block;font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:2px 0 4px}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -540,7 +541,7 @@ async function cloudSave(){
   pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
   // Cada documento se guarda por separado: si uno falla, los demás (y la foto) se guardan igualmente
   const jobs = [
-    ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true})],
+    ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, liked:me.liked||[], nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true})],
     ["profiles", () => FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true})],
     ["gallery", () => FB.db.collection("gallery").doc(me.uid).set({items:(me.gallery||[]).map(g => ({src:g.src, cap:g.cap||""}))})]
   ];
@@ -801,7 +802,7 @@ function openLightbox(items, start = 0){
   o.addEventListener("touchend", e => { if (x0 == null || items.length < 2) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40){ i = (i + (dx < 0 ? 1 : -1) + items.length) % items.length; render(); } x0 = null; });
   document.addEventListener("keydown", key); document.body.appendChild(o); render();
 }
-const profilePhotoItem = p => p.showFoto ? {bg: shots[(p.id-1)%shots.length], cap: p.alias, ex:true} : null;
+const profilePhotoItem = p => (p.showFoto && !p.real) ? {bg: shots[hashId(p.id)%shots.length], cap: p.alias, ex:true} : null;
 function galleryHTML(list, opts={}){
   if (!list || !list.length) return opts.empty ? `<div class="gal-empty">${opts.empty}</div>` : "";
   return `<div class="gal">${list.map((g,i)=>`<button type="button" class="gal-it" data-gi="${i}" aria-label="${L("Ampliar foto","Enlarge photo")}: ${esc(g.cap||"")}">
@@ -810,7 +811,8 @@ function galleryHTML(list, opts={}){
 function bindGallery(root, list){ (root||document).querySelectorAll(".gal-it").forEach(b => b.onclick = () => openLightbox(list, +b.dataset.gi)); }
 
 function photo(p, size, matched){
-  if (!p.showFoto) return `<div class="ph ${size}" style="background:${tint(p)}"><span class="init">${esc(p.alias[0])}</span></div>`;
+  if (p.real && p.showFoto && !matched) return `<div class="ph ${size} locked" style="background:${tint(p)}" role="img" aria-label="${L("Foto oculta hasta el match","Photo hidden until you match")}">${LOCK}</div>`;
+  if (!p.showFoto || p.real) return `<div class="ph ${size}" style="background:${tint(p)}"><span class="init">${esc(p.alias[0])}</span></div>`;
   return `<div class="ph ${size} ${matched?"":"locked"}" style="background:${shots[(p.id-1)%shots.length]}" role="img" aria-label="${matched?L(`Foto de ${esc(p.alias)} (ejemplo)`,`Photo of ${esc(p.alias)} (example)`):L("Foto oculta hasta el match","Photo hidden until you match")}">${matched?"":LOCK}</div>`;
 }
 function myPhoto(size){
@@ -822,7 +824,8 @@ const chats = [];
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const tint = p => tints[(p.id-1) % tints.length];
+const hashId = id => typeof id === "number" ? id - 1 : [...String(id)].reduce((a,c) => (a*31 + c.charCodeAt(0)) >>> 0, 7);
+const tint = p => tints[hashId(p.id) % tints.length];
 const fmt = d => d.toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"short"});
 function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200)}
 const notifs = [];
@@ -926,7 +929,52 @@ function bindBack(){
     const i = people.indexOf(q); people.splice(i,1); people.unshift(q);
     if (!plus) viewsUsed = Math.max(0, viewsUsed-1); descubrir(); };
 }
+/* ---- Perfiles reales: se cargan de Firestore y van siempre antes que los de ejemplo ---- */
+let realLoaded = false, realLoading = false;
+function toPerson(uid, d){
+  const tags = String(d.intereses||"").split(",").map(x => x.trim()).filter(Boolean).slice(0,3);
+  return {id:"r_"+uid, uid, real:true, alias:d.alias||"—", edad:d.edad||"", zona:d.zona||"", prof:d.prof||"", bio:d.bio||"", long:d.long||"", tags,
+    langs:(d.langs && d.langs.length) ? d.langs : ["es"], g:d.g||"n", showFoto:d.showFoto !== false, code:d.code||"", corr:d.corr||0, rAvg:d.rAvg||0, rN:d.rN||0,
+    places:[], gallery:[], home:homeOf(d.zona), at:(d.updatedAt && d.updatedAt.toMillis) ? d.updatedAt.toMillis() : 0};
+}
+async function loadRealProfiles(){
+  if (!FB || !me.uid || realLoading) return; realLoading = true;
+  try {
+    const snap = await FB.db.collection("profiles").orderBy("updatedAt","desc").limit(100).get();
+    const reals = [];
+    snap.forEach(doc => { const d = doc.data(); if (doc.id === me.uid || !d.alias || !d.bio) return; if (people.some(x => x.uid === doc.id)) return; reals.push(toPerson(doc.id, d)); });
+    // Los más recientes primero y, todos, por delante de los perfiles de ejemplo
+    reals.sort((a,b) => b.at - a.at);
+    people.unshift(...reals);
+    realLoaded = true;
+    await checkMutualLikes();
+    if (reals.length && location.hash.replace("#","") in {"":1,"descubrir":1} && me.created && !document.querySelector(".card")) descubrir();
+  } catch(e){ console.warn("Perfiles reales:", e); }
+  realLoading = false;
+}
+async function likeReal(p){
+  p.myYes = now; me.liked = [...new Set([...(me.liked||[]), p.uid])]; saveLocal();
+  if (!FB || !me.uid){ toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`)); return; }
+  try {
+    await FB.db.collection("likes").doc(me.uid + "_" + p.uid).set({from:me.uid, to:p.uid, at:firebase.firestore.FieldValue.serverTimestamp()});
+    const back = await FB.db.collection("likes").doc(p.uid + "_" + me.uid).get();
+    if (back.exists) realMatch(p, true); else toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`));
+  } catch(e){ console.warn(e); toast(L("No se ha podido guardar tu elección. Revisa que las reglas de Firestore estén publicadas.","Couldn't save your choice. Check the Firestore rules are published.")); }
+}
+function realMatch(p, iFirst){
+  if (p.matched) return; p.matched = true;
+  chats.unshift({p, letters:[], unread:true, turn:iFirst?"me":"them", deadline:addD(now, FIRST_DAYS), closed:null}); badge();
+  notify(`Match con ${p.alias}.`, `Match with ${p.alias}.`); matchModal(p, iFirst);
+}
+async function checkMutualLikes(){
+  for (const uid of (me.liked||[])){
+    const p = people.find(x => x.uid === uid); if (!p || p.matched) continue;
+    try { const back = await FB.db.collection("likes").doc(uid + "_" + me.uid).get(); if (back.exists) realMatch(p, false); } catch(e){}
+  }
+}
+
 function descubrir(){
+  if (FB && me.uid && !realLoaded) loadRealProfiles();
   const left = pending();
   const head = `<h2 class="disc-h">${L("Descubrir","Discover")}</h2>${suspBanner()}`;
   if (!plus && viewsLeft()<=0){
@@ -940,7 +988,7 @@ function descubrir(){
     <div class="views">${backBtn()}<span>${plus?L("Remitee Plus · perfiles ilimitados","Remitee Plus · unlimited profiles"):L(`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`,`Profile ${viewsUsed+1} of ${VIEW_LIMIT} today`)}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
     <article class="card">
       <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?L("La foto se muestra si hay match","The photo is shown if you match"):L("Ha elegido no mostrar foto","Has chosen not to show a photo")}</div></div>
-      <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(p.zona)}</div></div>
+      <div><p class="name">${esc(p.alias)}</p>${p.real ? "" : `<span class="exbadge">${L("Perfil de ejemplo","Example profile")}</span>`}<div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(p.zona)}</div></div>
       ${statsHTML(p.corr||0, p.places||[], p.rAvg, p.rN)}
       <div class="rate-row">${ratingHTML(p.rAvg, p.rN)}</div>
       ${langsHTML(p)}
@@ -957,6 +1005,7 @@ function descubrir(){
   $("#no").onclick = () => { used(); passedStack.push(p); descubrir(); };
   $("#yes").onclick = () => {
     used();
+    if (p.real){ likeReal(p); descubrir(); return; }
     if (p.likesMe){ p.matched = true; chats.unshift({p, letters:[], unread:true, turn:"me", deadline:addD(now, FIRST_DAYS), closed:null}); badge(); matchModal(p, true); }
     else { p.myYes = now; if (p.likesLater != null) p.matchAt = addD(now, p.likesLater); toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`)); }
     descubrir();
@@ -1069,7 +1118,7 @@ function ventana(c){
       toast(L(`Has valorado la carta de ${c.p.alias} con ${v} ${v===1?"sobre":"sobres"}`,`You rated ${c.p.alias}'s letter ${v} ${v===1?"envelope":"envelopes"}`)); ventana(c); };
   });
   const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
-    if (c.meReveal && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (openId===c.p.id) ventana(c); } }, 1800);
+    if (c.meReveal && !c.p.real && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (openId===c.p.id) ventana(c); } }, 1800);
     if (!c.meReveal) c.themReveal = false; ventana(c); };
   bindSim();
   const btn = $("#sent"); if (btn && canSend) btn.onclick = () => sendModal(c);
@@ -1100,7 +1149,7 @@ function sendModal(c){
     o.querySelector("#s-ok").onclick = () => {
       const l = newLetter(true, now); l.photo = pic; c.letters.push(l); c.turn = "them";
       c.deadline = addD(l.due.delivered, REPLY_DAYS);
-      const ra = c.p.id in replyAfter ? replyAfter[c.p.id] : 5; c.replyAt = ra==null ? null : addD(l.due.delivered, ra);
+      const ra = c.p.real ? null : (c.p.id in replyAfter ? replyAfter[c.p.id] : 5); c.replyAt = ra==null ? null : addD(l.due.delivered, ra);
       l.ls = 0; o.remove(); notify(`Has enviado tu carta para ${c.p.alias}. Te avisaremos cuando llegue a nuestra oficina.`,`You've sent your letter to ${c.p.alias}. We'll let you know when it reaches our office.`); ventana(c);
     };
   };
@@ -1263,11 +1312,12 @@ function perfil(){
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
   <div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">${L("Tu código","Your code")}: <b>${esc(me.code)}</b></div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
       return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces)}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
     ${profileFields()}
     ${myGalleryHTML()}
+    <div class="field"><label>${L("Tu código de buzón","Your mailbox code")}</label><span class="code-inline" style="justify-self:start;font-size:1rem">${esc(me.code)}</span><small>${L("Es lo que la gente escribe en el sobre para ti. No hace falta que lo compartas: lo ven tus matches.","It's what people write on the envelope for you. You don't need to share it: your matches can see it.")}</small></div>
     <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
     <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
     <label class="switch" for="f-na"><span><b>${L("En la app","In the app")}</b><small>${L("Notificaciones en el móvil","Notifications on your phone")}</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>

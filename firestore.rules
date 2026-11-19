@@ -15,6 +15,12 @@ service cloud.firestore {
     match /gallery/{uid} {
       allow read, write: if verified() && request.auth.uid == uid;
     }
+    // "Quiero escribirle": cada like es un documento con id "<de>_<para>"
+    match /likes/{id} {
+      allow create: if verified() && request.resource.data.from == request.auth.uid
+        && id == request.auth.uid + "_" + request.resource.data.to;
+      allow get: if verified() && (id.matches(request.auth.uid + "_.*") || id.matches(".*_" + request.auth.uid));
+    }
     // Emails salientes (extensión Trigger Email): cada persona solo puede dejar uno de bienvenida, para su propio email
     match /mail/{id} {
       allow create: if verified() && id == "welcome_" + request.auth.uid
