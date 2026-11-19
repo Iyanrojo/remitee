@@ -32,6 +32,9 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 - **Nunca contesta.** Quien ha perdido 2 o más matches por no responder lo muestra en su perfil.
 - **Avisos.** Cada cambio de fase de una carta se notifica por email y en la app a las dos personas (por ejemplo: «Tu carta está en nuestra oficina. Se la enviaremos a Lince»). Los canales se eligen en el perfil.
 
+- **Valoraciones.** Quien recibe una carta la valora de 0 a 5 cartas. Cada perfil muestra la media y el número de valoraciones.
+- **Idiomas.** Español e inglés, con un botón ES/EN en la cabecera. Por defecto se usa el idioma del navegador.
+
 ## Qué se puede probar
 
 | Vista | Qué enseña |

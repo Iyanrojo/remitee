@@ -36,8 +36,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .logo span{color:var(--accent)}
 
 .logo .ebar{position:relative;display:inline-block;font-weight:inherit;padding-right:.62em}
-.logo .ebar .bar{position:absolute;left:.42em;bottom:var(--bar-y,.63em);width:.5em;height:var(--bar-h,.1em);background:currentColor}
-.logo .ebar .dot{position:absolute;left:.86em;bottom:calc(var(--bar-y,.63em) + var(--bar-h,.1em)/2 - .1em);width:.2em;height:.2em;border-radius:50%;background:var(--accent)}
+.logo .ebar .bar{position:absolute;left:var(--bar-x,.38em);bottom:var(--bar-y,.41em);width:.5em;height:var(--bar-h,.1em);background:currentColor}
+.logo .ebar .dot{position:absolute;left:.86em;bottom:calc(var(--bar-y,.41em) + var(--bar-h,.1em)/2 - .1em);width:.2em;height:.2em;border-radius:50%;background:var(--accent)}
 .logo .slogan{display:block;font-family:var(--body);font-size:.68rem;font-weight:500;letter-spacing:.02em;color:var(--muted);margin-top:-2px}
 .theme-btn{width:38px;height:38px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center}
 .theme-btn svg{width:18px;height:18px}
@@ -379,6 +379,32 @@ body.wide .app{max-width:1040px}
 .sc.on .pp-drop{animation-duration:1.8s}.sc.on .pp-drop2{animation-duration:1.8s;animation-delay:.8s}
 .sc.on .pp-in{animation-duration:1.8s}.sc.on .pp-in2{animation-duration:1.8s;animation-delay:.8s}
 .sc.on .pp-rise{animation-duration:2s}.sc.on .pp-go{animation-duration:3.6s}
+.rate-row{display:flex;justify-content:center}
+.rate-row.sm{justify-content:flex-start;margin-top:4px}
+.rating{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted)}
+.r-icons{position:relative;display:inline-block;line-height:0}
+.r-base,.r-fill{display:flex;gap:3px}
+.r-fill{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap}
+.rating svg{width:20px;height:15px;flex:none}
+.rating.sm svg{width:16px;height:12px}
+.r-base svg rect{fill:none;stroke:var(--line);stroke-width:1.8}
+.r-base svg .fl{fill:none;stroke:var(--line);stroke-width:1.8;stroke-linejoin:round}
+.r-fill svg rect{fill:var(--accent);stroke:var(--accent);stroke-width:1.8}
+.r-fill svg .fl{fill:none;stroke:var(--surface);stroke-width:1.6;stroke-linejoin:round}
+.r-txt{font-weight:500;color:var(--ink)}
+.ratebox{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:.85rem;font-weight:600;border-top:1px dashed var(--line);padding-top:10px}
+.ratebox.done{font-weight:500;color:var(--muted)}
+.rate-pick{display:flex;gap:4px}
+.rp{background:none;padding:4px;border-radius:8px;line-height:0}
+.rp svg{width:24px;height:18px}
+.rp svg rect{fill:none;stroke:var(--muted);stroke-width:1.8;transition:fill .15s,stroke .15s}
+.rp svg .fl{fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linejoin:round}
+.rp.hov svg rect,.rp:focus-visible svg rect{fill:var(--accent);stroke:var(--accent)}
+.rp.hov svg .fl{stroke:var(--surface)}
+.rate-pick:hover .rp:hover ~ .rp svg rect{fill:none;stroke:var(--muted)}
+.langbtn{font-weight:700;font-size:.78rem;letter-spacing:.04em}
+.helpbtn .hq{display:none}
+@media (max-width:440px){.helpbtn{width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center}.helpbtn .hl{display:none}.helpbtn .hq{display:inline;font-weight:700}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -386,14 +412,14 @@ body.wide .app{max-width:1040px}
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo" aria-label="remitee">remite<b class="ebar" aria-hidden="true">e<i class="bar"></i><i class="dot"></i></b><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo" aria-label="remitee">remite<b class="ebar" aria-hidden="true">e<i class="bar"></i><i class="dot"></i></b><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
 <nav class="tabs"><div class="in">
-  <a href="#descubrir" data-v="descubrir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Descubrir</a>
-  <a href="#cartas" data-v="cartas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>Cartas<span class="badge" id="badge" hidden></span></a>
-  <a href="#perfil" data-v="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.3-3.6 4.2-5.3 7.5-5.3s6.2 1.7 7.5 5.3"/></svg>Perfil</a>
+  <a href="#descubrir" data-v="descubrir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg><span class="tl">Descubrir</span></a>
+  <a href="#cartas" data-v="cartas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg><span class="tl">Cartas</span><span class="badge" id="badge" hidden></span></a>
+  <a href="#perfil" data-v="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.3-3.6 4.2-5.3 7.5-5.3s6.2 1.7 7.5 5.3"/></svg><span class="tl">Perfil</span></a>
 </div></nav>
 <div class="toast" id="toast" hidden></div>
 
@@ -463,46 +489,63 @@ const EXTRA = {1:{g:"f",corr:8,onTime:true},2:{g:"f",corr:0,likesLater:1},3:{g:"
   6:{g:"m",corr:5,onTime:true,likesLater:2},7:{g:"f",corr:0},8:{g:"m",corr:12,onTime:true},9:{g:"n",corr:2,ghosts:2},10:{g:"m",corr:0,likesLater:1},
   11:{g:"f",corr:9,onTime:true},12:{g:"f",corr:0},13:{g:"m",corr:30,onTime:true},14:{g:"f",corr:4},15:{g:"m",corr:7,onTime:true}};
 people.forEach(p => Object.assign(p, EXTRA[p.id]||{g:"n",corr:0}));
-const NEW_LABEL = {f:"Recién llegada", m:"Recién llegado", n:"Nueva en Remitee"};
+/* ---- Idioma: español / inglés ---- */
+let lang = (() => { try { const s = localStorage.getItem("remitee-lang"); if (s) return s; } catch(e){} return (navigator.language||"es").toLowerCase().startsWith("es") ? "es" : "en"; })();
+const L = (es, en) => lang === "en" ? en : es;
+const NEW_LABEL = () => ({f:L("Recién llegada","New here"), m:L("Recién llegado","New here"), n:L("Nueva en Remitee","New to Remitee")});
+const plural = (n, es1, esN, en1, enN) => n===1 ? L(es1,en1) : L(esN,enN);
+
+/* ---- Valoraciones: de 0 a 5 cartas ---- */
+// r: [media, número de valoraciones] de los perfiles de ejemplo
+const RATINGS = {1:[4.8,7],3:[3.1,3],4:[4.6,12],5:[4.9,18],6:[4.2,4],8:[4.7,10],9:[2.4,2],11:[4.5,8],13:[4.9,26],14:[3.8,3],15:[4.4,6]};
+people.forEach(p => { const r = RATINGS[p.id]; p.rAvg = r ? r[0] : 0; p.rN = r ? r[1] : 0; });
+const ENV_SVG = `<svg viewBox="0 0 24 18" aria-hidden="true"><rect x="1" y="1" width="22" height="16" rx="3"/><path d="M2.5 3 L12 10 L21.5 3" class="fl"/></svg>`;
+const fmtNum = n => n.toLocaleString(lang==="en"?"en-GB":"es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
+function ratingHTML(avg, n, opts={}){
+  const row = Array.from({length:5}, () => ENV_SVG).join("");
+  const label = n ? `${fmtNum(avg)} · ${n} ${plural(n,"valoración","valoraciones","rating","ratings")}` : L("Sin valoraciones aún","No ratings yet");
+  return `<span class="rating ${opts.sm?"sm":""}" role="img" aria-label="${n?L(`${fmtNum(avg)} de 5 cartas`,`${fmtNum(avg)} out of 5 letters`):label}">
+    <span class="r-icons"><span class="r-base">${row}</span><span class="r-fill" style="width:${n?avg/5*100:0}%">${row}</span></span><span class="r-txt">${label}</span></span>`;
+}
+const myRating = () => { const r = me.ratings || []; return [r.length ? r.reduce((a,b)=>a+b,0)/r.length : 0, r.length]; };
+
 function trust(p){
-  if ((p.ghosts||0) >= 2) return `<span class="tbad">Nunca contesta</span><span class="tcount">${p.ghosts} matches perdidos</span>`;
-  if (!p.corr) return `<span class="tnew">${NEW_LABEL[p.g]||NEW_LABEL.n}</span>`;
-  return `<span class="tcount">✉︎ ${p.corr} ${p.corr===1?"correspondencia":"correspondencias"}</span>${p.onTime?`<span class="tok">Responde a tiempo</span>`:""}`;
+  if ((p.ghosts||0) >= 2) return `<span class="tbad">${L("Nunca contesta","Never replies")}</span><span class="tcount">${p.ghosts} ${L("matches perdidos","lost matches")}</span>`;
+  if (!p.corr) return `<span class="tnew">${NEW_LABEL()[p.g]||NEW_LABEL().n}</span>`;
+  return `<span class="tcount">✉︎ ${p.corr} ${plural(p.corr,"correspondencia","correspondencias","correspondence","correspondences")}</span>${p.onTime?`<span class="tok">${L("Responde a tiempo","Replies on time")}</span>`:""}`;
 }
 const myTags = () => me.intereses.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
 const common = p => p.tags.filter(t => myTags().includes(t.toLowerCase()));
 const LOCK = `<span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>`;
-// Foto de una persona. matched=false → bloqueada (borrosa con candado).
 function photo(p, size, matched){
   if (!p.showFoto) return `<div class="ph ${size}" style="background:${tint(p)}"><span class="init">${esc(p.alias[0])}</span></div>`;
-  return `<div class="ph ${size} ${matched?"":"locked"}" style="background:${shots[(p.id-1)%shots.length]}" role="img" aria-label="${matched?`Foto de ${esc(p.alias)} (ejemplo)`:"Foto oculta hasta el match"}">${matched?"":LOCK}</div>`;
+  return `<div class="ph ${size} ${matched?"":"locked"}" style="background:${shots[(p.id-1)%shots.length]}" role="img" aria-label="${matched?L(`Foto de ${esc(p.alias)} (ejemplo)`,`Photo of ${esc(p.alias)} (example)`):L("Foto oculta hasta el match","Photo hidden until you match")}">${matched?"":LOCK}</div>`;
 }
 function myPhoto(size){
-  if (me.foto && me.showFoto) return `<div class="ph ${size}" style="background-image:url('${me.foto}')" role="img" aria-label="Tu foto"></div>`;
+  if (me.foto && me.showFoto) return `<div class="ph ${size}" style="background-image:url('${me.foto}')" role="img" aria-label="${L("Tu foto","Your photo")}"></div>`;
   return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:#fff">${esc((me.alias||"?")[0])}</span></div>`;
 }
 let idx = 0, openId = null;
-const chats = []; // {p, letters:[{mine, at, delivered}], unread}
+const chats = [];
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const tint = p => tints[(p.id-1) % tints.length];
-const av = (p, cls="") => `<div class="avatar ${cls}" style="background:${tint(p)};color:#2a2e45">${esc(p.alias[0])}</div>`;
-const meAv = `<div class="avatar" style="background:var(--accent);color:#fff">${esc((me.alias||"?")[0])}</div>`;
-const fmt = d => d.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+const fmt = d => d.toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"short"});
 function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200)}
 const notifs = [];
-function notify(text){
+// Los avisos guardan los dos idiomas para mostrarse en el idioma activo
+function notify(es, en){
   const ch = []; if (me.nEmail !== false) ch.push("Email"); if (me.nApp !== false) ch.push("App");
-  notifs.unshift({at:new Date(+now), text, ch, read:false}); toast(text); nBadge();
+  notifs.unshift({at:new Date(+now), es, en:en||es, ch, read:false}); toast(L(es, en||es)); nBadge();
 }
 function nBadge(){ const n = notifs.filter(x=>!x.read).length, b = $("#nBadge"); if (!b) return; b.textContent = n; b.hidden = !n; }
 function showNotifs(){
   const o = document.createElement("div"); o.className = "overlay";
-  o.innerHTML = `<div class="modal npanel"><h3 style="font-size:1.25rem">Avisos</h3>
-    <p class="note" style="margin:0">${me.nEmail!==false?`Te los enviamos también a <b>${esc(me.email||"tu email")}</b>.`:"Los avisos por email están desactivados."}</p>
-    <div class="nlist">${notifs.length?notifs.map(n=>`<div class="nitem ${n.read?"":"unread"}"><div class="ntext">${esc(n.text)}</div><div class="nmeta">${fmt(n.at)}${n.ch.map(c=>`<span class="nch">${c}</span>`).join("")}</div></div>`).join(""):`<div class="empty" style="padding:20px">Sin avisos todavía.</div>`}</div>
-    <button class="plain" id="n-ok">Cerrar</button></div>`;
+  o.innerHTML = `<div class="modal npanel"><h3 style="font-size:1.25rem">${L("Avisos","Notifications")}</h3>
+    <p class="note" style="margin:0">${me.nEmail!==false?L(`Te los enviamos también a <b>${esc(me.email||"tu email")}</b>.`,`We also send them to <b>${esc(me.email||"your email")}</b>.`):L("Los avisos por email están desactivados.","Email notifications are turned off.")}</p>
+    <div class="nlist">${notifs.length?notifs.map(n=>`<div class="nitem ${n.read?"":"unread"}"><div class="ntext">${esc(L(n.es,n.en))}</div><div class="nmeta">${fmt(n.at)}${n.ch.map(c=>`<span class="nch">${c}</span>`).join("")}</div></div>`).join(""):`<div class="empty" style="padding:20px">${L("Sin avisos todavía.","No notifications yet.")}</div>`}</div>
+    <button class="plain" id="n-ok">${L("Cerrar","Close")}</button></div>`;
   document.body.appendChild(o); notifs.forEach(n=>n.read=true); nBadge();
   o.querySelector("#n-ok").onclick = () => o.remove();
 }
@@ -514,16 +557,14 @@ const FIRST_DAYS = 7, REPLY_DAYS = 14, POST_DAYS = 3, SUSPEND_DAYS = 3;
 const DAY = 864e5; let now = new Date(); now.setHours(10,0,0,0);
 const addD = (d,n) => new Date(+d + n*DAY);
 const daysLeft = d => Math.max(0, Math.ceil((d - now)/DAY));
-// Cuántos días tarda cada perfil de ejemplo en responder tras recibir tu carta. null = nunca responde.
 const replyAfter = {1:4, 3:null, 4:6};
 const VIEW_LIMIT = 5; let viewsUsed = 0, viewDay = now.toDateString(), plus = false;
-const passedStack = []; // perfiles pasados hoy, para poder volver atrás
+const passedStack = [];
 function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; passedStack.length = 0; } return plus ? Infinity : VIEW_LIMIT - viewsUsed; }
 const suspended = () => me.suspendedUntil && now < me.suspendedUntil;
 
-/* ---- Cartas: fases de cada envío ----
-   Fases: 0 Enviada (foto del sobre) · 1 En la oficina · 2 Reenviada · 3 Entregada */
-const PHASES = ["Enviada","En la oficina","Reenviada","Entregada"];
+/* ---- Cartas: fases de cada envío ---- */
+const PHASES = () => [L("Enviada","Sent"), L("En la oficina","At our office"), L("Reenviada","Forwarded"), L("Entregada","Delivered")];
 function newLetter(mine, at){ return {mine, at, due:{office:addD(at,2), forwarded:addD(at,3), delivered:addD(at,5)}, confirmedAt:null, photo:null}; }
 function stage(l){
   let k = 0; if (now >= l.due.office) k = 1; if (now >= l.due.forwarded) k = 2;
@@ -534,12 +575,11 @@ const phaseDate = (l,k) => [l.at, l.due.office, l.due.forwarded, l.confirmedAt |
 const incoming = c => c.letters.find(l => !l.mine && stage(l) < 3);
 
 function tick(){
-  // Matches que completa la otra persona: le toca escribir primero
   people.forEach(p => {
     if (p.myYes && p.matchAt && !p.matched && now >= p.matchAt){
       p.matched = true;
       chats.unshift({p, letters:[], unread:true, turn:"them", firstByThem:true, deadline:addD(p.matchAt, FIRST_DAYS), replyAt:addD(p.matchAt, 2), closed:null});
-      notify(`Match con ${p.alias}. Completó el match, así que te escribirá primero.`);
+      notify(`Match con ${p.alias}. Completó el match, así que te escribirá primero.`, `Match with ${p.alias}. They completed the match, so they'll write first.`);
       matchModal(p, false);
     }
   });
@@ -548,37 +588,45 @@ function tick(){
     if (c.turn==="them" && c.replyAt && now >= c.replyAt){
       const l = newLetter(false, c.replyAt); c.letters.push(l);
       c.turn = "me"; c.deadline = addD(l.due.delivered, 2 + REPLY_DAYS); c.replyAt = null; c.unread = true;
-      notify(`${c.p.alias} te ha escrito una carta. Va de camino a nuestra oficina.`);
+      notify(`${c.p.alias} te ha escrito una carta. Va de camino a nuestra oficina.`, `${c.p.alias} has written you a letter. It's on its way to our office.`);
     }
     checkPhases(c);
     if (now > c.deadline){
       if (c.turn==="me"){ c.closed="me"; me.suspendedUntil = addD(now, SUSPEND_DAYS); me.ghosts = (me.ghosts||0) + 1; saveMe();
-        notify(`No respondiste a tiempo a ${c.p.alias}. La correspondencia se cierra y tu cuenta queda suspendida ${SUSPEND_DAYS} días.`); }
+        notify(`No respondiste a tiempo a ${c.p.alias}. La correspondencia se cierra y tu cuenta queda suspendida ${SUSPEND_DAYS} días.`, `You didn't reply to ${c.p.alias} in time. The correspondence is closed and your account is suspended for ${SUSPEND_DAYS} days.`); }
       else { c.closed="them"; c.unread = true; c.p.ghosts = (c.p.ghosts||0) + 1;
-        notify(`${c.p.alias} no escribió a tiempo. La correspondencia se cierra y su cuenta queda suspendida.`); }
+        notify(`${c.p.alias} no escribió a tiempo. La correspondencia se cierra y su cuenta queda suspendida.`, `${c.p.alias} didn't write in time. The correspondence is closed and their account is suspended.`); }
     }
   });
   badge();
 }
-// Avisa de cada cambio de fase de una carta
 const PHASE_MSG = {
-  mine: [null, n=>`Tu carta está en nuestra oficina. Se la enviaremos a ${n}.`, n=>`Hemos enviado tu carta a ${n}.`, n=>`Tu carta ha llegado a ${n}.`],
-  theirs: [null, n=>`La carta de ${n} está en nuestra oficina. Te la enviaremos en breve.`, n=>`Te hemos enviado la carta de ${n}.`, n=>`La carta de ${n} debería estar ya en tu buzón.`]
+  mine: [null,
+    n=>[`Tu carta está en nuestra oficina. Se la enviaremos a ${n}.`,`Your letter is at our office. We'll send it on to ${n}.`],
+    n=>[`Hemos enviado tu carta a ${n}.`,`We've sent your letter to ${n}.`],
+    n=>[`Tu carta ha llegado a ${n}.`,`Your letter has reached ${n}.`]],
+  theirs: [null,
+    n=>[`La carta de ${n} está en nuestra oficina. Te la enviaremos en breve.`,`${n}'s letter is at our office. We'll send it to you shortly.`],
+    n=>[`Te hemos enviado la carta de ${n}.`,`We've sent you ${n}'s letter.`],
+    n=>[`La carta de ${n} debería estar ya en tu buzón.`,`${n}'s letter should be in your mailbox by now.`]]
 };
 function checkPhases(c){
   c.letters.forEach(l => { const k = stage(l); if (l.ls == null) l.ls = 0;
-    while (l.ls < k){ l.ls++; notify(PHASE_MSG[l.mine?"mine":"theirs"][l.ls](c.p.alias)); } });
+    while (l.ls < k){ l.ls++; const m = PHASE_MSG[l.mine?"mine":"theirs"][l.ls](c.p.alias); notify(m[0], m[1]);
+      // Simulación: cuando tu carta llega, la otra persona la valora
+      if (l.mine && l.ls === 3 && !l.ratedByThem){ l.ratedByThem = c.p.id === 3 ? 3 : (c.p.id % 2 ? 5 : 4); me.ratings = [...(me.ratings||[]), l.ratedByThem]; saveMe();
+        notify(`${c.p.alias} ha valorado tu carta: ${l.ratedByThem} de 5 cartas.`, `${c.p.alias} rated your letter: ${l.ratedByThem} out of 5 letters.`); } } });
 }
 function sim(){
-  return `<div class="sim"><span><b>Simulación</b> · Hoy es ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">+1 día</button><button class="soft sm" data-days="7">+7 días</button></span></div>`;
+  return `<div class="sim"><span><b>${L("Simulación","Simulation")}</b> · ${L("Hoy es","Today is")} ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">${L("+1 día","+1 day")}</button><button class="soft sm" data-days="7">${L("+7 días","+7 days")}</button></span></div>`;
 }
 function bindSim(){ document.querySelectorAll("[data-days]").forEach(b => b.onclick = () => { now = addD(now, +b.dataset.days); tick(); route(); }); }
 function suspBanner(){
-  return suspended() ? `<div class="susp"><b>Cuenta suspendida hasta el ${fmt(me.suspendedUntil)}</b><br>No respondiste a una carta a tiempo. Mientras dure no puedes hacer nuevos matches.</div>` : "";
+  return suspended() ? `<div class="susp"><b>${L(`Cuenta suspendida hasta el ${fmt(me.suspendedUntil)}`,`Account suspended until ${fmt(me.suspendedUntil)}`)}</b><br>${L("No respondiste a una carta a tiempo. Mientras dure no puedes hacer nuevos matches.","You didn't reply to a letter in time. Until then you can't make new matches.")}</div>` : "";
 }
 
 function backBtn(){
-  return `<button class="backp" id="prevp" ${passedStack.length?"":"disabled"} aria-label="Volver al perfil anterior">← Anterior</button>`;
+  return `<button class="backp" id="prevp" ${passedStack.length?"":"disabled"} aria-label="${L("Volver al perfil anterior","Back to the previous profile")}">← ${L("Anterior","Previous")}</button>`;
 }
 function bindBack(){
   const b = $("#prevp"); if (!b) return;
@@ -588,94 +636,102 @@ function bindBack(){
 }
 function descubrir(){
   const left = pending();
-  const head = `<h2>Descubrir</h2><p class="sub">Primero los intereses. La foto, después del match.</p>${suspBanner()}`;
+  const head = `<h2>${L("Descubrir","Discover")}</h2><p class="sub">${L("Primero los intereses. La foto, después del match.","Interests first. Photos after the match.")}</p>${suspBanner()}`;
   if (!plus && viewsLeft()<=0){
-    $("#view").innerHTML = head + `${backBtn()}<div class="paywall"><b>Ya has visto tus ${VIEW_LIMIT} perfiles de hoy</b><p>Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.</p><button id="sub">Suscribirme a Remitee Plus</button><small>Simulación: no se cobra nada.</small></div>${sim()}`;
-    bindSim(); bindBack(); $("#sub").onclick = () => { plus = true; toast("Ya eres de Remitee Plus: perfiles ilimitados"); descubrir(); }; return;
+    $("#view").innerHTML = head + `${backBtn()}<div class="paywall"><b>${L(`Ya has visto tus ${VIEW_LIMIT} perfiles de hoy`,`You've seen your ${VIEW_LIMIT} profiles for today`)}</b><p>${L(`Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.`,`Tomorrow you'll see ${VIEW_LIMIT} more. To meet more people now, subscribe to Remitee Plus.`)}</p><button id="sub">${L("Suscribirme a Remitee Plus","Subscribe to Remitee Plus")}</button><small>${L("Simulación: no se cobra nada.","Simulation: nothing is charged.")}</small></div>${sim()}`;
+    bindSim(); bindBack(); $("#sub").onclick = () => { plus = true; toast(L("Ya eres de Remitee Plus: perfiles ilimitados","You're on Remitee Plus: unlimited profiles")); descubrir(); }; return;
   }
-  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.</div>${backBtn()}${sim()}`; bindSim(); bindBack(); return; }
+  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">${L("Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.","You've seen every available profile.<br>Come back soon: new people are joining.")}</div>${backBtn()}${sim()}`; bindSim(); bindBack(); return; }
   const p = left[0];
   const shared = common(p);
   $("#view").innerHTML = head + `
-    <div class="views">${backBtn()}<span>${plus?"Remitee Plus · perfiles ilimitados":`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
+    <div class="views">${backBtn()}<span>${plus?L("Remitee Plus · perfiles ilimitados","Remitee Plus · unlimited profiles"):L(`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`,`Profile ${viewsUsed+1} of ${VIEW_LIMIT} today`)}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
     <article class="card">
-      <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?"La foto se muestra si hay match":"Ha elegido no mostrar foto"}</div></div>
-      <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} años · Escribe desde ${esc(p.zona)}</div></div>
+      <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?L("La foto se muestra si hay match","The photo is shown if you match"):L("Ha elegido no mostrar foto","Has chosen not to show a photo")}</div></div>
+      <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(p.zona)}</div></div>
+      <div class="rate-row">${ratingHTML(p.rAvg, p.rN)}</div>
       <div class="trust">${trust(p)}</div>
       <p class="bio">${esc(p.bio)}</p>
       <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
-      <div class="common">${shared.length?`${shared.length} ${shared.length===1?"interés":"intereses"} en común`:"Ningún interés en común, aún puede sorprenderte"}</div>
-      <div class="actions"><button class="plain" id="no">Pasar</button><button id="yes" ${suspended()?"disabled":""}>Quiero escribirle</button></div>
+      <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
+      <div class="actions"><button class="plain" id="no">${L("Pasar","Pass")}</button><button id="yes" ${suspended()?"disabled":""}>${L("Quiero escribirle","I want to write")}</button></div>
     </article>
-    <p class="hint">Si los dos os elegís, hay match. Escribe primero quien completa el match.</p>${sim()}`;
+    <p class="hint">${L("Si los dos os elegís, hay match. Escribe primero quien completa el match.","If you both choose each other, it's a match. Whoever completes the match writes first.")}</p>${sim()}`;
   bindSim(); bindBack();
   const used = () => { if (!plus) viewsUsed++; p.seen = true; };
   $("#no").onclick = () => { used(); passedStack.push(p); descubrir(); };
   $("#yes").onclick = () => {
     used();
     if (p.likesMe){ p.matched = true; chats.unshift({p, letters:[], unread:true, turn:"me", deadline:addD(now, FIRST_DAYS), closed:null}); badge(); matchModal(p, true); }
-    else { p.myYes = now; if (p.likesLater != null) p.matchAt = addD(now, p.likesLater); toast(`Si ${p.alias} también te elige, os avisaremos`); }
+    else { p.myYes = now; if (p.likesLater != null) p.matchAt = addD(now, p.likesLater); toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`)); }
     descubrir();
   };
 }
 
-// iFirst = tú completas el match, así que escribes primero
 function matchModal(p, iFirst){
   document.querySelector(".overlay.mt")?.remove();
   const o = document.createElement("div"); o.className = "overlay mt";
   o.innerHTML = `<div class="modal" role="dialog" aria-label="Match">
     <div class="pair">${myPhoto("md")}${photo(p,"md",true)}</div>
-    <h3>¡Es mutuo!</h3>
-    <p style="margin:0;color:var(--muted)">${iFirst?`${esc(p.alias)} ya te había elegido.`:`${esc(p.alias)} también te ha elegido.`} ${p.showFoto?"Ya podéis ver vuestras fotos y biografías completas.":`${esc(p.alias)} prefiere no mostrar foto, pero ya puedes leer su biografía completa.`}</p>
-    <div class="whofirst ${iFirst?"me":""}">${iFirst?`<b>Te toca escribir primero</b>Has completado el match. Tienes ${FIRST_DAYS} días para enviar la primera carta.`:`<b>${esc(p.alias)} escribirá primero</b>Ha completado el match. Tiene ${FIRST_DAYS} días para enviarte la primera carta.`}</div>
-    <button id="go">Abrir correspondencia</button><button class="plain" id="later">Más tarde</button></div>`;
+    <h3>${L("¡Es mutuo!","It's mutual!")}</h3>
+    <p style="margin:0;color:var(--muted)">${iFirst?L(`${esc(p.alias)} ya te había elegido.`,`${esc(p.alias)} had already chosen you.`):L(`${esc(p.alias)} también te ha elegido.`,`${esc(p.alias)} has chosen you too.`)} ${p.showFoto?L("Ya podéis ver vuestras fotos y biografías completas.","You can now see each other's photos and full bios."):L(`${esc(p.alias)} prefiere no mostrar foto, pero ya puedes leer su biografía completa.`,`${esc(p.alias)} prefers not to show a photo, but you can now read their full bio.`)}</p>
+    <div class="whofirst ${iFirst?"me":""}">${iFirst?`<b>${L("Te toca escribir primero","You write first")}</b>${L(`Has completado el match. Tienes ${FIRST_DAYS} días para enviar la primera carta.`,`You completed the match. You have ${FIRST_DAYS} days to send the first letter.`)}`:`<b>${L(`${esc(p.alias)} escribirá primero`,`${esc(p.alias)} will write first`)}</b>${L(`Ha completado el match. Tiene ${FIRST_DAYS} días para enviarte la primera carta.`,`They completed the match. They have ${FIRST_DAYS} days to send you the first letter.`)}`}</div>
+    <button id="go">${L("Abrir correspondencia","Open correspondence")}</button><button class="plain" id="later">${L("Más tarde","Later")}</button></div>`;
   document.body.appendChild(o);
   o.querySelector("#go").onclick = () => { o.remove(); openId = p.id; location.hash = "#cartas"; route(); };
   o.querySelector("#later").onclick = () => o.remove();
 }
 
 function lastLine(c){
-  if (c.closed==="me") return "Cerrada · no respondiste a tiempo";
-  if (c.closed==="them") return `Cerrada · ${c.p.alias} no escribió a tiempo`;
+  if (c.closed==="me") return L("Cerrada · no respondiste a tiempo","Closed · you didn't reply in time");
+  if (c.closed==="them") return L(`Cerrada · ${c.p.alias} no escribió a tiempo`,`Closed · ${c.p.alias} didn't write in time`);
   const d = daysLeft(c.deadline), inc = incoming(c);
-  if (inc) return `Carta de ${c.p.alias} · ${PHASES[stage(inc)].toLowerCase()}`;
-  if (c.turn==="me") return c.letters.length ? `Te toca escribir · quedan ${d} días` : `Escribes tú primero · quedan ${d} días`;
-  if (!c.letters.length) return `${c.p.alias} escribe primero`;
+  if (inc) return L(`Carta de ${c.p.alias}`,`Letter from ${c.p.alias}`) + ` · ${PHASES()[stage(inc)].toLowerCase()}`;
+  if (c.turn==="me") return c.letters.length ? L(`Te toca escribir · quedan ${d} días`,`Your turn to write · ${d} days left`) : L(`Escribes tú primero · quedan ${d} días`,`You write first · ${d} days left`);
+  if (!c.letters.length) return L(`${c.p.alias} escribe primero`,`${c.p.alias} writes first`);
   const l = c.letters[c.letters.length-1];
-  return `Tu carta · ${PHASES[stage(l)].toLowerCase()}`;
+  return L("Tu carta","Your letter") + ` · ${PHASES()[stage(l)].toLowerCase()}`;
 }
 
 function cartas(){
   if (openId){ return ventana(chats.find(c => c.p.id === openId)); }
-  $("#view").innerHTML = `<h2>Cartas</h2><p class="sub">Tus correspondencias abiertas.</p>${suspBanner()}` + (chats.length
+  $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias abiertas.","Your open correspondences.")}</p>${suspBanner()}` + (chats.length
     ? `<div class="list">${chats.map(c=>{ const urgent = !c.closed && c.turn==="me" && !incoming(c) && daysLeft(c.deadline)<=2;
-        return `<button class="item ${c.closed?"closed":""}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s ${urgent?"urgent":""}">${esc(lastLine(c))}</div></div>${c.unread?'<span class="dot" aria-label="Novedad"></span>':""}</button>`; }).join("")}</div>`
-    : `<div class="empty">Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.</div>`) + sim();
+        return `<button class="item ${c.closed?"closed":""}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s ${urgent?"urgent":""}">${esc(lastLine(c))}</div></div>${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
+    : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = +b.dataset.id; cartas(); });
   bindSim();
 }
 
 function deadlineBox(c){
-  if (c.closed==="me") return `<div class="dl bad"><b>Correspondencia cerrada</b>No enviaste tu carta a tiempo. Tu cuenta ha quedado suspendida ${SUSPEND_DAYS} días.</div>`;
-  if (c.closed==="them") return `<div class="dl bad"><b>Correspondencia cerrada</b>${esc(c.p.alias)} no escribió en su plazo. Su cuenta queda suspendida. Tú no pierdes nada.</div>`;
+  if (c.closed==="me") return `<div class="dl bad"><b>${L("Correspondencia cerrada","Correspondence closed")}</b>${L(`No enviaste tu carta a tiempo. Tu cuenta ha quedado suspendida ${SUSPEND_DAYS} días.`,`You didn't send your letter in time. Your account has been suspended for ${SUSPEND_DAYS} days.`)}</div>`;
+  if (c.closed==="them") return `<div class="dl bad"><b>${L("Correspondencia cerrada","Correspondence closed")}</b>${L(`${esc(c.p.alias)} no escribió en su plazo. Su cuenta queda suspendida. Tú no pierdes nada.`,`${esc(c.p.alias)} didn't write within their deadline. Their account is suspended. You lose nothing.`)}</div>`;
   const d = daysLeft(c.deadline), inc = incoming(c);
-  if (inc) return `<div class="dl them"><b>${esc(c.p.alias)} te ha escrito</b>Su carta va de camino. Cuando te llegue tendrás ${REPLY_DAYS} días para responder.</div>`;
+  if (inc) return `<div class="dl them"><b>${L(`${esc(c.p.alias)} te ha escrito`,`${esc(c.p.alias)} has written to you`)}</b>${L(`Su carta va de camino. Cuando te llegue tendrás ${REPLY_DAYS} días para responder.`,`Their letter is on its way. Once it arrives you'll have ${REPLY_DAYS} days to reply.`)}</div>`;
   if (c.turn==="me"){
     const first = !c.letters.length;
-    return `<div class="dl ${d<=2?"warn":"mine"}"><b>${first?"Te toca escribir primero":"Te toca escribir"}</b>${first?"Completaste el match. ":""}Quedan ${d} ${d===1?"día":"días"}, hasta el ${fmt(c.deadline)}. Si no la envías a tiempo, la correspondencia se cierra y tu cuenta queda suspendida ${SUSPEND_DAYS} días.</div>`;
+    return `<div class="dl ${d<=2?"warn":"mine"}"><b>${first?L("Te toca escribir primero","You write first"):L("Te toca escribir","Your turn to write")}</b>${first?L("Completaste el match. ","You completed the match. "):""}${L(`Quedan ${d} ${d===1?"día":"días"}, hasta el ${fmt(c.deadline)}. Si no la envías a tiempo, la correspondencia se cierra y tu cuenta queda suspendida ${SUSPEND_DAYS} días.`,`${d} ${d===1?"day":"days"} left, until ${fmt(c.deadline)}. If you don't send it in time, the correspondence closes and your account is suspended for ${SUSPEND_DAYS} days.`)}</div>`;
   }
-  if (!c.letters.length) return `<div class="dl them"><b>${esc(c.p.alias)} escribe primero</b>Completó el match, así que tiene hasta el ${fmt(c.deadline)} para enviarte la primera carta. Tú solo tienes que esperar.</div>`;
+  if (!c.letters.length) return `<div class="dl them"><b>${L(`${esc(c.p.alias)} escribe primero`,`${esc(c.p.alias)} writes first`)}</b>${L(`Completó el match, así que tiene hasta el ${fmt(c.deadline)} para enviarte la primera carta. Tú solo tienes que esperar.`,`They completed the match, so they have until ${fmt(c.deadline)} to send you the first letter. You just have to wait.`)}</div>`;
   const l = c.letters[c.letters.length-1], k = stage(l);
-  return `<div class="dl them"><b>Le toca a ${esc(c.p.alias)}</b>${k===0?"Tu plazo queda en pausa hasta que la carta llegue a nuestra oficina.":k<3?"Tu carta ya está en nuestras manos. Plazo cumplido.":`Tu carta ya ha llegado. Tiene hasta el ${fmt(c.deadline)} para responder.`}</div>`;
+  return `<div class="dl them"><b>${L(`Le toca a ${esc(c.p.alias)}`,`${esc(c.p.alias)}'s turn`)}</b>${k===0?L("Tu plazo queda en pausa hasta que la carta llegue a nuestra oficina.","Your deadline is paused until the letter reaches our office."):k<3?L("Tu carta ya está en nuestras manos. Plazo cumplido.","Your letter is in our hands. Deadline met."):L(`Tu carta ya ha llegado. Tiene hasta el ${fmt(c.deadline)} para responder.`,`Your letter has arrived. They have until ${fmt(c.deadline)} to reply.`)}</div>`;
+}
+
+function rateBox(c, l, i){
+  if (l.mine || stage(l) < 3) return "";
+  if (l.rated) return `<div class="ratebox done">${L("Tu valoración","Your rating")}: ${ratingHTML(l.rated, 1, {sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.rated} ${L("de 5","of 5")}</span>`)}</div>`;
+  return `<div class="ratebox"><span>${L("Valora esta carta","Rate this letter")}</span><span class="rate-pick" role="group" aria-label="${L("De 1 a 5 cartas","From 1 to 5 letters")}">${[1,2,3,4,5].map(v=>`<button type="button" class="rp" data-rate="${i}" data-v="${v}" aria-label="${v} ${L(v===1?"carta":"cartas",v===1?"letter":"letters")}">${ENV_SVG}</button>`).join("")}</span></div>`;
 }
 
 function letterCard(c, l, i){
-  const k = stage(l), isLast = i === c.letters.length-1;
+  const k = stage(l), isLast = i === c.letters.length-1, PH = PHASES();
   return `<div class="lcard ${l.mine?"mine":""}">
-    <div class="lhead"><div class="ic">✉︎</div><div><div class="t">${l.mine?"Tu carta":`Carta de ${esc(c.p.alias)}`}</div><div class="d">${PHASES[k]} · ${fmt(phaseDate(l,k))}</div></div>
-      ${l.photo?`<div class="thumb" ${l.photo==="example"?"":`style="background-image:url('${l.photo}')"`} title="Foto del sobre">${l.photo==="example"?"✉︎":""}</div>`:""}</div>
-    ${isLast||k<3?`<ol class="phases">${PHASES.map((ph,j)=>`<li class="${j<k?"done":j===k?"now":""}"><span>${ph}</span><small>${j<=k?fmt(phaseDate(l,j)):""}</small></li>`).join("")}</ol>`:""}
-    ${!l.mine && k===2?`<button class="soft sm" data-arrived="${i}">Ya me ha llegado</button>`:""}
+    <div class="lhead"><div class="ic">✉︎</div><div><div class="t">${l.mine?L("Tu carta","Your letter"):L(`Carta de ${esc(c.p.alias)}`,`Letter from ${esc(c.p.alias)}`)}</div><div class="d">${PH[k]} · ${fmt(phaseDate(l,k))}</div></div>
+      ${l.photo?`<div class="thumb" ${l.photo==="example"?"":`style="background-image:url('${l.photo}')"`} title="${L("Foto del sobre","Envelope photo")}">${l.photo==="example"?"✉︎":""}</div>`:""}</div>
+    ${isLast||k<3?`<ol class="phases">${PH.map((ph,j)=>`<li class="${j<k?"done":j===k?"now":""}"><span>${ph}</span><small>${j<=k?fmt(phaseDate(l,j)):""}</small></li>`).join("")}</ol>`:""}
+    ${!l.mine && k===2?`<button class="soft sm" data-arrived="${i}">${L("Ya me ha llegado","It has arrived")}</button>`:""}
+    ${l.mine && l.ratedByThem?`<div class="ratebox done">${L(`${esc(c.p.alias)} la ha valorado`,`${esc(c.p.alias)} rated it`)}: ${ratingHTML(l.ratedByThem,1,{sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.ratedByThem} ${L("de 5","of 5")}</span>`)}</div>`:""}
+    ${rateBox(c, l, i)}
   </div>`;
 }
 
@@ -683,52 +739,60 @@ function ventana(c){
   c.unread = false; badge();
   const inc = incoming(c);
   const canSend = !c.closed && c.turn==="me" && !inc;
-  $("#view").innerHTML = `<button class="back" id="back">← Cartas</button>
-    <div class="chead">${photo(c.p,"md",true)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="trust sm">${trust(c.p)}</div></div></div>
-    <details class="about" ${c.letters.length?"":"open"}><summary>Sobre ${esc(c.p.alias)}</summary>
+  $("#view").innerHTML = `<button class="back" id="back">← ${L("Cartas","Letters")}</button>
+    <div class="chead">${photo(c.p,"md",true)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
+    <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Sobre ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
-      <p>${esc(c.p.long || c.p.bio)}</p><small>${esc(c.p.edad)} años · Escribe desde ${esc(c.p.zona)}</small></details>
+      <p>${esc(c.p.long || c.p.bio)}</p><small>${esc(c.p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(c.p.zona)}</small></details>
     ${deadlineBox(c)}
     ${c.closed?"":(c.meReveal&&c.themReveal
-      ? `<div class="sendto"><span class="lbl">Direcciones compartidas</span><span class="addr">Ya podéis escribiros directamente.</span><span class="addr"><b>${esc(c.p.alias)}:</b> dirección de ejemplo, ${esc(c.p.zona)}</span></div>`
-      : `<div class="sendto"><span class="lbl">Sobre interior</span><span>Solo el código: <span class="code">${esc(c.p.code)}</span></span><span class="lbl" style="margin-top:8px">Sobre exterior</span><span class="addr">${esc(CENTRAL)}</span><button class="linkbtn" id="howflow">¿Cómo funciona?</button></div>`)}
+      ? `<div class="sendto"><span class="lbl">${L("Direcciones compartidas","Addresses shared")}</span><span class="addr">${L("Ya podéis escribiros directamente.","You can now write to each other directly.")}</span><span class="addr"><b>${esc(c.p.alias)}:</b> ${L("dirección de ejemplo","example address")}, ${esc(c.p.zona)}</span></div>`
+      : `<div class="sendto"><span class="lbl">${L("Sobre interior","Inner envelope")}</span><span>${L("Solo el código","Just the code")}: <span class="code">${esc(c.p.code)}</span></span><span class="lbl" style="margin-top:8px">${L("Sobre exterior","Outer envelope")}</span><span class="addr">${esc(CENTRAL)}</span><button class="linkbtn" id="howflow">${L("¿Cómo funciona?","How does it work?")}</button></div>`)}
     <div class="timeline">${c.letters.length ? c.letters.map((l,i)=>letterCard(c,l,i)).join("")
-      : `<div class="empty" style="padding:24px">Todavía no hay cartas.<br>${c.turn==="me"?"Escribe la primera y prepárala con el doble sobre.":`Esperando la primera carta de ${esc(c.p.alias)}.`}</div>`}</div>
-    ${c.closed?"":`<button class="bigbtn" id="sent" ${canSend?"":"disabled"}>${canSend?(c.letters.length?"Ya he enviado mi respuesta":"Ya he enviado la primera carta"):inc?`Esperando la carta de ${esc(c.p.alias)}`:c.turn==="them"&&!c.letters.length?`${esc(c.p.alias)} escribe primero`:"Carta enviada ✓"}</button>
-    <p class="note">${canSend?"Te pediremos una foto del sobre interior cerrado.":c.turn==="them"?`Te avisaremos en cada paso del recorrido.`:""}</p>`}
-    ${c.closed||!c.letters.length?"":`<div class="share"><div><b>Compartir direcciones</b><small>${c.meReveal&&c.themReveal?"Hecho. Las cartas ya no pasan por nuestra oficina.":c.meReveal?`Esperando a que ${esc(c.p.alias)} también acepte.`:"Solo se comparten si los dos aceptáis. Nadie sabe si el otro ha dicho que no."}</small></div>
-      ${c.meReveal&&c.themReveal?"":`<button class="${c.meReveal?"plain":"soft"} sm" id="share">${c.meReveal?"Retirar":"Aceptar"}</button>`}</div>`}
+      : `<div class="empty" style="padding:24px">${L("Todavía no hay cartas.","No letters yet.")}<br>${c.turn==="me"?L("Escribe la primera y prepárala con el doble sobre.","Write the first one and prepare it with the double envelope."):L(`Esperando la primera carta de ${esc(c.p.alias)}.`,`Waiting for ${esc(c.p.alias)}'s first letter.`)}</div>`}</div>
+    ${c.closed?"":`<button class="bigbtn" id="sent" ${canSend?"":"disabled"}>${canSend?(c.letters.length?L("Ya he enviado mi respuesta","I've sent my reply"):L("Ya he enviado la primera carta","I've sent the first letter")):inc?L(`Esperando la carta de ${esc(c.p.alias)}`,`Waiting for ${esc(c.p.alias)}'s letter`):c.turn==="them"&&!c.letters.length?L(`${esc(c.p.alias)} escribe primero`,`${esc(c.p.alias)} writes first`):L("Carta enviada ✓","Letter sent ✓")}</button>
+    <p class="note">${canSend?L("Te pediremos una foto del sobre interior cerrado.","We'll ask for a photo of the sealed inner envelope."):c.turn==="them"?L("Te avisaremos en cada paso del recorrido.","We'll notify you at every step of the journey."):""}</p>`}
+    ${c.closed||!c.letters.length?"":`<div class="share"><div><b>${L("Compartir direcciones","Share addresses")}</b><small>${c.meReveal&&c.themReveal?L("Hecho. Las cartas ya no pasan por nuestra oficina.","Done. Letters no longer go through our office."):c.meReveal?L(`Esperando a que ${esc(c.p.alias)} también acepte.`,`Waiting for ${esc(c.p.alias)} to accept too.`):L("Solo se comparten si los dos aceptáis. Nadie sabe si el otro ha dicho que no.","They're only shared if you both accept. Nobody knows if the other said no.")}</small></div>
+      ${c.meReveal&&c.themReveal?"":`<button class="${c.meReveal?"plain":"soft"} sm" id="share">${c.meReveal?L("Retirar","Withdraw"):L("Aceptar","Accept")}</button>`}</div>`}
     ${sim()}`;
   $("#back").onclick = () => { openId = null; cartas(); };
   const hf = $("#howflow"); if (hf) hf.onclick = showFlow;
   document.querySelectorAll("[data-arrived]").forEach(b => b.onclick = () => { const l = c.letters[+b.dataset.arrived]; l.confirmedAt = now; l.ls = 3;
-    c.deadline = addD(now, REPLY_DAYS); toast(`Carta marcada como recibida. Tienes ${REPLY_DAYS} días para responder`); ventana(c); });
+    c.deadline = addD(now, REPLY_DAYS); toast(L(`Carta marcada como recibida. Tienes ${REPLY_DAYS} días para responder`,`Letter marked as received. You have ${REPLY_DAYS} days to reply`)); ventana(c); });
+  // Valorar una carta recibida
+  document.querySelectorAll("[data-rate]").forEach(b => {
+    const grp = [...document.querySelectorAll(`[data-rate="${b.dataset.rate}"]`)];
+    b.onmouseenter = () => grp.forEach(x => x.classList.toggle("hov", +x.dataset.v <= +b.dataset.v));
+    b.onmouseleave = () => grp.forEach(x => x.classList.remove("hov"));
+    b.onclick = () => { const l = c.letters[+b.dataset.rate], v = +b.dataset.v; l.rated = v;
+      c.p.rAvg = (c.p.rAvg * c.p.rN + v) / (c.p.rN + 1); c.p.rN += 1;
+      toast(L(`Has valorado la carta de ${c.p.alias} con ${v} de 5 cartas`,`You rated ${c.p.alias}'s letter ${v} out of 5 letters`)); ventana(c); };
+  });
   const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
-    if (c.meReveal && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(`${c.p.alias} también ha aceptado compartir direcciones`); if (openId===c.p.id) ventana(c); } }, 1800);
+    if (c.meReveal && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (openId===c.p.id) ventana(c); } }, 1800);
     if (!c.meReveal) c.themReveal = false; ventana(c); };
   bindSim();
   const btn = $("#sent"); if (btn && canSend) btn.onclick = () => sendModal(c);
 }
 
-/* ---- Envío: doble sobre + foto obligatoria ---- */
 function sendModal(c){
   let pic = null;
   const o = document.createElement("div"); o.className = "overlay";
   const render = () => {
-    o.innerHTML = `<div class="modal wmodal" role="dialog" aria-label="Enviar carta">
-      <h3 style="font-size:1.25rem">Prepara y envía tu carta</h3>
+    o.innerHTML = `<div class="modal wmodal" role="dialog" aria-label="${L("Enviar carta","Send letter")}">
+      <h3 style="font-size:1.25rem">${L("Prepara y envía tu carta","Prepare and send your letter")}</h3>
       <div class="flowcard">${prepHTML(c.p)}</div>
       <ol class="checklist">
-        <li>Carta dentro de un <b>sobre interior</b> cerrado, con solo el código <span class="code-inline">${esc(c.p.code)}</span>.</li>
-        <li>Ese sobre y <b>un segundo sello</b>, dentro del <b>sobre exterior</b>.</li>
-        <li>Sobre exterior dirigido a <b>${esc(CENTRAL)}</b>, con su sello.</li>
+        <li>${L(`Carta dentro de un <b>sobre interior</b> cerrado, con solo el código <span class="code-inline">${esc(c.p.code)}</span>.`,`Letter inside a sealed <b>inner envelope</b>, with only the code <span class="code-inline">${esc(c.p.code)}</span>.`)}</li>
+        <li>${L("Ese sobre y <b>un segundo sello</b>, dentro del <b>sobre exterior</b>.","That envelope and <b>a second stamp</b>, inside the <b>outer envelope</b>.")}</li>
+        <li>${L(`Sobre exterior dirigido a <b>${esc(CENTRAL)}</b>, con su sello.`,`Outer envelope addressed to <b>${esc(CENTRAL)}</b>, with its own stamp.`)}</li>
       </ol>
-      <div class="field" style="background:var(--bg)"><label>Foto del sobre interior cerrado</label>
+      <div class="field" style="background:var(--bg)"><label>${L("Foto del sobre interior cerrado","Photo of the sealed inner envelope")}</label>
         <div class="photo-pick">${pic?`<div class="thumb big" ${pic==="example"?"":`style="background-image:url('${pic}')"`}>${pic==="example"?"✉︎":""}</div>`:""}
-          <label class="filebtn" for="s-p">${pic?"Cambiar foto":"Hacer o subir foto"}</label><input type="file" id="s-p" accept="image/*" capture="environment" hidden>
-          ${pic?"":`<button class="linkbtn" id="s-ex">Usar foto de ejemplo</button>`}</div>
-        <small>Que se vea el código ${esc(c.p.code)}. Con la foto, tu plazo queda en pausa hasta que la carta llegue a nuestra oficina.</small></div>
-      <div class="wbtns"><button class="plain" id="s-x">Cancelar</button><button id="s-ok" ${pic?"":"disabled"}>Confirmar envío</button></div></div>`;
+          <label class="filebtn" for="s-p">${pic?L("Cambiar foto","Change photo"):L("Hacer o subir foto","Take or upload a photo")}</label><input type="file" id="s-p" accept="image/*" capture="environment" hidden>
+          ${pic?"":`<button class="linkbtn" id="s-ex">${L("Usar foto de ejemplo","Use an example photo")}</button>`}</div>
+        <small>${L(`Que se vea el código ${esc(c.p.code)}. Con la foto, tu plazo queda en pausa hasta que la carta llegue a nuestra oficina.`,`Make sure the code ${esc(c.p.code)} is visible. With the photo, your deadline is paused until the letter reaches our office.`)}</small></div>
+      <div class="wbtns"><button class="plain" id="s-x">${L("Cancelar","Cancel")}</button><button id="s-ok" ${pic?"":"disabled"}>${L("Confirmar envío","Confirm sending")}</button></div></div>`;
     startPrep(o);
     o.querySelector("#s-p").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { pic = r.result; render(); }; r.readAsDataURL(f); };
     const ex = o.querySelector("#s-ex"); if (ex) ex.onclick = () => { pic = "example"; render(); };
@@ -737,26 +801,27 @@ function sendModal(c){
       const l = newLetter(true, now); l.photo = pic; c.letters.push(l); c.turn = "them";
       c.deadline = addD(l.due.delivered, REPLY_DAYS);
       const ra = c.p.id in replyAfter ? replyAfter[c.p.id] : 5; c.replyAt = ra==null ? null : addD(l.due.delivered, ra);
-      l.ls = 0; o.remove(); notify(`Has enviado tu carta para ${c.p.alias}. Te avisaremos cuando llegue a nuestra oficina.`); ventana(c);
+      l.ls = 0; o.remove(); notify(`Has enviado tu carta para ${c.p.alias}. Te avisaremos cuando llegue a nuestra oficina.`,`You've sent your letter to ${c.p.alias}. We'll let you know when it reaches our office.`); ventana(c);
     };
   };
   document.body.appendChild(o); render();
 }
 
 /* ---- Animación: el doble sobre y los dos sellos ---- */
-const PREP = [
-  "Mete tu carta en un sobre y ciérralo. Por fuera, escribe solo el código de la otra persona.",
-  "Mete ese sobre cerrado y un segundo sello dentro de otro sobre más grande.",
-  "Dirige el sobre grande a Remitee y ponle un sello. Ese envío lo pagas tú, como cualquier carta.",
-  "En la oficina abrimos solo el sobre grande. Tu carta sigue cerrada: nadie la lee.",
-  "Metemos tu sobre cerrado en un segundo sobre, con la dirección de la otra persona y tu segundo sello.",
-  "Y sale hacia su buzón. Ninguno de los dos conoce la dirección del otro."
+const PREP = () => [
+  L("Mete tu carta en un sobre y ciérralo. Por fuera, escribe solo el código de la otra persona.","Put your letter in an envelope and seal it. On the outside, write only the other person's code."),
+  L("Mete ese sobre cerrado y un segundo sello dentro de otro sobre más grande.","Put that sealed envelope and a second stamp inside a larger envelope."),
+  L("Dirige el sobre grande a Remitee y ponle un sello. Ese envío lo pagas tú, como cualquier carta.","Address the large envelope to Remitee and stamp it. You pay for that postage, like any letter."),
+  L("En la oficina abrimos solo el sobre grande. Tu carta sigue cerrada: nadie la lee.","At our office we open only the large envelope. Your letter stays sealed: nobody reads it."),
+  L("Metemos tu sobre cerrado en un segundo sobre, con la dirección de la otra persona y tu segundo sello.","We put your sealed envelope into a new one, with the other person's address and your second stamp."),
+  L("Y sale hacia su buzón. Ninguno de los dos conoce la dirección del otro.","And off it goes to their mailbox. Neither of you knows the other's address.")
 ];
 function prepHTML(p){
   const code = esc(p ? p.code : "LUNA-4821"), who = esc(p ? p.alias : "Lince");
   const stamp = (x,y,cls="") => `<g transform="translate(${x} ${y})"><g class="${cls}"><rect width="18" height="22" rx="2" class="pp-stamp"/><circle cx="9" cy="10" r="4" class="pp-stampi"/></g></g>`;
   const small = (x,y,cls="",label=true) => `<g transform="translate(${x} ${y})"><g class="${cls}"><rect width="76" height="48" rx="4" class="pp-env"/><path d="M2 3 L38 26 L74 3" class="pp-flap"/>${label?`<text x="38" y="42" class="pp-code">${code}</text>`:""}</g></g>`;
-  return `<div class="prep" aria-label="Cómo preparar la carta"><svg viewBox="0 0 320 150" role="img" aria-hidden="true">
+  const P = PREP();
+  return `<div class="prep" aria-label="${L("Cómo preparar la carta","How to prepare the letter")}"><svg viewBox="0 0 320 150" role="img" aria-hidden="true">
     <g class="sc" data-s="0">
       ${small(122,70,"pp-fade1",true)}
       <g transform="translate(138 10)"><g class="pp-drop"><rect width="44" height="54" rx="3" class="pp-paper"/><path d="M8 12h28M8 20h28M8 28h20" class="pp-lines"/></g></g>
@@ -767,18 +832,18 @@ function prepHTML(p){
     </g>
     <g class="sc" data-s="2">
       <g transform="translate(70 30)"><g class="pp-pop"><rect width="180" height="100" rx="6" class="pp-env big"/><path d="M3 4 L90 56 L177 4" class="pp-flap"/>
-        <text x="90" y="80" class="pp-addr">Remitee · Apdo. 123</text><text x="90" y="92" class="pp-addr2">Santander</text></g></g>
+        <text x="90" y="80" class="pp-addr">Remitee · ${L("Apdo.","PO Box")} 123</text><text x="90" y="92" class="pp-addr2">Santander</text></g></g>
       ${stamp(222,36,"pp-pop2")}
     </g>
     <g class="sc" data-s="3">
       <g transform="translate(22 52)"><rect width="44" height="44" rx="10" class="pp-off"/><path d="M11 31 V19 L22 11 L33 19 V31 Z M18 31 V23 H26 V31" class="pp-house"/></g>
       <g transform="translate(110 70)"><rect width="180" height="70" rx="6" class="pp-env big"/><path d="M3 2 L90 -36 L177 2" class="pp-flap open"/></g>
       ${small(162,74,"pp-rise",true)}
-      <text x="282" y="46" class="pp-tag pp-fade2">Sigue cerrada</text>
+      <text x="282" y="46" class="pp-tag pp-fade2">${L("Sigue cerrada","Still sealed")}</text>
     </g>
     <g class="sc" data-s="4">
       <g transform="translate(70 44)"><g class="pp-pop"><rect width="180" height="100" rx="6" class="pp-env big"/><path d="M3 2 L90 -30 L177 2" class="pp-flap open"/>
-        <text x="90" y="72" class="pp-addr">Para: ${who}</text><text x="90" y="85" class="pp-addr2">Su dirección, que solo conoce Remitee</text></g></g>
+        <text x="90" y="72" class="pp-addr">${L("Para","To")}: ${who}</text><text x="90" y="85" class="pp-addr2">${L("Su dirección, que solo conoce Remitee","Their address, known only to Remitee")}</text></g></g>
       ${small(122,-2,"pp-in",true)}
       <g transform="translate(222 50)"><g class="pp-pop2"><rect width="18" height="22" rx="2" class="pp-stamp"/><circle cx="9" cy="10" r="4" class="pp-stampi"/></g></g>
     </g>
@@ -786,54 +851,55 @@ function prepHTML(p){
       <g transform="translate(276 62)"><circle r="20" cx="0" cy="12" class="pp-them"/><text y="17" class="pp-init">${who[0]}</text></g>
       <g transform="translate(20 50)"><g class="pp-go"><rect width="120" height="74" rx="5" class="pp-env big"/><path d="M3 3 L60 40 L117 3" class="pp-flap"/>
         <g transform="translate(96 6)"><rect width="18" height="22" rx="2" class="pp-stamp"/><circle cx="9" cy="10" r="4" class="pp-stampi"/></g>
-        <text x="58" y="62" class="pp-addr2">Para: ${who}</text></g></g>
+        <text x="58" y="62" class="pp-addr2">${L("Para","To")}: ${who}</text></g></g>
     </g>
   </svg><p class="fl-txt pp-txt" id="pp-txt" aria-live="polite"></p>
-  <div class="pnav"><button type="button" class="plain sm" data-pp="-1">Anterior</button>
-    <div class="fl-dots">${PREP.map((_,i)=>`<button type="button" class="dotb" data-go="${i}" aria-label="Paso ${i+1}"></button>`).join("")}</div>
-    <button type="button" class="sm" data-pp="1">Siguiente</button></div></div>`;
+  <div class="pnav"><button type="button" class="plain sm" data-pp="-1">${L("Anterior","Previous")}</button>
+    <div class="fl-dots">${P.map((_,i)=>`<button type="button" class="dotb" data-go="${i}" aria-label="${L("Paso","Step")} ${i+1}"></button>`).join("")}</div>
+    <button type="button" class="sm" data-pp="1">${L("Siguiente","Next")}</button></div></div>`;
 }
-let prepTimer = 0;
 function startPrep(root){
   const box = root && root.querySelector(".prep"); if (!box) return;
   const scenes = [...box.querySelectorAll(".sc")], dots = [...box.querySelectorAll(".dotb")], txt = box.querySelector("#pp-txt");
   const prev = box.querySelector('[data-pp="-1"]'), next = box.querySelector('[data-pp="1"]');
-  let i = 0;
+  const P = PREP(); let i = 0;
+  const label = () => L(`Paso ${i+1} de ${P.length}. `,`Step ${i+1} of ${P.length}. `) + P[i];
   const show = () => {
     scenes.forEach((s,j)=>s.classList.toggle("on", j===i)); dots.forEach((d,j)=>d.classList.toggle("on", j===i));
-    txt.classList.add("fade"); setTimeout(() => { txt.textContent = `Paso ${i+1} de ${PREP.length}. ${PREP[i]}`; txt.classList.remove("fade"); }, 350);
-    prev.disabled = i === 0; next.textContent = i === PREP.length-1 ? "Volver a empezar" : "Siguiente";
+    txt.classList.add("fade"); setTimeout(() => { txt.textContent = label(); txt.classList.remove("fade"); }, 350);
+    prev.disabled = i === 0; next.textContent = i === P.length-1 ? L("Volver a empezar","Start again") : L("Siguiente","Next");
   };
   prev.onclick = () => { if (i > 0){ i--; show(); } };
-  next.onclick = () => { i = i === PREP.length-1 ? 0 : i+1; show(); };
+  next.onclick = () => { i = i === P.length-1 ? 0 : i+1; show(); };
   dots.forEach((d,j) => d.onclick = () => { i = j; show(); });
-  txt.textContent = `Paso 1 de ${PREP.length}. ${PREP[0]}`; show();
+  txt.textContent = label(); show();
 }
 
 /* ---- Perfil propio: se guarda en este navegador ---- */
 function saveLocal(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); } catch(_){} } }
-function saveMe(){ saveLocal(); if (FB && me.uid) cloudSave().catch(e => toast("No se ha podido guardar en la nube. Revisa tu conexión.")); }
+function saveMe(){ saveLocal(); if (FB && me.uid) cloudSave().catch(e => toast(L("No se ha podido guardar en la nube. Revisa tu conexión.","Couldn't save to the cloud. Check your connection."))); }
 function loadMe(){ try { const d = JSON.parse(localStorage.getItem("remitee-me")||"null"); if (d) Object.assign(me, d); } catch(e) {} }
 const RANGES = ["25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
 function newCode(){ const w=["MAR","LUNA","RIO","SOL","PINO","ALBA","NIDO","ROCA"]; return `${w[Math.floor(Math.random()*w.length)]}-${1000+Math.floor(Math.random()*9000)}`; }
+const G_OPTS = () => [["f",L("En femenino","Feminine")],["m",L("En masculino","Masculine")],["n",L("Neutro","Neutral")]];
 
 function profileFields(){
   return `
-    <div class="field"><label for="f-p">Foto</label><div class="photo-pick">${myPhoto("sm")}<input type="file" id="f-p" accept="image/*"></div><small>Opcional. Nadie la ve antes del match.</small></div>
-    <label class="switch" for="f-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="f-s" ${me.showFoto?"checked":""}></label>
-    <div class="field"><label for="f-a">Alias *</label><input id="f-a" required maxlength="24" value="${esc(me.alias)}" placeholder="Cómo quieres que te llamen"></div>
-    <div class="field"><label for="f-pr">Profesión</label><input id="f-pr" value="${esc(me.prof)}" placeholder="A qué te dedicas"></div>
-    <div class="field"><label for="f-e">Edad *</label><select id="f-e" style="font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango, nunca la edad exacta.</small></div>
-    <div class="field"><label for="f-g">Cómo quieres que te presentemos</label><select id="f-g" class="sel">${[["f","En femenino"],["m","En masculino"],["n","Neutro"]].map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
-    <div class="field"><label for="f-z">Escribes desde *</label><input id="f-z" required value="${esc(me.zona)}" placeholder="Región o provincia"><small>Nunca tu dirección.</small></div>
-    <div class="field"><label for="f-b">Biografía breve *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="Lo primero que leerán de ti">${esc(me.bio)}</textarea><small>La ve todo el mundo en Descubrir. Máximo 200 caracteres.</small></div>
-    <div class="field"><label for="f-l">Biografía extensa</label><textarea id="f-l" rows="5" maxlength="800" placeholder="Cuéntate con más calma">${esc(me.long)}</textarea><small>Solo la ven las personas con las que haces match. Máximo 800 caracteres.</small></div>
-    <div class="field"><label for="f-i">3 intereses *</label><input id="f-i" required value="${esc(me.intereses)}" placeholder="cine, montaña, poesía"><small>Separados por comas. Se usan para el match.</small></div>
-    <div class="field"><label for="f-d">Dirección postal *</label><input id="f-d" required value="${esc(me.dir||"")}" placeholder="Calle, número, código postal, ciudad"><small>Privada. Nadie la ve: solo se usa para reenviarte las cartas.</small></div>`;
+    <div class="field"><label for="f-p">${L("Foto","Photo")}</label><div class="photo-pick">${myPhoto("sm")}<input type="file" id="f-p" accept="image/*"></div><small>${L("Opcional. Nadie la ve antes del match.","Optional. Nobody sees it before a match.")}</small></div>
+    <label class="switch" for="f-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="f-s" ${me.showFoto?"checked":""}></label>
+    <div class="field"><label for="f-a">${L("Alias","Alias")} *</label><input id="f-a" required maxlength="24" value="${esc(me.alias)}" placeholder="${L("Cómo quieres que te llamen","What should people call you")}"></div>
+    <div class="field"><label for="f-pr">${L("Profesión","Occupation")}</label><input id="f-pr" value="${esc(me.prof)}" placeholder="${L("A qué te dedicas","What you do")}"></div>
+    <div class="field"><label for="f-e">${L("Edad","Age")} *</label><select id="f-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>${L("Se muestra como rango, nunca la edad exacta.","Shown as a range, never your exact age.")}</small></div>
+    <div class="field"><label for="f-g">${L("Cómo quieres que te presentemos","How should we introduce you")}</label><select id="f-g" class="sel">${G_OPTS().map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
+    <div class="field"><label for="f-z">${L("Escribes desde","Writing from")} *</label><input id="f-z" required value="${esc(me.zona)}" placeholder="${L("Región o provincia","Region or county")}"><small>${L("Nunca tu dirección.","Never your address.")}</small></div>
+    <div class="field"><label for="f-b">${L("Biografía breve","Short bio")} *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="${L("Lo primero que leerán de ti","The first thing people will read about you")}">${esc(me.bio)}</textarea><small>${L("La ve todo el mundo en Descubrir. Máximo 200 caracteres.","Everyone sees it in Discover. Up to 200 characters.")}</small></div>
+    <div class="field"><label for="f-l">${L("Biografía extensa","Long bio")}</label><textarea id="f-l" rows="5" maxlength="800" placeholder="${L("Cuéntate con más calma","Tell your story at your own pace")}">${esc(me.long)}</textarea><small>${L("Solo la ven las personas con las que haces match. Máximo 800 caracteres.","Only your matches see it. Up to 800 characters.")}</small></div>
+    <div class="field"><label for="f-i">${L("3 intereses","3 interests")} *</label><input id="f-i" required value="${esc(me.intereses)}" placeholder="${L("cine, montaña, poesía","film, hiking, poetry")}"><small>${L("Separados por comas. Se usan para el match.","Separated by commas. Used for matching.")}</small></div>
+    <div class="field"><label for="f-d">${L("Dirección postal","Postal address")} *</label><input id="f-d" required value="${esc(me.dir||"")}" placeholder="${L("Calle, número, código postal, ciudad","Street, number, postcode, city")}"><small>${L("Privada. Nadie la ve: solo se usa para reenviarte las cartas.","Private. Nobody sees it: it's only used to forward your letters.")}</small></div>`;
 }
 function bindProfile(rerender){
   $("#f-p").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
-    r.onload = () => { readForm(); me.foto = r.result; rerender(); toast("Foto subida. Solo se verá tras un match"); }; r.readAsDataURL(f); };
+    r.onload = () => { readForm(); me.foto = r.result; rerender(); toast(L("Foto subida. Solo se verá tras un match","Photo uploaded. It will only be shown after a match")); }; r.readAsDataURL(f); };
   $("#f-s").onchange = e => { me.showFoto = e.target.checked; };
 }
 function readForm(){
@@ -843,59 +909,62 @@ function readForm(){
 }
 
 function perfil(){
-  $("#view").innerHTML = `<h2>Perfil</h2><p class="sub">Esto es lo que ven los demás. Tu email nunca se muestra.</p>
-  <div class="verified"><span class="vdot">✓</span><div><b>Identidad verificada con Google</b><small>${esc(me.email||"")}</small></div></div>
+  const [ra, rn] = myRating();
+  $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
+  <div class="verified"><span class="vdot">✓</span><div><b>${L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div><div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">${L("Tu código","Your code")}: <b>${esc(me.code)}</b></div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div><div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${profileFields()}
-    <div class="sechead">Avisos cuando una carta cambia de fase</div>
-    <label class="switch" for="f-ne"><span><b>Por email</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
-    <label class="switch" for="f-na"><span><b>En la app</b><small>Notificaciones en el móvil</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
-    <button type="submit">Guardar cambios</button>
-    <button type="button" class="plain" id="logout">Cerrar sesión</button>
+    <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
+    <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
+    <label class="switch" for="f-na"><span><b>${L("En la app","In the app")}</b><small>${L("Notificaciones en el móvil","Notifications on your phone")}</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
+    <button type="submit">${L("Guardar cambios","Save changes")}</button>
+    <button type="button" class="plain" id="logout">${L("Cerrar sesión","Sign out")}</button>
   </form>`;
   bindProfile(perfil);
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
-  $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast("Perfil guardado"); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
+  $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[]}); location.hash=""; route(); };
 }
 
-
 /* ---- Animación: cómo viajan las cartas ---- */
-const FLOW = [
-  {from:0,to:1,txt:"Escribes tu carta y la envías a nuestra oficina, con el código de la otra persona."},
-  {from:1,to:2,txt:"En la oficina la metemos en un sobre nuevo y la enviamos a su dirección."},
-  {from:2,to:1,txt:"Su respuesta hace el mismo camino: primero llega a nuestra oficina…"},
-  {from:1,to:0,txt:"…y de ahí, a tu buzón. Ninguno conoce la dirección del otro."},
-  {from:0,to:2,direct:true,txt:"Cuando los dos decidáis compartir direcciones, ya podéis escribiros directamente."}
+const FLOW = () => [
+  {from:0,to:1,txt:L("Escribes tu carta y la envías a nuestra oficina, con el código de la otra persona.","You write your letter and send it to our office, with the other person's code.")},
+  {from:1,to:2,txt:L("En la oficina la metemos en un sobre nuevo y la enviamos a su dirección.","At our office we put it in a new envelope and send it to their address.")},
+  {from:2,to:1,txt:L("Su respuesta hace el mismo camino: primero llega a nuestra oficina…","Their reply takes the same route: first it reaches our office…")},
+  {from:1,to:0,txt:L("…y de ahí, a tu buzón. Ninguno conoce la dirección del otro.","…and from there, your mailbox. Neither knows the other's address.")},
+  {from:0,to:2,direct:true,txt:L("Cuando los dos decidáis compartir direcciones, ya podéis escribiros directamente.","Once you both decide to share addresses, you can write to each other directly.")}
 ];
 function flowHTML(){
-  return `<div class="flow" aria-label="Cómo viajan las cartas">
+  const F = FLOW();
+  return `<div class="flow" aria-label="${L("Cómo viajan las cartas","How letters travel")}">
   <svg viewBox="0 0 340 150" role="img" aria-hidden="true">
-    <path class="fl-line" id="fl-l1" d="M58 92 H152"/><path class="fl-line" id="fl-l2" d="M188 92 H282"/>
+    <path class="fl-line" d="M58 92 H152"/><path class="fl-line" d="M188 92 H282"/>
     <path class="fl-arc" id="fl-arc" d="M40 70 Q170 -6 300 70"/>
-    <g class="fl-node" transform="translate(40 92)"><circle r="22" class="fl-me"/><text y="5" class="fl-init">Tú</text></g>
+    <g class="fl-node" transform="translate(40 92)"><circle r="22" class="fl-me"/><text y="5" class="fl-init">${L("Tú","You")}</text></g>
     <g class="fl-node" id="fl-office" transform="translate(170 92)"><rect x="-22" y="-22" width="44" height="44" rx="10" class="fl-off"/>
       <path d="M-11 9 V-3 L0 -11 L11 -3 V9 Z M-4 9 V1 H4 V9" class="fl-house"/></g>
     <g class="fl-node" transform="translate(300 92)"><circle r="22" class="fl-them"/><text y="5" class="fl-init">L</text></g>
-    <text x="40" y="134" class="fl-lbl">Tú</text><text x="170" y="134" class="fl-lbl">Oficina Remitee</text><text x="300" y="134" class="fl-lbl">Lince</text>
+    <text x="40" y="134" class="fl-lbl">${L("Tú","You")}</text><text x="170" y="134" class="fl-lbl">${L("Oficina Remitee","Remitee office")}</text><text x="300" y="134" class="fl-lbl">Lince</text>
     <g id="fl-env"><rect x="-13" y="-9" width="26" height="18" rx="3" class="fl-envr"/><path d="M-12 -8 L0 1 L12 -8" class="fl-envf"/></g>
   </svg>
   <p class="fl-txt" id="fl-txt" aria-live="polite"></p>
-  <div class="fl-dots">${FLOW.map((_,i)=>`<span data-i="${i}"></span>`).join("")}</div></div>`;
+  <div class="fl-dots">${F.map((_,i)=>`<span data-i="${i}"></span>`).join("")}</div></div>`;
 }
 let flowRaf = 0;
 function startFlow(root){
   cancelAnimationFrame(flowRaf);
-  const X = [40,170,300], env = root.querySelector("#fl-env"), txt = root.querySelector("#fl-txt");
+  if (!root) return;
+  const F = FLOW(), X = [40,170,300], env = root.querySelector("#fl-env"), txt = root.querySelector("#fl-txt");
+  if (!env) return;
   const dots = [...root.querySelectorAll(".fl-dots span")], office = root.querySelector("#fl-office"), arc = root.querySelector("#fl-arc");
   const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
   const MOVE = 1800, HOLD = 1300, PH = MOVE + HOLD; let t0 = performance.now(), last = -1;
   const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
-  function frame(now){
-    if (!root.isConnected) return;
-    const el = Math.max(0, now - t0), i = Math.floor(el / PH) % FLOW.length, f = FLOW[i];
+  function frame(t){
+    if (!root.isConnected || !env.isConnected) return;
+    const el = Math.max(0, t - t0), i = Math.floor(el / PH) % F.length, f = F[i];
     const k = reduce ? 1 : ease(Math.min(1, (el % PH) / MOVE));
     const x = X[f.from] + (X[f.to]-X[f.from])*k, y = f.direct ? 70 - Math.sin(Math.PI*k)*42 : 70;
     env.setAttribute("transform", `translate(${x} ${y})`);
@@ -909,66 +978,72 @@ function showFlow(){
   const o = document.createElement("div"); o.className = "overlay";
   let tab = 0;
   const render = () => {
-    o.innerHTML = `<div class="modal"><h3 style="font-size:1.25rem">¿Cómo funciona Remitee?</h3>
-      <div class="seg" role="tablist"><button role="tab" class="${tab===0?"on":""}" data-t="0">El viaje</button><button role="tab" class="${tab===1?"on":""}" data-t="1">Preparar la carta</button></div>
+    o.innerHTML = `<div class="modal"><h3 style="font-size:1.25rem">${L("¿Cómo funciona Remitee?","How does Remitee work?")}</h3>
+      <div class="seg" role="tablist"><button role="tab" class="${tab===0?"on":""}" data-t="0">${L("El viaje","The journey")}</button><button role="tab" class="${tab===1?"on":""}" data-t="1">${L("Preparar la carta","Preparing the letter")}</button></div>
       <div class="flowcard">${tab===0?flowHTML():prepHTML()}</div>
-      <button id="fl-more">Saber más</button><button class="plain" id="fl-ok">Entendido</button></div>`;
+      <button id="fl-more">${L("Saber más","Learn more")}</button><button class="plain" id="fl-ok">${L("Entendido","Got it")}</button></div>`;
     tab===0 ? startFlow(o) : startPrep(o);
     o.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { tab = +b.dataset.t; render(); });
     o.querySelector("#fl-ok").onclick = () => o.remove();
-    o.querySelector("#fl-more").onclick = () => { o.remove(); location.hash = "#como"; };
+    o.querySelector("#fl-more").onclick = () => { o.remove(); location.hash = "#como"; if (!me.created) { route(); } };
   };
   document.body.appendChild(o); render();
 }
 
-/* ---- Alta: Google (simulado) + creación de perfil ---- */
+/* ---- Landing y alta ---- */
 let altaStep = 0;
 function landing(){
-  const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","Mensajería a fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
+  const phrases = lang==="en"
+    ? ["Connect with people by letter","Find friends","A bond","A story","Words first","Slow-cooked mail","No rush","Waiting counts too","Real letters"]
+    : ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","Mensajería a fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
   $("#view").innerHTML = `<div class="land">
     <section class="hero">
       <div class="hero-text">
-        <span class="kicker">Correspondencia entre desconocidos</span>
-        <h2 class="mega hero-title">Mensajería a<br><em>fuego lento.</em></h2>
-        <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.</p>
-        <div class="hero-cta"><button id="start">Crear mi perfil</button><button class="plain" id="how">Cómo funciona</button></div>
-        <small class="hero-note">Gratis · Solo mayores de 25 años</small>
+        <span class="kicker">${L("Correspondencia entre desconocidos","Letters between strangers")}</span>
+        <h2 class="mega hero-title">${L("Mensajería a<br><em>fuego lento.</em>","Mail,<br><em>slow-cooked.</em>")}</h2>
+        <p class="hero-sub">${L("Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.","Remitee connects people who want to write to each other by post. No chat, no rush, and nobody ever knows your address. Here things take a few days. That's the beauty of it.")}</p>
+        <div class="hero-cta"><button id="start">${L("Crear mi perfil","Create my profile")}</button><button class="plain" id="how">${L("Cómo funciona","How it works")}</button></div>
+        <small class="hero-note">${L("Gratis · Solo mayores de 25 años","Free · Over 25s only")}</small>
       </div>
       <div class="hero-video">
           <video id="heroVid" muted loop playsinline autoplay preload="metadata"><source src="hero.mp4" type="video/mp4"></video>
-          <div class="vph" id="vph"><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><b>Aquí va el vídeo</b><small>Sube un archivo hero.mp4 y se reproduce solo, en bucle y sin sonido.</small></div>
+          <div class="vph" id="vph"><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><b>${L("Aquí va el vídeo","The video goes here")}</b><small>${L("Sube un archivo hero.mp4 y se reproduce solo, en bucle y sin sonido.","Upload a hero.mp4 file and it plays on its own, looped and muted.")}</small></div>
         </div>
     </section>
     <div class="marquee" aria-hidden="true"><div class="mq">${[...phrases,...phrases].map(t=>`<span>${t}</span>`).join("")}</div></div>
     <section class="statements slow-in">
-      <p>Conecta por carta con <em>personas</em>.</p>
+      ${lang==="en" ? `<p>Connect with <em>people</em> by letter.</p>
+      <p>Find friends. A <em>bond</em>. A story.</p>
+      <p>Words <em>first</em>. Faces later.</p>
+      <p>Write without hurry. Read with <em>calm</em>.</p>
+      <p>Real letters, in <em>your mailbox</em>.</p>` : `<p>Conecta por carta con <em>personas</em>.</p>
       <p>Encuentra amigos. Un <em>vínculo</em>. Una historia.</p>
       <p>Primero las <em>palabras</em>. Después, la cara.</p>
       <p>Escribe sin prisas. Lee con <em>calma</em>.</p>
-      <p>Cartas de verdad, en <em>tu buzón</em>.</p>
+      <p>Cartas de verdad, en <em>tu buzón</em>.</p>`}
     </section>
     <section class="slowbox">
-      <span class="kicker">El valor de la espera</span>
+      <span class="kicker">${L("El valor de la espera","The value of waiting")}</span>
       <div class="compare">
-        <div><span class="big">1 s</span><p>Lo que tarda un mensaje. Y lo que dura en la memoria.</p></div>
-        <div><span class="big">3–5 días</span><p>Lo que tarda una carta. Se lee despacio, se relee y se guarda en una caja.</p></div>
+        <div><span class="big">1 s</span><p>${L("Lo que tarda un mensaje. Y lo que dura en la memoria.","How long a text takes to arrive. And how long it stays with you.")}</p></div>
+        <div><span class="big">${L("3–5 días","3–5 days")}</span><p>${L("Lo que tarda una carta. Se lee despacio, se relee y se guarda en una caja.","How long a letter takes. It's read slowly, reread, and kept in a box.")}</p></div>
       </div>
-      <div class="transit"><div class="transit-top"><span>Tu carta va de camino</span><span class="pp">✉︎</span></div><div class="tbar"><span></span></div><small>Sin prisa. Llega cuando llega.</small></div>
-      <p class="slow-quote">Lo bueno <em>tarda en llegar</em>.</p>
+      <div class="transit"><div class="transit-top"><span>${L("Tu carta va de camino","Your letter is on its way")}</span><span class="pp">✉︎</span></div><div class="tbar"><span></span></div><small>${L("Sin prisa. Llega cuando llega.","No hurry. It arrives when it arrives.")}</small></div>
+      <p class="slow-quote">${L("Lo bueno <em>tarda en llegar</em>.","Good things <em>take time</em>.")}</p>
     </section>
     <section class="steps3">
-      <div><span class="n">1</span><h3>Haz match por intereses</h3><p>Lees cómo escribe alguien y qué le gusta. Si los dos os elegís, se abre la correspondencia.</p></div>
-      <div><span class="n">2</span><h3>Escribe tu carta</h3><p>En papel, a mano si quieres. La metes en un sobre con su código y nos la mandas.</p></div>
-      <div><span class="n">3</span><h3>Nosotros la llevamos</h3><p>La reenviamos cerrada a su casa. Ninguno de los dos conoce la dirección del otro.</p></div>
+      <div><span class="n">1</span><h3>${L("Haz match por intereses","Match on interests")}</h3><p>${L("Lees cómo escribe alguien y qué le gusta. Si los dos os elegís, se abre la correspondencia.","You read how someone writes and what they like. If you both choose each other, the correspondence opens.")}</p></div>
+      <div><span class="n">2</span><h3>${L("Escribe tu carta","Write your letter")}</h3><p>${L("En papel, a mano si quieres. La metes en un sobre con su código y nos la mandas.","On paper, by hand if you like. Put it in an envelope with their code and send it to us.")}</p></div>
+      <div><span class="n">3</span><h3>${L("Nosotros la llevamos","We deliver it")}</h3><p>${L("La reenviamos cerrada a su casa. Ninguno de los dos conoce la dirección del otro.","We forward it, still sealed, to their home. Neither of you knows the other's address.")}</p></div>
     </section>
     <section class="privacy">
-      <h3>Tu dirección no la ve nadie</h3>
+      <h3>${L("Tu dirección no la ve nadie","Nobody sees your address")}</h3>
       <div class="flowcard">${flowHTML()}</div>
-      <ul class="perks"><li>Tus cartas pasan por nuestra oficina y nunca se abren</li><li>Foto y biografía completa, solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li><li>Compartís direcciones solo si los dos queréis</li></ul>
+      <ul class="perks"><li>${L("Tus cartas pasan por nuestra oficina y nunca se abren","Your letters go through our office and are never opened")}</li><li>${L("Foto y biografía completa, solo tras el match","Photo and full bio, only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Compartís direcciones solo si los dos queréis","You share addresses only if you both want to")}</li><li>${L("Valoraciones de 0 a 5 cartas para saber con quién escribes","Ratings from 0 to 5 letters, so you know who you're writing to")}</li></ul>
     </section>
     <section class="final">
-      <h2 class="mega sm">Escribe hoy.<br>Recibe <em>sin prisa</em>.</h2>
-      <button id="start2">Empezar ahora</button>
+      <h2 class="mega sm">${L("Escribe hoy.<br>Recibe <em>sin prisa</em>.","Write today.<br>Receive <em>slowly</em>.")}</h2>
+      <button id="start2">${L("Empezar ahora","Start now")}</button>
     </section>
   </div>`;
   startFlow($(".privacy .flowcard"));
@@ -982,31 +1057,31 @@ function alta(){
   if (altaStep === 0) return landing();
   if (altaStep === 1){
     $("#view").innerHTML = `<div class="welcome">
-      <button class="back" id="toLand" style="justify-self:start">← Volver</button>
-      <h2>Entra en Remitee</h2>
-      <p class="sub">Usamos tu cuenta de Google solo para verificar que eres una persona real.</p>
-      <ul class="perks"><li>Tu dirección nunca se comparte</li><li>Foto y biografía completa solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li><li>Solo para mayores de 25 años</li></ul>
-      <button class="google" id="g">Continuar con Google</button>
+      <button class="back" id="toLand" style="justify-self:start">← ${L("Volver","Back")}</button>
+      <h2>${L("Entra en Remitee","Join Remitee")}</h2>
+      <p class="sub">${L("Usamos tu cuenta de Google solo para verificar que eres una persona real.","We only use your Google account to verify that you're a real person.")}</p>
+      <ul class="perks"><li>${L("Tu dirección nunca se comparte","Your address is never shared")}</li><li>${L("Foto y biografía completa solo tras el match","Photo and full bio only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Solo para mayores de 25 años","Over 25s only")}</li></ul>
+      <button class="google" id="g">${L("Continuar con Google","Continue with Google")}</button>
       <div class="gsim" id="gsim" hidden>
-        <p class="note" style="margin:0 0 10px;text-align:left">En la versión real aquí se abre el inicio de sesión de Google. En el prototipo, escribe un email para simularlo.</p>
-        <div class="field"><label for="f-email">Email de tu cuenta de Google</label><input id="f-email" type="email" placeholder="nombre@gmail.com"></div>
-        <button id="gok" style="width:100%;margin-top:10px">Verificar y continuar</button>
+        <p class="note" style="margin:0 0 10px;text-align:left">${L("En la versión real aquí se abre el inicio de sesión de Google. En el prototipo, escribe un email para simularlo.","In the real version, Google sign-in opens here. In the prototype, type an email to simulate it.")}</p>
+        <div class="field"><label for="f-email">${L("Email de tu cuenta de Google","Your Google account email")}</label><input id="f-email" type="email" placeholder="${L("nombre@gmail.com","name@gmail.com")}"></div>
+        <button id="gok" style="width:100%;margin-top:10px">${L("Verificar y continuar","Verify and continue")}</button>
       </div>
-      <p class="note">Tu email no aparece en tu perfil.</p></div>`;
+      <p class="note">${L("Tu email no aparece en tu perfil.","Your email doesn't appear on your profile.")}</p></div>`;
     $("#toLand").onclick = () => { altaStep = 0; alta(); };
     $("#g").onclick = () => {
       if (FB){
-        $("#g").disabled = true; $("#g").textContent = "Conectando con Google…";
+        $("#g").disabled = true; $("#g").textContent = L("Conectando con Google…","Connecting to Google…");
         googleLogin().then(had => {
-          if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(`Hola de nuevo, ${me.alias}`); }
+          if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Hola de nuevo, ${me.alias}`,`Welcome back, ${me.alias}`)); }
           else { altaStep = 2; alta(); }
-        }).catch(e => { $("#g").disabled = false; $("#g").textContent = "Continuar con Google";
-          toast(e && e.code === "auth/popup-closed-by-user" ? "Has cerrado la ventana de Google" : "No se ha podido iniciar sesión con Google. Inténtalo de nuevo."); });
+        }).catch(e => { $("#g").disabled = false; $("#g").textContent = L("Continuar con Google","Continue with Google");
+          toast(e && e.code === "auth/popup-closed-by-user" ? L("Has cerrado la ventana de Google","You closed the Google window") : L("No se ha podido iniciar sesión con Google. Inténtalo de nuevo.","Couldn't sign in with Google. Please try again.")); });
         return;
       }
       $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
     $("#gok").onclick = () => { const v = $("#f-email").value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast("Escribe un email válido, por ejemplo nombre@gmail.com"); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast(L("Escribe un email válido, por ejemplo nombre@gmail.com","Enter a valid email, for example name@gmail.com")); return; }
       me.email = v; me.verified = true; altaStep = 2; alta(); };
     return;
   }
@@ -1015,105 +1090,108 @@ function alta(){
 
 /* ---- Tutorial de alta: un pop-up por paso ---- */
 let wStep = 0;
-const W = [
-  {t:"Pon tu alias", d:"Es el nombre con el que te conocerán. No hace falta que sea el real.",
-   f:()=>`<div class="field"><label for="w-a">Alias</label><input id="w-a" maxlength="24" value="${esc(me.alias)}" placeholder="Por ejemplo, Tinta Azul"></div>
-     <div class="field"><label for="w-e">Edad</label><select id="w-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango.</small></div>
-     <label class="agecheck" for="w-25"><input type="checkbox" id="w-25" ${me.over25?"checked":""}><span>Confirmo que tengo 25 años o más</span></label>
-     <div class="field"><label for="w-g">Cómo quieres que te presentemos</label><select id="w-g" class="sel">${[["f","En femenino (recién llegada)"],["m","En masculino (recién llegado)"],["n","Neutro (nueva en Remitee)"]].map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
-     <div class="field"><label for="w-z">Escribes desde</label><input id="w-z" value="${esc(me.zona)}" placeholder="Región o provincia"></div>
-     <div class="field"><label for="w-pr">Profesión (opcional)</label><input id="w-pr" value="${esc(me.prof)}" placeholder="A qué te dedicas"></div>`,
+const W = () => [
+  {t:L("Pon tu alias","Choose your alias"), d:L("Es el nombre con el que te conocerán. No hace falta que sea el real.","It's the name people will know you by. It doesn't have to be your real one."),
+   f:()=>`<div class="field"><label for="w-a">${L("Alias","Alias")}</label><input id="w-a" maxlength="24" value="${esc(me.alias)}" placeholder="${L("Por ejemplo, Tinta Azul","For example, Blue Ink")}"></div>
+     <div class="field"><label for="w-e">${L("Edad","Age")}</label><select id="w-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>${L("Se muestra como rango.","Shown as a range.")}</small></div>
+     <label class="agecheck" for="w-25"><input type="checkbox" id="w-25" ${me.over25?"checked":""}><span>${L("Confirmo que tengo 25 años o más","I confirm I'm 25 or older")}</span></label>
+     <div class="field"><label for="w-g">${L("Cómo quieres que te presentemos","How should we introduce you")}</label><select id="w-g" class="sel">${[["f",L("En femenino (recién llegada)","Feminine")],["m",L("En masculino (recién llegado)","Masculine")],["n",L("Neutro (nueva en Remitee)","Neutral")]].map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
+     <div class="field"><label for="w-z">${L("Escribes desde","Writing from")}</label><input id="w-z" value="${esc(me.zona)}" placeholder="${L("Región o provincia","Region or county")}"></div>
+     <div class="field"><label for="w-pr">${L("Profesión (opcional)","Occupation (optional)")}</label><input id="w-pr" value="${esc(me.prof)}" placeholder="${L("A qué te dedicas","What you do")}"></div>`,
    save:()=>{ me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.over25=$("#w-25").checked; me.g=$("#w-g").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
-     return !me.alias ? "Escribe un alias para continuar" : !me.over25 ? "Remitee es solo para mayores de 25 años" : !me.zona ? "Indica desde dónde escribes" : ""; }},
-  {t:"Añade tu foto si quieres", d:"Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.", skip:"Más adelante",
-   f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?"Cambiar foto":"Elegir foto"}</label><input type="file" id="w-p" accept="image/*" hidden></div>
-     <label class="switch" for="w-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
+     return !me.alias ? L("Escribe un alias para continuar","Enter an alias to continue") : !me.over25 ? L("Remitee es solo para mayores de 25 años","Remitee is for over 25s only") : !me.zona ? L("Indica desde dónde escribes","Tell us where you're writing from") : ""; }},
+  {t:L("Añade tu foto si quieres","Add a photo if you like"), d:L("Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.","Nobody will see it before a match. You can also add it later from your profile."), skip:L("Más adelante","Later"),
+   f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?L("Cambiar foto","Change photo"):L("Elegir foto","Choose photo")}</label><input type="file" id="w-p" accept="image/*" hidden></div>
+     <label class="switch" for="w-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
    bind:()=>{ $("#w-p").onchange = e => { const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ me.foto=r.result; wizard(); }; r.readAsDataURL(f); }; },
    save:()=>{ me.showFoto=$("#w-s").checked; return ""; }},
-  {t:"Una breve biografía", d:"Para que las personas sepan cómo eres. Es lo primero que leerán en Descubrir, junto con tus 3 intereses.",
-   f:()=>`<div class="field"><label for="w-b">Biografía breve</label><textarea id="w-b" rows="3" maxlength="200" placeholder="Escribo mejor de lo que hablo...">${esc(me.bio)}</textarea><small><span id="w-bc">${me.bio.length}</span>/200</small></div>
-     <div class="field"><label for="w-i">3 intereses</label><input id="w-i" value="${esc(me.intereses)}" placeholder="cine, montaña, poesía"><small>Separados por comas. Sirven para hacer match.</small></div>`,
+  {t:L("Una breve biografía","A short bio"), d:L("Para que las personas sepan cómo eres. Es lo primero que leerán en Descubrir, junto con tus 3 intereses.","So people know what you're like. It's the first thing they'll read in Discover, along with your 3 interests."),
+   f:()=>`<div class="field"><label for="w-b">${L("Biografía breve","Short bio")}</label><textarea id="w-b" rows="3" maxlength="200" placeholder="${L("Escribo mejor de lo que hablo...","I write better than I talk...")}">${esc(me.bio)}</textarea><small><span id="w-bc">${me.bio.length}</span>/200</small></div>
+     <div class="field"><label for="w-i">${L("3 intereses","3 interests")}</label><input id="w-i" value="${esc(me.intereses)}" placeholder="${L("cine, montaña, poesía","film, hiking, poetry")}"><small>${L("Separados por comas. Sirven para hacer match.","Separated by commas. Used for matching.")}</small></div>`,
    bind:()=>{ $("#w-b").oninput = e => $("#w-bc").textContent = e.target.value.length; },
    save:()=>{ me.bio=$("#w-b").value.trim(); me.intereses=$("#w-i").value.split(",").map(x=>x.trim()).filter(Boolean).slice(0,3).join(", ");
-     return !me.bio ? "Escribe una biografía breve" : me.intereses.split(",").filter(Boolean).length<3 ? "Añade 3 intereses separados por comas" : ""; }},
-  {t:"Una biografía extensa", d:"Solo la leerán las personas con las que hagas match. Cuéntate con calma: qué haces, qué te gusta, qué buscas.",
-   f:()=>`<div class="field"><label for="w-l">Biografía extensa</label><textarea id="w-l" rows="6" maxlength="800" placeholder="Cuéntate con más calma...">${esc(me.long)}</textarea><small><span id="w-lc">${me.long.length}</span>/800</small></div>`,
+     return !me.bio ? L("Escribe una biografía breve","Write a short bio") : me.intereses.split(",").filter(Boolean).length<3 ? L("Añade 3 intereses separados por comas","Add 3 interests separated by commas") : ""; }},
+  {t:L("Una biografía extensa","A long bio"), d:L("Solo la leerán las personas con las que hagas match. Cuéntate con calma: qué haces, qué te gusta, qué buscas.","Only your matches will read it. Take your time: what you do, what you like, what you're looking for."),
+   f:()=>`<div class="field"><label for="w-l">${L("Biografía extensa","Long bio")}</label><textarea id="w-l" rows="6" maxlength="800" placeholder="${L("Cuéntate con más calma...","Tell your story at your own pace...")}">${esc(me.long)}</textarea><small><span id="w-lc">${me.long.length}</span>/800</small></div>`,
    bind:()=>{ $("#w-l").oninput = e => $("#w-lc").textContent = e.target.value.length; },
    save:()=>{ me.long=$("#w-l").value.trim(); return ""; }},
-  {t:"Tu dirección", d:"Es imprescindible. Nadie tiene acceso a ella: nosotros la usamos solo para reenviarte las cartas que te escriban.",
-   f:()=>`<div class="field"><label for="w-d">Dirección postal</label><textarea id="w-d" rows="3" placeholder="Calle, número, piso&#10;Código postal y ciudad">${esc(me.dir||"")}</textarea></div>
-     <div class="lockline">🔒 Las otras personas solo verán tu código de buzón, nunca tu dirección.</div>`,
-   save:()=>{ me.dir=$("#w-d").value.trim(); return me.dir.length<8 ? "La dirección es imprescindible para recibir cartas" : ""; }},
-  {t:"Así se envía una carta", d:"Doble sobre y dos sellos: uno para que nos llegue y otro para que la reenviemos. Tu carta nunca se abre.",
+  {t:L("Tu dirección","Your address"), d:L("Es imprescindible. Nadie tiene acceso a ella: nosotros la usamos solo para reenviarte las cartas que te escriban.","It's essential. Nobody else has access to it: we only use it to forward the letters people write to you."),
+   f:()=>`<div class="field"><label for="w-d">${L("Dirección postal","Postal address")}</label><textarea id="w-d" rows="3" placeholder="${L("Calle, número, piso&#10;Código postal y ciudad","Street, number, flat&#10;Postcode and city")}">${esc(me.dir||"")}</textarea></div>
+     <div class="lockline">🔒 ${L("Las otras personas solo verán tu código de buzón, nunca tu dirección.","Other people will only see your mailbox code, never your address.")}</div>`,
+   save:()=>{ me.dir=$("#w-d").value.trim(); return me.dir.length<8 ? L("La dirección es imprescindible para recibir cartas","An address is essential to receive letters") : ""; }},
+  {t:L("Así se envía una carta","How to send a letter"), d:L("Doble sobre y dos sellos: uno para que nos llegue y otro para que la reenviemos. Tu carta nunca se abre.","Two envelopes and two stamps: one to reach us and one for us to forward it. Your letter is never opened."),
    f:()=>`<div class="flowcard">${prepHTML()}</div>`,
    bind:()=>startPrep(document.querySelector(".overlay.wiz")),
    save:()=>""}
 ];
 function wizard(){
-  const st = W[wStep], last = wStep === W.length-1;
-  $("#view").innerHTML = `<div class="wbg"><div class="verified"><span class="vdot">✓</span><div><b>Cuenta verificada</b><small>${esc(me.email)}</small></div></div><h2>Crea tu perfil</h2><p class="sub">Te guiamos paso a paso.</p></div>`;
+  const WW = W(), st = WW[wStep], last = wStep === WW.length-1;
+  $("#view").innerHTML = `<div class="wbg"><div class="verified"><span class="vdot">✓</span><div><b>${L("Cuenta verificada","Account verified")}</b><small>${esc(me.email)}</small></div></div><h2>${L("Crea tu perfil","Create your profile")}</h2><p class="sub">${L("Te guiamos paso a paso.","We'll guide you step by step.")}</p></div>`;
   document.querySelector(".overlay.wiz")?.remove();
   const o = document.createElement("div"); o.className = "overlay wiz";
   o.innerHTML = `<div class="modal wmodal" role="dialog" aria-labelledby="wt">
-    <div class="wtop"><span class="wstep">Paso ${wStep+1} de ${W.length}</span><div class="wbar"><span style="width:${(wStep+1)/W.length*100}%"></span></div></div>
+    <div class="wtop"><span class="wstep">${L(`Paso ${wStep+1} de ${WW.length}`,`Step ${wStep+1} of ${WW.length}`)}</span><div class="wbar"><span style="width:${(wStep+1)/WW.length*100}%"></span></div></div>
     <h3 id="wt">${st.t}</h3><p class="wdesc">${st.d}</p>
     <div class="wfields">${st.f()}</div>
-    <div class="wbtns">${wStep>0?`<button class="plain" id="wb">Atrás</button>`:"<span></span>"}
-      <span class="row">${st.skip?`<button class="soft" id="wsk">${st.skip}</button>`:""}<button id="wn">${last?"Crear perfil":"Siguiente"}</button></span></div></div>`;
+    <div class="wbtns">${wStep>0?`<button class="plain" id="wb">${L("Atrás","Back")}</button>`:"<span></span>"}
+      <span class="row">${st.skip?`<button class="soft" id="wsk">${st.skip}</button>`:""}<button id="wn">${last?L("Crear perfil","Create profile"):L("Siguiente","Next")}</button></span></div></div>`;
   document.body.appendChild(o);
   st.bind && st.bind();
   const first = o.querySelector("input:not([type=file]):not([type=checkbox]),textarea"); if (first) first.focus();
-  const go = n => { const err = st.save(); if (n>0 && err){ toast(err); return; } wStep += n; wizard(); };
   o.querySelector("#wn").onclick = () => { const err = st.save(); if (err){ toast(err); return; }
     if (!last){ wStep++; wizard(); return; }
-    o.remove(); me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 0; wStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(`Perfil creado. Tu código de buzón es ${me.code}`); };
+    o.remove(); me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 0; wStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Perfil creado. Tu código de buzón es ${me.code}`,`Profile created. Your mailbox code is ${me.code}`)); };
   const sk = o.querySelector("#wsk"); if (sk) sk.onclick = () => { st.save(); wStep++; wizard(); };
   const bk = o.querySelector("#wb"); if (bk) bk.onclick = () => { st.save(); wStep--; wizard(); };
   o.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.tagName==="INPUT") { e.preventDefault(); o.querySelector("#wn").click(); } });
 }
 
 function como(){
-  $("#view").innerHTML = `<button class="back" id="back">← Volver</button>
+  const S = (es, en) => `<p>${L(es, en)}</p>`;
+  $("#view").innerHTML = `<button class="back" id="back">← ${L("Volver","Back")}</button>
   <article class="art">
-    <span class="art-kicker">Guía</span>
-    <h2>Cómo funciona Remitee</h2>
-    <p class="art-lede">Remitee pone en contacto a personas que quieren escribirse cartas en papel. La app sirve para encontraros; la relación ocurre por correo postal, sin chat y sin prisas.</p>
+    <span class="art-kicker">${L("Guía","Guide")}</span>
+    <h2>${L("Cómo funciona Remitee","How Remitee works")}</h2>
+    <p class="art-lede">${L("Remitee pone en contacto a personas que quieren escribirse cartas en papel. La app sirve para encontraros; la relación ocurre por correo postal, sin chat y sin prisas.","Remitee connects people who want to write each other paper letters. The app is for finding each other; the relationship happens by post, with no chat and no rush.")}</p>
     <div class="flowcard">${flowHTML()}</div>
-    <h3>1. Tu perfil</h3>
-    <p>Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, una biografía breve y 3 intereses. Tu email nunca se muestra.</p>
-    <h3>2. Match por intereses</h3>
-    <p>En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.</p>
-    <h3>3. Lo que se desbloquea con el match</h3>
-    <p>Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y su biografía extensa, que solo leen sus matches.</p>
-    <h3>4. Quién escribe primero</h3>
-    <p>Escribe primero quien completa el match, es decir, quien dice que sí en segundo lugar. La app lo indica en la pantalla del match, así nunca se cruzan dos cartas ni os quedáis esperando el uno al otro.</p>
-    <h3>5. Cómo viajan las cartas</h3>
-    <p>Nunca escribes a la casa de nadie. Tu carta pasa por nuestra oficina, que la reenvía a la dirección de la otra persona. Su respuesta hace el mismo camino hasta ti.</p>
-    <h3>6. El doble sobre y los dos sellos</h3>
+    <h3>${L("1. Tu perfil","1. Your profile")}</h3>
+    ${S("Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, una biografía breve y 3 intereses. Tu email nunca se muestra.","You sign up with Google to verify that you're a real person. Remitee is for over 25s only. Your profile has an alias, an age range, where you write from, your occupation, a short bio and 3 interests. Your email is never shown.")}
+    <h3>${L("2. Match por intereses","2. Matching on interests")}</h3>
+    ${S(`En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.`,`In Discover you read profiles without seeing photos. You can choose someone or pass. If you both choose each other, it's a match and the correspondence opens. Each day you can see ${VIEW_LIMIT} profiles; with Remitee Plus there's no limit.`)}
+    <h3>${L("3. Lo que se desbloquea con el match","3. What a match unlocks")}</h3>
+    ${S("Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y su biografía extensa, que solo leen sus matches.","After a match you can see the other person's photo, if they've chosen to show it, and their long bio, which only their matches can read.")}
+    <h3>${L("4. Quién escribe primero","4. Who writes first")}</h3>
+    ${S("Escribe primero quien completa el match, es decir, quien dice que sí en segundo lugar. La app lo indica en la pantalla del match, así nunca se cruzan dos cartas ni os quedáis esperando el uno al otro.","Whoever completes the match writes first, that is, whoever says yes second. The app shows it on the match screen, so two letters never cross and nobody is left waiting for the other.")}
+    <h3>${L("5. Cómo viajan las cartas","5. How letters travel")}</h3>
+    ${S("Nunca escribes a la casa de nadie. Tu carta pasa por nuestra oficina, que la reenvía a la dirección de la otra persona. Su respuesta hace el mismo camino hasta ti.","You never write to anyone's home. Your letter goes through our office, which forwards it to the other person's address. Their reply takes the same route back to you.")}
+    <h3>${L("6. El doble sobre y los dos sellos","6. Two envelopes, two stamps")}</h3>
     <div class="flowcard" id="prepcard">${prepHTML()}</div>
-    <p>Metes la carta en un sobre interior cerrado, con solo el código de buzón de la otra persona, por ejemplo <span class="code-inline">LUNA-4821</span>. Ese sobre, junto con un segundo sello, va dentro de un sobre exterior dirigido a Remitee y con su propio sello. En la oficina abrimos solo el sobre exterior y usamos tu segundo sello para reenviar el interior, intacto. Nadie lee tu carta.</p>
-    <h3>7. Seguimiento de cada carta</h3>
-    <p>Al enviarla, subes una foto del sobre interior cerrado. Desde ahí, las dos personas ven en qué punto está: <b>enviada</b>, <b>en la oficina</b>, <b>reenviada</b> y <b>entregada</b>, con la fecha de cada paso. La foto pone tu plazo en pausa y la llegada a la oficina lo confirma. Si una carta no llega a la oficina en unos cinco días, te avisamos antes de penalizar, por si hay un retraso de Correos. Quien la recibe confirma con un botón que le ha llegado.</p>
-    <h3>8. Plazos y suspensiones</h3>
-    <p>Quien escribe primero tiene ${FIRST_DAYS} días tras el match. Cada vez que recibes una carta, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches.</p>
-    <h3>9. Cuánto cuesta</h3>
-    <p>Usar Remitee es gratis. Cada carta lleva dos sellos que pones tú, como con cualquier carta: uno para que nos llegue y otro para reenviarla. Remitee Plus es opcional y te deja ver más de ${VIEW_LIMIT} perfiles al día.</p>
-    <h3>Avisos en cada paso</h3>
-    <p>Cada vez que una carta cambia de fase te avisamos por email y en la app: cuando la envías, cuando llega a nuestra oficina, cuando la reenviamos y cuando llega a su destino. También cuando alguien te escribe, cuando hay un match o cuando se acerca un plazo. Puedes elegir los canales en tu perfil.</p>
-    <h3>10. Tu historial</h3>
-    <p>En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada. Y quien ha perdido varios matches por no responder aparece marcado como «Nunca contesta».</p>
-    <h3>11. Compartir direcciones</h3>
-    <p>Cuando os conozcáis, podéis compartir vuestras direcciones para escribiros directamente. Solo ocurre si los dos aceptáis, y nadie sabe si el otro ha dicho que no.</p>
-    <h3>Tu privacidad</h3>
-    <p>Tu dirección solo la conoce Remitee y solo se usa para reenviarte cartas. No hay teléfonos ni emails en los perfiles, y puedes ocultar tu foto cuando quieras.</p>
+    <p>${L(`Metes la carta en un sobre interior cerrado, con solo el código de buzón de la otra persona, por ejemplo <span class="code-inline">LUNA-4821</span>. Ese sobre, junto con un segundo sello, va dentro de un sobre exterior dirigido a Remitee y con su propio sello. En la oficina abrimos solo el sobre exterior, metemos tu sobre cerrado en uno nuevo con la dirección de la otra persona y usamos tu segundo sello para enviarlo. Nadie lee tu carta.`,`You put the letter in a sealed inner envelope, with only the other person's mailbox code, for example <span class="code-inline">LUNA-4821</span>. That envelope, together with a second stamp, goes inside an outer envelope addressed to Remitee with its own stamp. At our office we open only the outer envelope, put your sealed envelope into a new one with the other person's address, and use your second stamp to send it. Nobody reads your letter.`)}</p>
+    <h3>${L("7. Seguimiento de cada carta","7. Tracking every letter")}</h3>
+    <p>${L("Al enviarla, subes una foto del sobre interior cerrado. Desde ahí, las dos personas ven en qué punto está: <b>enviada</b>, <b>en la oficina</b>, <b>reenviada</b> y <b>entregada</b>, con la fecha de cada paso. La foto pone tu plazo en pausa y la llegada a la oficina lo confirma. Si una carta no llega a la oficina en unos cinco días, te avisamos antes de penalizar, por si hay un retraso de Correos. Quien la recibe confirma con un botón que le ha llegado.","When you send it, you upload a photo of the sealed inner envelope. From then on, both of you can see where it is: <b>sent</b>, <b>at our office</b>, <b>forwarded</b> and <b>delivered</b>, with the date of each step. The photo pauses your deadline and its arrival at our office confirms it. If a letter doesn't reach our office within about five days, we warn you before any penalty, in case of postal delays. The recipient confirms with a button that it has arrived.")}</p>
+    <h3>${L("8. Plazos y suspensiones","8. Deadlines and suspensions")}</h3>
+    ${S(`Quien escribe primero tiene ${FIRST_DAYS} días tras el match. Cada vez que recibes una carta, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches.`,`Whoever writes first has ${FIRST_DAYS} days after the match. Each time you receive a letter, you have ${REPLY_DAYS} days to reply. If someone misses their deadline, the correspondence closes and their account is suspended for ${SUSPEND_DAYS} days, with no new matches.`)}
+    <h3>${L("9. Valoraciones","9. Ratings")}</h3>
+    ${S("Cuando te llega una carta, puedes valorarla de 0 a 5 cartas. La media aparece en el perfil de cada persona junto al número de valoraciones, para que sepas cómo de fiable y cuidadosa es como corresponsal.","When a letter reaches you, you can rate it from 0 to 5 letters. The average appears on each person's profile next to the number of ratings, so you know how reliable and thoughtful they are as a correspondent.")}
+    <h3>${L("10. Tu historial","10. Your track record")}</h3>
+    ${S("En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada. Y quien ha perdido varios matches por no responder aparece marcado como «Nunca contesta».","Each profile shows how many correspondences that person has had and whether they always reply on time. Newcomers are marked as new. And anyone who has lost several matches by not replying is marked “Never replies”.")}
+    <h3>${L("11. Cuánto cuesta","11. What it costs")}</h3>
+    ${S(`Usar Remitee es gratis. Cada carta lleva dos sellos que pones tú, como con cualquier carta: uno para que nos llegue y otro para reenviarla. Remitee Plus es opcional y te deja ver más de ${VIEW_LIMIT} perfiles al día.`,`Using Remitee is free. Each letter carries two stamps that you add yourself, as with any letter: one to reach us and one to forward it. Remitee Plus is optional and lets you see more than ${VIEW_LIMIT} profiles a day.`)}
+    <h3>${L("12. Avisos en cada paso","12. Notifications at every step")}</h3>
+    ${S("Cada vez que una carta cambia de fase te avisamos por email y en la app: cuando la envías, cuando llega a nuestra oficina, cuando la reenviamos y cuando llega a su destino. También cuando alguien te escribe, cuando hay un match o cuando se acerca un plazo. Puedes elegir los canales en tu perfil.","Every time a letter changes stage we notify you by email and in the app: when you send it, when it reaches our office, when we forward it and when it's delivered. Also when someone writes to you, when you get a match or when a deadline is near. You can choose the channels in your profile.")}
+    <h3>${L("13. Compartir direcciones","13. Sharing addresses")}</h3>
+    ${S("Cuando os conozcáis, podéis compartir vuestras direcciones para escribiros directamente. Solo ocurre si los dos aceptáis, y nadie sabe si el otro ha dicho que no.","Once you know each other, you can share addresses to write directly. It only happens if you both accept, and nobody knows if the other said no.")}
+    <h3>${L("Tu privacidad","Your privacy")}</h3>
+    ${S("Tu dirección solo la conoce Remitee y solo se usa para reenviarte cartas. No hay teléfonos ni emails en los perfiles, y puedes ocultar tu foto cuando quieras.","Only Remitee knows your address, and it's only used to forward your letters. There are no phone numbers or emails on profiles, and you can hide your photo whenever you like.")}
   </article>`;
-  $("#back").onclick = () => history.length > 1 ? history.back() : (location.hash = "#descubrir");
-  startFlow($(".flowcard")); startPrep($("#prepcard"));
+  $("#back").onclick = () => { if (!me.created){ location.hash = ""; route(); return; } history.length > 1 ? history.back() : (location.hash = "#descubrir"); };
+  startFlow($(".art .flowcard")); startPrep($("#prepcard"));
 }
 
 const views = {descubrir, cartas, perfil, como};
 function route(){
-  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#helpBtn").hidden = onb; $("#bellBtn").hidden = onb;
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#bellBtn").hidden = onb;
+  if (onb && location.hash === "#como"){ document.body.classList.remove("wide"); como(); window.scrollTo(0,0); return; }
   if (onb){ alta(); window.scrollTo(0,0); return; }
   document.body.classList.remove("wide");
   const v = (location.hash || "#descubrir").slice(1), name = views[v] ? v : "descubrir";
@@ -1123,19 +1201,36 @@ function route(){
 }
 document.querySelector('.tabs a[data-v="cartas"]').addEventListener("click", () => { openId = null; if (location.hash==="#cartas") route(); });
 window.addEventListener("hashchange", route);
+
+/* ---- Textos fijos de la cabecera y las pestañas ---- */
+function applyStatic(){
+  document.documentElement.lang = lang;
+  $(".slogan").textContent = L("Mensajería a fuego lento","Slow-cooked mail");
+  $(".demo").textContent = L("Prototipo","Prototype");
+  $("#helpBtn").innerHTML = `<span class="hl">${L("Cómo funciona","How it works")}</span><span class="hq" aria-hidden="true">?</span>`;
+  $("#helpBtn").setAttribute("aria-label", L("Cómo funciona","How it works"));
+  $("#bellBtn").setAttribute("aria-label", L("Avisos","Notifications"));
+  const tabTxt = {descubrir:L("Descubrir","Discover"), cartas:L("Cartas","Letters"), perfil:L("Perfil","Profile")};
+  document.querySelectorAll(".tabs a").forEach(a => { const t = a.querySelector(".tl"); if (t) t.textContent = tabTxt[a.dataset.v]; });
+  const lb = $("#langBtn"); lb.textContent = lang==="en" ? "ES" : "EN"; lb.setAttribute("aria-label", lang==="en" ? "Cambiar a español" : "Switch to English");
+}
+function setLang(l){ lang = l; try { localStorage.setItem("remitee-lang", l); } catch(e){} document.querySelectorAll(".overlay").forEach(o => o.remove()); applyStatic(); setTheme(document.documentElement.getAttribute("data-theme")||"light"); route(); }
+
 // Tema: claro por defecto, botón para pasar a oscuro.
 const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
 const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
 function setTheme(t){
   document.documentElement.setAttribute("data-theme", t);
   const b = $("#themeBtn"); b.innerHTML = t==="dark" ? SUN : MOON;
-  b.setAttribute("aria-label", t==="dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+  b.setAttribute("aria-label", t==="dark" ? L("Cambiar a modo claro","Switch to light mode") : L("Cambiar a modo oscuro","Switch to dark mode"));
   try { localStorage.setItem("remitee-theme", t); } catch(e) {}
 }
 let saved = null; try { saved = localStorage.getItem("remitee-theme"); } catch(e) {}
 setTheme(saved === "dark" ? "dark" : "light");
+applyStatic();
 $("#helpBtn").onclick = showFlow;
 $("#bellBtn").onclick = showNotifs;
+$("#langBtn").onclick = () => setLang(lang === "en" ? "es" : "en");
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
 route();
 </script>
