@@ -1,14 +1,11 @@
-// Configuración de Firebase para Remitee.
-// Mientras esté vacía, la web funciona en modo prototipo (login simulado y perfil guardado solo en el navegador).
-// Para activar el login real con Google, pega aquí el bloque firebaseConfig de tu proyecto:
-// Firebase → Configuración del proyecto → Tus apps → App web.
+// Configuración de Firebase para Remitee (proyecto remitee-c36cf).
 // Estos valores no son secretos: la seguridad la ponen las reglas de firestore.rules.
 
 window.REMITEE_FIREBASE = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyD-XHw2WmBxv5RJNW2os707YwAK_A5DmfI",
+  authDomain: "remitee-c36cf.firebaseapp.com",
+  projectId: "remitee-c36cf",
+  storageBucket: "remitee-c36cf.firebasestorage.app",
+  messagingSenderId: "491236383900",
+  appId: "1:491236383900:web:3d4a16d195c289cccee159"
 };
