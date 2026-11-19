@@ -218,6 +218,8 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .vbar i{width:18px;height:4px;border-radius:999px;background:var(--line)}
 .vbar i.used{background:var(--muted)}
 .vbar i.now{background:var(--accent)}
+.backp{background:none;color:var(--accent);padding:4px 0;font-size:.85rem;font-weight:600}
+.backp:disabled{color:var(--muted);opacity:.5}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -298,7 +300,8 @@ const daysLeft = d => Math.max(0, Math.ceil((d - now)/DAY));
 // Cuántos días tarda cada perfil de ejemplo en responder tras recibir tu carta. null = nunca responde.
 const replyAfter = {1:4, 3:null, 4:6};
 const VIEW_LIMIT = 5; let viewsUsed = 0, viewDay = now.toDateString(), plus = false;
-function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; } return plus ? Infinity : VIEW_LIMIT - viewsUsed; }
+const passedStack = []; // perfiles pasados hoy, para poder volver atrás
+function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; passedStack.length = 0; } return plus ? Infinity : VIEW_LIMIT - viewsUsed; }
 const suspended = () => me.suspendedUntil && now < me.suspendedUntil;
 
 function tick(){
@@ -326,18 +329,27 @@ function suspBanner(){
   return suspended() ? `<div class="susp"><b>Cuenta suspendida hasta el ${fmt(me.suspendedUntil)}</b><br>No respondiste a una carta a tiempo. Mientras dure no puedes hacer nuevos matches.</div>` : "";
 }
 
+function backBtn(){
+  return `<button class="backp" id="prevp" ${passedStack.length?"":"disabled"} aria-label="Volver al perfil anterior">← Anterior</button>`;
+}
+function bindBack(){
+  const b = $("#prevp"); if (!b) return;
+  b.onclick = () => { const q = passedStack.pop(); if (!q) return; q.seen = false;
+    const i = people.indexOf(q); people.splice(i,1); people.unshift(q); // que sea el siguiente en mostrarse
+    if (!plus) viewsUsed = Math.max(0, viewsUsed-1); descubrir(); };
+}
 function descubrir(){
   const left = pending();
   const head = `<h2>Descubrir</h2><p class="sub">Primero los intereses. La foto, después del match.</p>${suspBanner()}`;
   if (!plus && viewsLeft()<=0){
-    $("#view").innerHTML = head + `<div class="paywall"><b>Ya has visto tus ${VIEW_LIMIT} perfiles de hoy</b><p>Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.</p><button id="sub">Suscribirme a Remitee Plus</button><small>Simulación: no se cobra nada.</small></div>${sim()}`;
-    bindSim(); $("#sub").onclick = () => { plus = true; toast("Ya eres de Remitee Plus: perfiles ilimitados"); descubrir(); }; return;
+    $("#view").innerHTML = head + `${backBtn()}<div class="paywall"><b>Ya has visto tus ${VIEW_LIMIT} perfiles de hoy</b><p>Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.</p><button id="sub">Suscribirme a Remitee Plus</button><small>Simulación: no se cobra nada.</small></div>${sim()}`;
+    bindSim(); bindBack(); $("#sub").onclick = () => { plus = true; toast("Ya eres de Remitee Plus: perfiles ilimitados"); descubrir(); }; return;
   }
-  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.</div>${sim()}`; bindSim(); return; }
+  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.</div>${backBtn()}${sim()}`; bindSim(); bindBack(); return; }
   const p = left[0];
   const shared = common(p);
   $("#view").innerHTML = head + `
-    <div class="views">${plus?"Remitee Plus · perfiles ilimitados":`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`}${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
+    <div class="views">${backBtn()}<span>${plus?"Remitee Plus · perfiles ilimitados":`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
     <article class="card">
       <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?"La foto se muestra si hay match":"Ha elegido no mostrar foto"}</div></div>
       <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} años · Escribe desde ${esc(p.zona)}</div></div>
@@ -347,9 +359,9 @@ function descubrir(){
       <div class="actions"><button class="plain" id="no">Pasar</button><button id="yes" ${suspended()?"disabled":""}>Quiero escribirle</button></div>
     </article>
     <p class="hint">Si los dos os elegís, se abre la correspondencia y tendrás ${FIRST_DAYS} días para enviar la primera carta.</p>${sim()}`;
-  bindSim();
+  bindSim(); bindBack();
   const used = () => { if (!plus) viewsUsed++; p.seen = true; };
-  $("#no").onclick = () => { used(); descubrir(); };
+  $("#no").onclick = () => { used(); passedStack.push(p); descubrir(); };
   $("#yes").onclick = () => {
     used();
     if (p.likesMe){ chats.unshift({p, letters:[], unread:true, turn:"me", deadline:addD(now, FIRST_DAYS), closed:null}); badge(); match(p); }
