@@ -21,6 +21,12 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 - **Perfiles diarios.** Se pueden ver 5 perfiles al día. Para ver más hay que suscribirse a Remitee Plus.
 - **Tras el match.** Se desbloquean la foto, si la persona la comparte, y la biografía extensa.
 
+- **Quién escribe primero.** Quien completa el match, es decir, quien dice que sí en segundo lugar.
+- **Doble sobre y dos sellos.** La carta va en un sobre interior cerrado con solo el código del destinatario. Ese sobre y un segundo sello van dentro de un sobre exterior dirigido a Remitee. En la oficina se abre solo el exterior y el segundo sello se usa para reenviar el interior, intacto.
+- **Seguimiento.** Al enviar se sube una foto del sobre interior. Cada carta pasa por cuatro fases visibles para los dos: enviada, en la oficina, reenviada y entregada.
+- **Coste.** La app es gratis; cada persona pone sus dos sellos. Remitee Plus es opcional.
+- **Historial.** Cada perfil muestra cuántas correspondencias ha tenido y si responde a tiempo. Quien acaba de llegar aparece como recién llegado, recién llegada o nueva en Remitee.
+
 ## Qué se puede probar
 
 | Vista | Qué enseña |
