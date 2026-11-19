@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <title>Remitee</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -392,6 +396,37 @@ body.wide .app{max-width:1040px}
 <script>
 const CENTRAL = "Remitee · Apartado 123 · 39080 Santander";
 const me = {created:false, g:"n", email:"", verified:false, alias:"", edad:"30–35", zona:"", prof:"", code:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true};
+/* ---- Firebase: login real con Google y perfiles guardados en la nube ----
+   Solo se activa en la web publicada cuando firebase-config.js tiene la configuración del proyecto.
+   En la vista previa de claude.ai no hay Firebase y todo se simula en el navegador. */
+const FB = (() => { try { if (window.firebase && window.REMITEE_FIREBASE && window.REMITEE_FIREBASE.apiKey){
+  firebase.initializeApp(window.REMITEE_FIREBASE); return {auth:firebase.auth(), db:firebase.firestore()}; } } catch(e){ console.warn("Firebase:", e); } return null; })();
+// Lo que ven los demás va en "profiles"; el email y la dirección, en "private", que solo puede leer su dueño.
+const PUBLIC_FIELDS = ["alias","edad","zona","prof","bio","long","intereses","g","showFoto","code","over25"];
+async function cloudSave(){
+  if (!FB || !me.uid) return;
+  const pub = {}; PUBLIC_FIELDS.forEach(k => pub[k] = me[k] ?? null);
+  pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+  await FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true});
+  await FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true});
+}
+async function cloudLoad(uid){
+  const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
+  if (!a.exists) return false;
+  const pub = a.data(); delete pub.updatedAt;
+  Object.assign(me, pub, b.exists ? b.data() : {}, {uid, created:true}); saveLocal(); return true;
+}
+async function googleLogin(){
+  const r = await FB.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  const u = r.user; me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
+  return cloudLoad(u.uid);
+}
+if (FB) FB.auth.onAuthStateChanged(async u => {
+  if (u){ if (!me.created || me.uid !== u.uid){ me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
+      try { if (await cloudLoad(u.uid)) route(); } catch(e){ console.warn(e); } } }
+  else if (me.created && me.uid){ Object.assign(me, {created:false, uid:null}); route(); }
+});
+
 loadMe();
 const tints = ["#ffe3d6","#dfe9ff","#dff5e8","#f3e1fb","#fff1c9"];
 // "Fotos" de ejemplo: degradados en lugar de retratos reales. showFoto = la persona decide si la enseña tras el match.
@@ -772,7 +807,8 @@ function startPrep(root){
 }
 
 /* ---- Perfil propio: se guarda en este navegador ---- */
-function saveMe(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); } catch(_){} } }
+function saveLocal(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); } catch(_){} } }
+function saveMe(){ saveLocal(); if (FB && me.uid) cloudSave().catch(e => toast("No se ha podido guardar en la nube. Revisa tu conexión.")); }
 function loadMe(){ try { const d = JSON.parse(localStorage.getItem("remitee-me")||"null"); if (d) Object.assign(me, d); } catch(e) {} }
 const RANGES = ["25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
 function newCode(){ const w=["MAR","LUNA","RIO","SOL","PINO","ALBA","NIDO","ROCA"]; return `${w[Math.floor(Math.random()*w.length)]}-${1000+Math.floor(Math.random()*9000)}`; }
@@ -818,7 +854,7 @@ function perfil(){
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast("Perfil guardado"); perfil(); };
-  $("#logout").onclick = () => { try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
 }
 
 
@@ -954,7 +990,17 @@ function alta(){
       </div>
       <p class="note">Tu email no aparece en tu perfil.</p></div>`;
     $("#toLand").onclick = () => { altaStep = 0; alta(); };
-    $("#g").onclick = () => { $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
+    $("#g").onclick = () => {
+      if (FB){
+        $("#g").disabled = true; $("#g").textContent = "Conectando con Google…";
+        googleLogin().then(had => {
+          if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(`Hola de nuevo, ${me.alias}`); }
+          else { altaStep = 2; alta(); }
+        }).catch(e => { $("#g").disabled = false; $("#g").textContent = "Continuar con Google";
+          toast(e && e.code === "auth/popup-closed-by-user" ? "Has cerrado la ventana de Google" : "No se ha podido iniciar sesión con Google. Inténtalo de nuevo."); });
+        return;
+      }
+      $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
     $("#gok").onclick = () => { const v = $("#f-email").value.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast("Escribe un email válido, por ejemplo nombre@gmail.com"); return; }
       me.email = v; me.verified = true; altaStep = 2; alta(); };

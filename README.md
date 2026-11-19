@@ -50,6 +50,24 @@ Abre `index.html` en el navegador. No necesita instalación.
 
 Para publicarlo con GitHub Pages: *Settings → Pages → Deploy from a branch → `main` / root*.
 
+## Activar el login con Google (Firebase)
+
+Mientras `firebase-config.js` esté vacío, la web funciona en modo prototipo: el login se simula y el perfil se guarda solo en el navegador.
+
+1. Crea un proyecto en [Firebase](https://console.firebase.google.com) (el plan gratuito basta).
+2. **Authentication → Sign-in method:** activa **Google**.
+3. **Authentication → Settings → Authorized domains:** añade el dominio donde se publica la web (por ejemplo `tuusuario.github.io` o `remitee.netlify.app`).
+4. **Firestore Database:** créala en modo producción, en una región europea (por ejemplo `europe-southwest1`, Madrid).
+5. **Firestore → Reglas:** pega el contenido de `firestore.rules` y publica.
+6. **Configuración del proyecto → Tus apps → App web:** copia el bloque `firebaseConfig` en `firebase-config.js`.
+
+Qué se guarda:
+
+- `profiles/{uid}`: alias, edad, zona, profesión, biografías, intereses, género, código de buzón. Lo leen las personas registradas.
+- `private/{uid}`: email, dirección postal y preferencias de avisos. Solo lo lee su dueño.
+
+Pendiente: mostrar en Descubrir los perfiles reales, matches entre usuarios, fotos (Firebase Storage) y envío real de emails.
+
 ## Pendiente de decidir
 
 - Coste del reenvío (sello, sobre, gestión) y modelo de negocio: suscripción o pago por carta.
