@@ -204,7 +204,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .fl-arc.show{opacity:.7}
 .fl-me{fill:var(--accent)} .fl-them{fill:#ffe3d6}
 .fl-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:#2a2e45}
-.fl-node:first-of-type .fl-init{fill:#fff}
+.fl-me + .fl-init{fill:#fff}
 .fl-off{fill:var(--accent-soft)} .fl-house{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
 #fl-office{transition:opacity .4s} #fl-office.dim{opacity:.3}
 .fl-lbl{font-size:11px;text-anchor:middle;fill:var(--muted);font-family:var(--body)}
@@ -507,6 +507,11 @@ body.wide .app{max-width:1040px}
 .hero-title .rot.out{opacity:0}
 @media (prefers-reduced-motion:reduce){.hero-title .rot{transition:none}}
 .exbadge{display:inline-block;font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:2px 0 4px}
+.fl-heart{opacity:0;transition:opacity .5s}
+.fl-heart.show{opacity:1}
+.fl-heart circle{fill:var(--surface);stroke:var(--accent);stroke-width:1.5}
+.fl-heart path{fill:var(--accent)}
+#fl-env{transition:opacity .3s}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -1158,7 +1163,7 @@ function sendModal(c){
 
 /* ---- Animación: el doble sobre y los dos sellos ---- */
 const PREP = () => [
-  L("Mete tu carta en un sobre y ciérralo. Por fuera, escribe solo el código de la otra persona.","Put your letter in an envelope and seal it. On the outside, write only the other person's code."),
+  L("Tras el match, escribe tu carta, métela en un sobre y ciérralo. Por fuera, escribe solo el código de la otra persona.","After the match, write your letter, put it in an envelope and seal it. On the outside, write only the other person's code."),
   L("Mete ese sobre cerrado y un segundo sello dentro de otro sobre más grande.","Put that sealed envelope and a second stamp inside a larger envelope."),
   L("Dirige el sobre grande a Remitee y ponle un sello. Ese envío lo pagas tú, como cualquier carta.","Address the large envelope to Remitee and stamp it. You pay for that postage, like any letter."),
   L("En la oficina abrimos solo el sobre grande. Tu carta sigue cerrada: nadie la lee.","At our office we open only the large envelope. Your letter stays sealed: nobody reads it."),
@@ -1334,6 +1339,7 @@ function perfil(){
 
 /* ---- Animación: cómo viajan las cartas ---- */
 const FLOW = () => [
+  {from:0,to:0,match:true,txt:L("Primero, haces match con alguien que comparte tus intereses y tus idiomas. Si los dos os elegís, se abre la correspondencia.","First, you match with someone who shares your interests and languages. If you both choose each other, the correspondence opens.")},
   {from:0,to:1,txt:L("Escribes tu carta y la envías a nuestra oficina, con el código de la otra persona.","You write your letter and send it to our office, with the other person's code.")},
   {from:1,to:2,txt:L("En la oficina la metemos en un sobre nuevo y la enviamos a su dirección.","At our office we put it in a new envelope and send it to their address.")},
   {from:2,to:1,txt:L("Su respuesta hace el mismo camino: primero llega a nuestra oficina…","Their reply takes the same route: first it reaches our office…")},
@@ -1346,6 +1352,7 @@ function flowHTML(){
   <svg viewBox="0 0 340 150" role="img" aria-hidden="true">
     <path class="fl-line" d="M58 92 H152"/><path class="fl-line" d="M188 92 H282"/>
     <path class="fl-arc" id="fl-arc" d="M40 70 Q170 -6 300 70"/>
+    <g id="fl-heart" class="fl-heart"><circle cx="170" cy="32" r="15"/><path d="M170 40 C162 34 158 30 158 26 a5.5 5.5 0 0 1 12 -2 a5.5 5.5 0 0 1 12 2 c0 4 -4 8 -12 14z"/></g>
     <g class="fl-node" transform="translate(40 92)"><circle r="22" class="fl-me"/><text y="5" class="fl-init">${L("Tú","You")}</text></g>
     <g class="fl-node" id="fl-office" transform="translate(170 92)"><rect x="-22" y="-22" width="44" height="44" rx="10" class="fl-off"/>
       <path d="M-11 9 V-3 L0 -11 L11 -3 V9 Z M-4 9 V1 H4 V9" class="fl-house"/></g>
@@ -1371,9 +1378,11 @@ function startFlow(root){
     const el = Math.max(0, t - t0), i = Math.floor(el / PH) % F.length, f = F[i];
     const k = reduce ? 1 : ease(Math.min(1, (el % PH) / MOVE));
     const x = X[f.from] + (X[f.to]-X[f.from])*k, y = f.direct ? 70 - Math.sin(Math.PI*k)*42 : 70;
+    env.style.opacity = f.match ? 0 : 1;
     env.setAttribute("transform", `translate(${x} ${y})`);
     if (i !== last){ last = i; txt.textContent = f.txt; dots.forEach((d,j)=>d.classList.toggle("on", j===i));
-      office.classList.toggle("dim", !!f.direct); arc.classList.toggle("show", !!f.direct); }
+      office.classList.toggle("dim", !!(f.direct || f.match)); arc.classList.toggle("show", !!(f.direct || f.match));
+      const ht = root.querySelector("#fl-heart"); if (ht) ht.classList.toggle("show", !!f.match); }
     flowRaf = requestAnimationFrame(frame);
   }
   flowRaf = requestAnimationFrame(frame);
@@ -1648,14 +1657,14 @@ function como(){
   <article class="art">
     <span class="art-kicker">${L("Guía","Guide")}</span>
     <h2>${L("Cómo funciona Remitee","How Remitee works")}</h2>
-    <p class="art-lede">${L("Remitee pone en contacto a personas que quieren escribirse cartas en papel. La app sirve para encontraros; la relación ocurre por correo postal, sin chat y sin prisas.","Remitee connects people who want to write each other paper letters. The app is for finding each other; the relationship happens by post, with no chat and no rush.")}</p>
+    <p class="art-lede">${L("Remitee pone en contacto a personas que quieren escribirse cartas en papel. Primero haces match con alguien que comparte tus intereses; después, la relación ocurre por correo postal, sin chat y sin prisas.","Remitee connects people who want to write each other paper letters. First you match with someone who shares your interests; then the relationship happens by post, with no chat and no rush.")}</p>
     <div class="flowcard">${flowHTML()}</div>
-    <h3>${L("1. Tu perfil","1. Your profile")}</h3>
+    <h3>${L("1. Primero, el match","1. First, the match")}</h3>
+    ${S(`Todo empieza con un match. Haces match con alguien que comparte tus intereses y tus idiomas. En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.`,`Everything starts with a match. You match with someone who shares your interests and languages. In Discover you read profiles without seeing photos. You can choose someone or pass. If you both choose each other, it's a match and the correspondence opens. Each day you can see ${VIEW_LIMIT} profiles; with Remitee Plus there's no limit.`)}
+    <h3>${L("2. Tu perfil","2. Your profile")}</h3>
     ${S("Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, los idiomas en los que escribes y lees, una biografía breve y 3 intereses. Tu email nunca se muestra.","You sign up with Google to verify that you're a real person. Remitee is for over 25s only. Your profile has an alias, an age range, where you write from, your occupation, the languages you write and read in, a short bio and 3 interests. Your email is never shown.")}
     <h3>${L("Idiomas","Languages")}</h3>
     ${S("Marcas los idiomas en los que puedes escribir y leer cartas. En Descubrir solo ves a personas con las que compartes al menos uno, de cualquier país, y en cada perfil se resaltan los idiomas que tenéis en común. Es una buena forma de practicar otro idioma o de cartearte con alguien de otro lugar.","You choose the languages you can write and read letters in. In Discover you only see people who share at least one, from any country, and each profile highlights the languages you have in common. It's a great way to practise a language or write to someone from somewhere else.")}
-    <h3>${L("2. Match por intereses","2. Matching on interests")}</h3>
-    ${S(`En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.`,`In Discover you read profiles without seeing photos. You can choose someone or pass. If you both choose each other, it's a match and the correspondence opens. Each day you can see ${VIEW_LIMIT} profiles; with Remitee Plus there's no limit.`)}
     <h3>${L("3. Lo que se desbloquea con el match","3. What a match unlocks")}</h3>
     ${S("Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y ampliarla con un toque. También ves su biografía extensa, su mapa de cartas y una pequeña galería con fotos de sus intereses. Tú puedes subir hasta 6 fotos de lo que te gusta desde tu perfil.","After a match you can see the other person's photo, if they've chosen to show it, and enlarge it with a tap. You also see their long bio, their letter map and a small gallery of photos of their interests. You can upload up to 6 photos of what you love from your profile.")}
     <h3>${L("4. Quién escribe primero","4. Who writes first")}</h3>
