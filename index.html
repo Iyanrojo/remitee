@@ -525,6 +525,22 @@ body.wide .app{max-width:1040px}
 .more-in{display:grid;gap:14px;padding-top:10px;animation:moreIn .35s ease}
 @keyframes moreIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.more-in{animation:none}}
+/* Escritorio: la navegación pasa a la parte superior */
+@media (min-width:820px){
+  .app{max-width:560px}
+  body:has(.tabs:not([hidden])){padding-top:64px;padding-bottom:48px}
+  .tabs{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:10px}
+  .tabs .in{max-width:560px;display:flex;justify-content:center;gap:6px;align-items:center}
+  .tabs a{display:flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;font-size:.92rem;font-weight:600}
+  .tabs a:hover{background:var(--bg)}
+  .tabs a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+  .tabs svg{width:20px;height:20px}
+  .tabs a.tab-main{width:auto;margin:0;padding:8px 18px;gap:8px}
+  .tabs a.tab-main svg{width:20px;height:20px;padding:0;background:none;color:inherit;box-shadow:none;border-radius:0}
+  .tabs a.tab-main[aria-current="page"] svg{background:none}
+  .tabs .badge{top:2px;left:auto;right:6px}
+  .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
