@@ -30,6 +30,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .top{display:flex;align-items:center;justify-content:space-between;padding-block:22px 18px}
 .logo{font-family:var(--head);font-weight:700;font-size:1.45rem;letter-spacing:-.02em;margin:0}
 .logo span{color:var(--accent)}
+.logo .slogan{display:block;font-family:var(--body);font-size:.68rem;font-weight:500;letter-spacing:.02em;color:var(--muted);margin-top:-2px}
 .theme-btn{width:38px;height:38px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center}
 .theme-btn svg{width:18px;height:18px}
 .topr{display:flex;gap:10px;align-items:center}
@@ -377,7 +378,7 @@ body.wide .app{max-width:1040px}
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo">remitee<span>.</span></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo">remitee<span>.</span><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
@@ -883,11 +884,11 @@ function showFlow(){
 /* ---- Alta: Google (simulado) + creación de perfil ---- */
 let altaStep = 0;
 function landing(){
-  const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","A fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
+  const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","Mensajería a fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
   $("#view").innerHTML = `<div class="land">
     <section class="hero">
       <div class="hero-text">
-        <span class="kicker">Correspondencia a fuego lento</span>
+        <span class="kicker">Mensajería a fuego lento</span>
         <h2 class="mega hero-title">Tu privacidad,<br><em>nuestro objetivo.</em></h2>
         <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.</p>
         <div class="hero-cta"><button id="start">Crear mi perfil</button><button class="plain" id="how">Cómo funciona</button></div>
@@ -913,7 +914,7 @@ function landing(){
         <div><span class="big">3–5 días</span><p>Lo que tarda una carta. Se lee despacio, se relee y se guarda en una caja.</p></div>
       </div>
       <div class="transit"><div class="transit-top"><span>Tu carta va de camino</span><span class="pp">✉︎</span></div><div class="tbar"><span></span></div><small>Sin prisa. Llega cuando llega.</small></div>
-      <p class="slow-quote">Relaciones a <em>fuego lento</em>.</p>
+      <p class="slow-quote">Mensajería a <em>fuego lento</em>.</p>
     </section>
     <section class="steps3">
       <div><span class="n">1</span><h3>Haz match por intereses</h3><p>Lees cómo escribe alguien y qué le gusta. Si los dos os elegís, se abre la correspondencia.</p></div>

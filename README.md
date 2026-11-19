@@ -1,5 +1,7 @@
 # Remitee
 
+*Mensajería a fuego lento.*
+
 Prototipo de una app para poner en contacto a desconocidos que quieren escribirse cartas en papel. Una especie de "Tinder epistolar": la app sirve para encontrarse y la relación ocurre por correo postal.
 
 > Estado: prototipo provisional. Todo funciona en el navegador con datos de ejemplo; no hay servidor ni base de datos.
