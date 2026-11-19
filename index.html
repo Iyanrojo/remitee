@@ -249,7 +249,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(30,40,90,.12)}
 .prep{display:grid;gap:8px}
 .prep svg{width:100%;height:auto;display:block}
-.sc{opacity:0;transition:opacity .35s}
+
 .sc.on{opacity:1}
 .pp-env{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
 .pp-env.big{fill:var(--bg)}
@@ -296,7 +296,9 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 @media (max-width:440px){.demo{display:none}}
 body.wide .app{max-width:1040px}
 .land{display:grid;gap:clamp(64px,10vw,120px);padding-bottom:40px}
-.hero{display:grid;gap:18px;padding-top:24px}
+.hero{display:grid;gap:28px;padding-top:24px;align-items:center}
+.hero-text{display:grid;gap:18px;min-width:0}
+@media (min-width:760px){.hero{grid-template-columns:1.25fr 1fr;gap:48px}.mega.hero-title{font-size:clamp(2.8rem,5.3vw,4.9rem);text-wrap:wrap}}
 .kicker{font-size:.78rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
 .mega{font-family:var(--head);font-weight:700;font-size:clamp(2.8rem,11vw,6.4rem);line-height:.98;letter-spacing:-.035em;margin:0;text-wrap:balance}
 .mega em{font-style:normal;color:var(--accent)}
@@ -326,11 +328,17 @@ body.wide .app{max-width:1040px}
 .final button{padding:15px 28px;font-size:1rem}
 @media (prefers-reduced-motion:reduce){.mq{animation:none}}
 .hero-row{display:grid;grid-template-columns:1fr;gap:10px;align-items:center}
-@media (min-width:760px){.hero-row{grid-template-columns:1fr 240px}}
-.drift{width:100%;max-width:240px;justify-self:end}
-.drift-path{fill:none;stroke:var(--muted);opacity:.45;stroke-width:2;stroke-dasharray:3 7}
-.drift-env{offset-path:path("M10 140 C 60 120, 90 40, 210 30");offset-rotate:0deg;animation:drift 22s ease-in-out infinite alternate}
-@keyframes drift{from{offset-distance:4%}to{offset-distance:92%}}
+@media (min-width:760px){.hero-row{grid-template-columns:1.4fr 1fr;gap:40px}}
+.hero-video{position:relative;border-radius:28px;overflow:hidden;background:var(--surface);aspect-ratio:16/10;width:100%}
+@media (min-width:760px){.hero-video{aspect-ratio:4/5}}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2.5s ease}
+.hero-video video.ready{opacity:1}
+.vph{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;text-align:center;padding:20px;
+  background:linear-gradient(160deg,var(--accent-soft),var(--surface));border:1.5px dashed var(--line);border-radius:28px}
+.vph b{font-family:var(--head);font-weight:600;font-size:1.05rem}
+.vph small{color:var(--muted);font-size:.8rem;max-width:26ch}
+.vplay{width:56px;height:56px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 6px 20px -8px rgba(40,50,110,.35)}
+.vplay svg{width:22px;height:22px;fill:var(--accent);margin-left:3px}
 .slow-in p{animation:slowIn 2.4s ease both}
 .slow-in p:nth-child(2){animation-delay:1.2s}.slow-in p:nth-child(3){animation-delay:2.4s}.slow-in p:nth-child(4){animation-delay:3.6s}.slow-in p:nth-child(5){animation-delay:4.8s}
 @keyframes slowIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -350,7 +358,18 @@ body.wide .app{max-width:1040px}
 .transit small{color:var(--muted)}
 .slow-quote{margin:0;font-family:var(--head);font-weight:700;font-size:clamp(2.4rem,9vw,5rem);line-height:1;letter-spacing:-.035em;color:var(--ink);text-align:center;padding-block:20px;text-wrap:balance}
 .slow-quote em{font-style:normal;color:var(--accent)}
-@media (prefers-reduced-motion:reduce){.drift-env,.slow-in p,.tbar span{animation:none!important}.drift-env{offset-distance:50%}}
+@media (prefers-reduced-motion:reduce){.slow-in p,.tbar span{animation:none!important}}
+.sc{opacity:0;transition:opacity .9s ease}
+.pp-txt{transition:opacity .35s ease;min-height:3.2em}
+.pp-txt.fade{opacity:0}
+.pnav{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pnav .fl-dots{flex:1}
+.dotb{width:8px;height:8px;padding:0;border-radius:50%;background:var(--line);transition:background .3s,width .3s}
+.dotb.on{background:var(--accent);width:20px;border-radius:999px}
+.pnav button:disabled{opacity:.4}
+.sc.on .pp-drop{animation-duration:1.8s}.sc.on .pp-drop2{animation-duration:1.8s;animation-delay:.8s}
+.sc.on .pp-in{animation-duration:1.8s}.sc.on .pp-in2{animation-duration:1.8s;animation-delay:.8s}
+.sc.on .pp-rise{animation-duration:2s}.sc.on .pp-go{animation-duration:3.6s}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -690,7 +709,8 @@ const PREP = [
   "Mete ese sobre cerrado y un segundo sello dentro de otro sobre más grande.",
   "Dirige el sobre grande a Remitee y ponle un sello. Ese envío lo pagas tú, como cualquier carta.",
   "En la oficina abrimos solo el sobre grande. Tu carta sigue cerrada: nadie la lee.",
-  "Con tu segundo sello la reenviamos, intacta, a la dirección de la otra persona."
+  "Metemos tu sobre cerrado en un segundo sobre, con la dirección de la otra persona y tu segundo sello.",
+  "Y sale hacia su buzón. Ninguno de los dos conoce la dirección del otro."
 ];
 function prepHTML(p){
   const code = esc(p ? p.code : "LUNA-4821"), who = esc(p ? p.alias : "Lince");
@@ -717,23 +737,37 @@ function prepHTML(p){
       <text x="282" y="46" class="pp-tag pp-fade2">Sigue cerrada</text>
     </g>
     <g class="sc" data-s="4">
+      <g transform="translate(70 44)"><g class="pp-pop"><rect width="180" height="100" rx="6" class="pp-env big"/><path d="M3 2 L90 -30 L177 2" class="pp-flap open"/>
+        <text x="90" y="72" class="pp-addr">Para: ${who}</text><text x="90" y="85" class="pp-addr2">Su dirección, que solo conoce Remitee</text></g></g>
+      ${small(122,-2,"pp-in",true)}
+      <g transform="translate(222 50)"><g class="pp-pop2"><rect width="18" height="22" rx="2" class="pp-stamp"/><circle cx="9" cy="10" r="4" class="pp-stampi"/></g></g>
+    </g>
+    <g class="sc" data-s="5">
       <g transform="translate(276 62)"><circle r="20" cx="0" cy="12" class="pp-them"/><text y="17" class="pp-init">${who[0]}</text></g>
       <g transform="translate(20 50)"><g class="pp-go"><rect width="120" height="74" rx="5" class="pp-env big"/><path d="M3 3 L60 40 L117 3" class="pp-flap"/>
         <g transform="translate(96 6)"><rect width="18" height="22" rx="2" class="pp-stamp"/><circle cx="9" cy="10" r="4" class="pp-stampi"/></g>
         <text x="58" y="62" class="pp-addr2">Para: ${who}</text></g></g>
     </g>
-  </svg><p class="fl-txt" id="pp-txt" aria-live="polite"></p>
-  <div class="fl-dots">${PREP.map((_,i)=>`<span data-i="${i}"></span>`).join("")}</div></div>`;
+  </svg><p class="fl-txt pp-txt" id="pp-txt" aria-live="polite"></p>
+  <div class="pnav"><button type="button" class="plain sm" data-pp="-1">Anterior</button>
+    <div class="fl-dots">${PREP.map((_,i)=>`<button type="button" class="dotb" data-go="${i}" aria-label="Paso ${i+1}"></button>`).join("")}</div>
+    <button type="button" class="sm" data-pp="1">Siguiente</button></div></div>`;
 }
 let prepTimer = 0;
 function startPrep(root){
-  clearInterval(prepTimer);
-  const box = root.querySelector(".prep"); if (!box) return;
-  const scenes = [...box.querySelectorAll(".sc")], dots = [...box.querySelectorAll(".fl-dots span")], txt = box.querySelector("#pp-txt");
+  const box = root && root.querySelector(".prep"); if (!box) return;
+  const scenes = [...box.querySelectorAll(".sc")], dots = [...box.querySelectorAll(".dotb")], txt = box.querySelector("#pp-txt");
+  const prev = box.querySelector('[data-pp="-1"]'), next = box.querySelector('[data-pp="1"]');
   let i = 0;
-  const show = () => { scenes.forEach((s,j)=>s.classList.toggle("on", j===i)); dots.forEach((d,j)=>d.classList.toggle("on", j===i)); txt.textContent = `${i+1}. ${PREP[i]}`; };
-  show();
-  prepTimer = setInterval(() => { if (!box.isConnected) { clearInterval(prepTimer); return; } i = (i+1) % PREP.length; show(); }, 3200);
+  const show = () => {
+    scenes.forEach((s,j)=>s.classList.toggle("on", j===i)); dots.forEach((d,j)=>d.classList.toggle("on", j===i));
+    txt.classList.add("fade"); setTimeout(() => { txt.textContent = `Paso ${i+1} de ${PREP.length}. ${PREP[i]}`; txt.classList.remove("fade"); }, 350);
+    prev.disabled = i === 0; next.textContent = i === PREP.length-1 ? "Volver a empezar" : "Siguiente";
+  };
+  prev.onclick = () => { if (i > 0){ i--; show(); } };
+  next.onclick = () => { i = i === PREP.length-1 ? 0 : i+1; show(); };
+  dots.forEach((d,j) => d.onclick = () => { i = j; show(); });
+  txt.textContent = `Paso 1 de ${PREP.length}. ${PREP[0]}`; show();
 }
 
 /* ---- Perfil propio: se guarda en este navegador ---- */
@@ -852,13 +886,17 @@ function landing(){
   const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","A fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
   $("#view").innerHTML = `<div class="land">
     <section class="hero">
-      <span class="kicker">Correspondencia a fuego lento</span>
-      <div class="hero-row"><h2 class="mega">Tu privacidad,<br><em>nuestro objetivo.</em></h2>
-        <svg class="drift" viewBox="0 0 220 160" aria-hidden="true"><path d="M10 140 C 60 120, 90 40, 210 30" class="drift-path"/>
-          <g class="drift-env"><rect x="-26" y="-17" width="52" height="34" rx="4" class="pp-env"/><path d="M-24 -15 L0 3 L24 -15" class="pp-flap"/></g></svg></div>
-      <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.</p>
-      <div class="hero-cta"><button id="start">Crear mi perfil</button><button class="plain" id="how">Cómo funciona</button></div>
-      <small class="hero-note">Gratis · Solo mayores de 25 años</small>
+      <div class="hero-text">
+        <span class="kicker">Correspondencia a fuego lento</span>
+        <h2 class="mega hero-title">Tu privacidad,<br><em>nuestro objetivo.</em></h2>
+        <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.</p>
+        <div class="hero-cta"><button id="start">Crear mi perfil</button><button class="plain" id="how">Cómo funciona</button></div>
+        <small class="hero-note">Gratis · Solo mayores de 25 años</small>
+      </div>
+      <div class="hero-video">
+          <video id="heroVid" muted loop playsinline autoplay preload="metadata"><source src="hero.mp4" type="video/mp4"></video>
+          <div class="vph" id="vph"><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><b>Aquí va el vídeo</b><small>Sube un archivo hero.mp4 y se reproduce solo, en bucle y sin sonido.</small></div>
+        </div>
     </section>
     <div class="marquee" aria-hidden="true"><div class="mq">${[...phrases,...phrases].map(t=>`<span>${t}</span>`).join("")}</div></div>
     <section class="statements slow-in">
@@ -893,6 +931,8 @@ function landing(){
     </section>
   </div>`;
   startFlow($(".privacy .flowcard"));
+  const v = $("#heroVid"); if (v){ const show = () => { $("#vph").hidden = true; v.classList.add("ready"); };
+    if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
   const go = () => { altaStep = 1; alta(); window.scrollTo(0,0); };
   $("#start").onclick = go; $("#start2").onclick = go; $("#how").onclick = showFlow;
 }

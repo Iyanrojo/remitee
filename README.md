@@ -42,6 +42,8 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 
 ## Uso
 
+Para el vídeo de la landing, sube un archivo `hero.mp4` a la raíz del repositorio (junto a `index.html`). Se reproduce solo, en bucle y sin sonido; mientras no exista, se ve un hueco reservado.
+
 Abre `index.html` en el navegador. No necesita instalación.
 
 Para publicarlo con GitHub Pages: *Settings → Pages → Deploy from a branch → `main` / root*.
