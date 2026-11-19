@@ -35,6 +35,9 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 - **Valoraciones.** Quien recibe una carta la valora de 0 a 5 cartas. Cada perfil muestra la media y el número de valoraciones.
 - **Idiomas.** Español e inglés, con un botón ES/EN en la cabecera. Por defecto se usa el idioma del navegador.
 
+- **Idiomas de correspondencia.** Cada persona marca en qué idiomas escribe y lee cartas. Descubrir solo muestra perfiles con al menos un idioma en común, de cualquier país.
+- **Mapa de cartas.** Cada perfil muestra públicamente su número de correspondencias, países y valoración, junto a un mapamundi con las ciudades a las que ha enviado y desde las que ha recibido cartas (nunca direcciones).
+
 ## Qué se puede probar
 
 | Vista | Qué enseña |

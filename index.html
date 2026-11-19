@@ -349,7 +349,7 @@ body.wide .app{max-width:1040px}
 .vplay{width:56px;height:56px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 6px 20px -8px rgba(40,50,110,.35)}
 .vplay svg{width:22px;height:22px;fill:var(--accent);margin-left:3px}
 .slow-in p{animation:slowIn 2.4s ease both}
-.slow-in p:nth-child(2){animation-delay:1.2s}.slow-in p:nth-child(3){animation-delay:2.4s}.slow-in p:nth-child(4){animation-delay:3.6s}.slow-in p:nth-child(5){animation-delay:4.8s}
+.slow-in p:nth-child(2){animation-delay:1.2s}.slow-in p:nth-child(3){animation-delay:2.4s}.slow-in p:nth-child(4){animation-delay:3.6s}.slow-in p:nth-child(5){animation-delay:4.8s}.slow-in p:nth-child(6){animation-delay:6s}
 @keyframes slowIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
 .statements{gap:18px}
 .slowbox{display:grid;gap:22px}
@@ -405,6 +405,54 @@ body.wide .app{max-width:1040px}
 .langbtn{font-weight:700;font-size:.78rem;letter-spacing:.04em}
 .helpbtn .hq{display:none}
 @media (max-width:440px){.helpbtn{width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center}.helpbtn .hl{display:none}.helpbtn .hq{display:inline;font-weight:700}}
+.langs{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;font-size:.76rem}
+.langs.left{justify-content:flex-start;margin:6px 0}
+.lglbl{color:var(--muted);margin-right:2px}
+.lg{padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.lg.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.lpick{display:flex;flex-wrap:wrap;gap:6px;padding-top:4px}
+.lpb{background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:7px 13px;font-size:.84rem;font-weight:500}
+.lpb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.wfields .lpb{background:var(--surface)}
+.wfields .lpb.on{background:var(--accent)}
+.world{display:grid;gap:26px}
+.greet{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;font-family:var(--head);line-height:1.1}
+.gw{font-weight:600;color:var(--muted);animation:greet 11s ease-in-out infinite}
+.gw.g0{font-size:clamp(1.6rem,6vw,3rem);color:var(--ink)}
+.gw.g1{font-size:clamp(1.2rem,4vw,2rem)}
+.gw.g2{font-size:clamp(1.9rem,7vw,3.6rem);color:var(--accent)}
+.gw.g3{font-size:clamp(1rem,3vw,1.5rem)}
+@keyframes greet{0%,100%{opacity:1}50%{opacity:.35}}
+.lcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.lcards>div{background:var(--surface);border-radius:24px;padding:22px;display:grid;gap:6px;align-content:start}
+.lcards>div:first-child{background:var(--accent);color:#fff}
+.lcards>div:first-child p{color:rgba(255,255,255,.85)}
+.lc-ic{font-size:1.3rem;color:var(--accent)}
+.lcards>div:first-child .lc-ic{color:#fff}
+.lcards h3{font-family:var(--head);font-weight:600;font-size:1.15rem;margin:4px 0 0}
+.lcards p{margin:0;color:var(--muted);font-size:.93rem}
+.salut{display:flex;flex-wrap:wrap;gap:10px}
+.salut span{font-family:var(--head);font-style:italic;font-weight:500;font-size:1.05rem;background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:8px 14px;color:var(--ink)}
+.world-note{margin:0;color:var(--muted);max-width:60ch}
+@media (prefers-reduced-motion:reduce){.gw{animation:none}}
+.stats{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}
+.st{background:var(--bg);border-radius:16px;padding:10px 8px;display:grid;justify-items:center;gap:0}
+.st b{font-family:var(--head);font-weight:700;font-size:1.35rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.st span{font-size:.7rem;color:var(--muted)}
+.st.main{background:var(--accent-soft)} .st.main b{color:var(--accent);font-size:1.6rem}
+.wmap{background:var(--bg);border-radius:18px;padding:10px 10px 8px;display:grid;gap:6px}
+.wmap svg{width:100%;height:auto;display:block}
+.m-land{fill:var(--muted);opacity:.32}
+.m-arc{fill:none;stroke:var(--accent);stroke-width:.8;opacity:.45;stroke-dasharray:2 2}
+.m-pt{fill:var(--accent);animation:mpt 3.5s ease-in-out infinite}
+.m-home{fill:var(--ink);stroke:var(--surface);stroke-width:1.2}
+@keyframes mpt{0%,100%{opacity:1}50%{opacity:.45}}
+.m-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.72rem;color:var(--muted);justify-content:center}
+.m-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.lg-home{background:var(--ink)} .lg-pt{background:var(--accent)}
+.m-empty{font-size:.76rem;color:var(--muted);text-align:center}
+.about .stats,.about .wmap{margin:10px 0}
+@media (prefers-reduced-motion:reduce){.m-pt{animation:none}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -432,7 +480,7 @@ const me = {created:false, g:"n", email:"", verified:false, alias:"", edad:"30�
 const FB = (() => { try { if (window.firebase && window.REMITEE_FIREBASE && window.REMITEE_FIREBASE.apiKey){
   firebase.initializeApp(window.REMITEE_FIREBASE); return {auth:firebase.auth(), db:firebase.firestore()}; } } catch(e){ console.warn("Firebase:", e); } return null; })();
 // Lo que ven los demás va en "profiles"; el email y la dirección, en "private", que solo puede leer su dueño.
-const PUBLIC_FIELDS = ["alias","edad","zona","prof","bio","long","intereses","g","showFoto","code","over25"];
+const PUBLIC_FIELDS = ["alias","edad","zona","prof","bio","long","intereses","langs","g","showFoto","code","over25"];
 async function cloudSave(){
   if (!FB || !me.uid) return;
   const pub = {}; PUBLIC_FIELDS.forEach(k => pub[k] = me[k] ?? null);
@@ -489,15 +537,53 @@ const EXTRA = {1:{g:"f",corr:8,onTime:true},2:{g:"f",corr:0,likesLater:1},3:{g:"
   6:{g:"m",corr:5,onTime:true,likesLater:2},7:{g:"f",corr:0},8:{g:"m",corr:12,onTime:true},9:{g:"n",corr:2,ghosts:2},10:{g:"m",corr:0,likesLater:1},
   11:{g:"f",corr:9,onTime:true},12:{g:"f",corr:0},13:{g:"m",corr:30,onTime:true},14:{g:"f",corr:4},15:{g:"m",corr:7,onTime:true}};
 people.forEach(p => Object.assign(p, EXTRA[p.id]||{g:"n",corr:0}));
+// Perfiles de otros países, escritos en su idioma
+[{id:16, alias:"Heron", zona:"London, UK", edad:"35–40", prof:"Bookbinder", code:"HERO-7711", g:"m", corr:6, onTime:true, likesMe:true, showFoto:true, langs:["en","es"],
+  bio:"I bind books for a living and still write my shopping lists by hand. Learning Spanish, happy to mix languages.", tags:["poesía","cine","bici"],
+  long:"I run a tiny bindery in east London. I spent a year in Granada and fell for the language. I'd love a pen pal who doesn't mind my clumsy Spanish and wants to practise English."},
+ {id:17, alias:"Mistral", zona:"Lyon, France", edad:"30–35", prof:"Photographe", code:"MIST-2290", g:"f", corr:3, onTime:true, likesMe:false, likesLater:1, showFoto:true, langs:["fr","en","es"],
+  bio:"Photographe argentique. J'aime les lettres longues et les cartes postales un peu froissées.", tags:["fotografía","viajes","café"],
+  long:"Je développe mes films dans ma cuisine. J'écris en français, en anglais ou en espagnol, selon l'humeur."},
+ {id:18, alias:"Saudade", zona:"Lisboa, Portugal", edad:"40–45", prof:"Professor de história", code:"SAUD-5513", g:"m", corr:0, likesMe:false, showFoto:false, langs:["pt","es"],
+  bio:"Gosto de cartas que demoram. Escrevo em português ou espanhol, devagar.", tags:["historia","música","mar"],
+  long:"Dou aulas de história em Lisboa. Coleciono postais antigos e gosto de imaginar quem os escreveu."},
+ {id:19, alias:"Olive", zona:"Dublin, Ireland", edad:"25–30", prof:"Nurse", code:"OLIV-8042", g:"f", corr:2, likesMe:true, showFoto:true, langs:["en"],
+  bio:"Night shifts, strong tea and very long letters. Tell me about your town.", tags:["novela","mar","cocina"],
+  long:"I work nights in a hospital, so letters are my way of slowing down. I only write in English for now, but I love hearing about other places."},
+ {id:20, alias:"Fjord", zona:"Bergen, Norway", edad:"45–50", prof:"Fisherman", code:"FJOR-3307", g:"m", corr:11, onTime:true, likesMe:false, showFoto:true, langs:["en","de"],
+  bio:"Long winters, longer letters. I write in English or German.", tags:["mar","radio","fotografía"],
+  long:"I fish in summer and read all winter. I've been writing letters to strangers for twenty years."}
+].forEach(x => people.push(x));
+// Idiomas de correspondencia de los perfiles españoles de ejemplo
+const LANGS_BY_ID = {1:["es","en"],3:["ca","es"],4:["es","en","fr"],6:["es","eu"],7:["es","en"],8:["gl","es","pt"],10:["eu","es"],11:["es","en"],13:["es","pt"],15:["ca","es","fr"]};
+people.forEach(p => { if (!p.langs) p.langs = LANGS_BY_ID[p.id] || ["es"]; });
 /* ---- Idioma: español / inglés ---- */
 let lang = (() => { try { const s = localStorage.getItem("remitee-lang"); if (s) return s; } catch(e){} return (navigator.language||"es").toLowerCase().startsWith("es") ? "es" : "en"; })();
 const L = (es, en) => lang === "en" ? en : es;
+const LANGS = [["es","Español","Spanish"],["en","Inglés","English"],["fr","Francés","French"],["pt","Portugués","Portuguese"],["it","Italiano","Italian"],["de","Alemán","German"],["ca","Catalán","Catalan"],["gl","Gallego","Galician"],["eu","Euskera","Basque"]];
+const langName = c => { const x = LANGS.find(l => l[0]===c); return x ? (lang==="en" ? x[2] : x[1]) : c; };
+const myLangs = () => (me.langs && me.langs.length) ? me.langs : [lang];
+const commonLangs = p => (p.langs||[]).filter(c => myLangs().includes(c));
+function langsHTML(p, opts={}){
+  const cl = commonLangs(p);
+  return `<div class="langs ${opts.left?"left":""}"><span class="lglbl">${L("Escribe en","Writes in")}</span>${(p.langs||[]).map(c=>`<span class="lg ${cl.includes(c)?"on":""}">${langName(c)}</span>`).join("")}</div>`;
+}
+function langPicker(id){
+  const sel = myLangs();
+  return `<div class="field"><label>${L("Idiomas en los que escribes y lees cartas","Languages you can write and read letters in")}</label>
+    <div class="lpick" id="${id}">${LANGS.map(([c])=>`<button type="button" class="lpb ${sel.includes(c)?"on":""}" data-lang="${c}" aria-pressed="${sel.includes(c)}">${langName(c)}</button>`).join("")}</div>
+    <small>${L("Marca todos los que quieras. Te mostraremos personas con las que compartas al menos uno.","Pick as many as you like. We'll show you people who share at least one.")}</small></div>`;
+}
+function bindLangPicker(id){
+  document.querySelectorAll(`#${id} .lpb`).forEach(b => b.onclick = () => { b.classList.toggle("on"); b.setAttribute("aria-pressed", b.classList.contains("on")); });
+}
+const readLangPicker = id => [...document.querySelectorAll(`#${id} .lpb.on`)].map(b => b.dataset.lang);
 const NEW_LABEL = () => ({f:L("Recién llegada","New here"), m:L("Recién llegado","New here"), n:L("Nueva en Remitee","New to Remitee")});
 const plural = (n, es1, esN, en1, enN) => n===1 ? L(es1,en1) : L(esN,enN);
 
 /* ---- Valoraciones: de 0 a 5 cartas ---- */
 // r: [media, número de valoraciones] de los perfiles de ejemplo
-const RATINGS = {1:[4.8,7],3:[3.1,3],4:[4.6,12],5:[4.9,18],6:[4.2,4],8:[4.7,10],9:[2.4,2],11:[4.5,8],13:[4.9,26],14:[3.8,3],15:[4.4,6]};
+const RATINGS = {16:[4.6,5],17:[4.9,3],19:[4.3,2],20:[4.8,9],1:[4.8,7],3:[3.1,3],4:[4.6,12],5:[4.9,18],6:[4.2,4],8:[4.7,10],9:[2.4,2],11:[4.5,8],13:[4.9,26],14:[3.8,3],15:[4.4,6]};
 people.forEach(p => { const r = RATINGS[p.id]; p.rAvg = r ? r[0] : 0; p.rN = r ? r[1] : 0; });
 const ENV_SVG = `<svg viewBox="0 0 24 18" aria-hidden="true"><rect x="1" y="1" width="22" height="16" rx="3"/><path d="M2.5 3 L12 10 L21.5 3" class="fl"/></svg>`;
 const fmtNum = n => n.toLocaleString(lang==="en"?"en-GB":"es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
@@ -509,10 +595,67 @@ function ratingHTML(avg, n, opts={}){
 }
 const myRating = () => { const r = me.ratings || []; return [r.length ? r.reduce((a,b)=>a+b,0)/r.length : 0, r.length]; };
 
+
+/* ---- Mapa de cartas: mapamundi de puntos propio (sin servicios externos) ---- */
+const LAND = {"STEP":2.5,"LAT0":80,"cols":144,"rows":55,"rowsHex":["000000133fcfffff000700000000c0000000","00000129900fffff00000000e001f8000000","000003c034003fff00000006007ff8008000","8040007c6fe01ffe000000061dfffff7f800","07ffffd43b381ff80001fe05ebffffffffff","f3fffffffc3e1fc04007fd3fffffffffffff","00fffffff51c1f00800f7ffffffffffffffe","03ffffffc0600e00003e7ffffffffffffef8","01e07fffe07e0000003e7fffffffffff8080","00801ffff87e00000214fffffffffffe0380","00000ffffeff80000d1fffffffffffff0300","000007ffffffc00003ffffffffffffff0000","000003fffff4e00003ffffffffffffff0000","000003fffffc000001fff5f7fffffffe0000","000003fffff0000001ebe0effffffffc4000","000003ffffe000000f86f6f3fffffff08000","000001ffffc000000f029ff3fffffe208000","000001ffffc0000000f007ffffffff130000","0000007fff80000007f003ffffffff040000","0000005ffe0000000ffeebffffffff800000","0000003fc10000000fffffefffffff800000","0000000f810000003ffffdf3ffffff000000","00000007800000003ffffdfe1ffffe800000","00000003880000007ffffeff0fe7e0000000","00000003d81800003ffffefe07c3d0000000","00000000780000007fffff780781e0800000","000000000e0000007fffffe00301f0c00000","00000000002800003fffff90030160000000","00000000017f00001ffffff0000100200000","00000000007f80000fbffff0008080000000","00000000007ff000000fffe0000186000000","0000000000fff000000fffc00000ce000000","0000000000fffc00000fff800000ce8c0000","0000000000ffff80000fff0000004083c000","0000000000ffffc00007ff0000002001e000","0000000000ffffc00007ff00000001a08000","00000000007fff800007ff00000000000000","00000000007fff000007ff100000000c0000","00000000001fff000007ff300000007e4000","00000000000fff000007fc300000007fe000","00000000000fff000007fc60000003fff000","00000000000ffc000003fc60000007fff000","00000000000ff8000003f800000007fff800","00000000001ff0000001f800000003fff800","00000000001ff0000001f000000003fff800","00000000001fe0000001c000000003c3f800","00000000001f80000000000000000000f000","00000000001f000000000000000000002002","00000000003c000000000000000000002004","00000000001c000000000000000000000008","000000000038000000000000000000000010","000000000038000000000000000000000000","000000000030800000000000000000000000","000000000018000000000000000000000000","000000000000000000000000000000000000"]};
+const MAP_W = 360, MAP_H = LAND.rows * LAND.STEP;
+const proj = (lat, lon) => [ (lon + 180) / 360 * MAP_W, (LAND.LAT0 - lat) ];
+function ensureLandSymbol(){
+  if (document.getElementById("landdots")) return;
+  let d = "";
+  LAND.rowsHex.forEach((hex, r) => { for (let i = 0; i < hex.length; i++){ const v = parseInt(hex[i], 16);
+    for (let b = 0; b < 4; b++) if (v & (8 >> b)){ const c = i*4 + b; const x = (c + .5) * LAND.STEP, y = (r + .5) * LAND.STEP;
+      d += `M${(x-.75).toFixed(2)} ${y.toFixed(2)}a.75 .75 0 1 0 1.5 0a.75 .75 0 1 0 -1.5 0`; } } });
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg"); svg.setAttribute("width","0"); svg.setAttribute("height","0"); svg.style.position = "absolute";
+  svg.innerHTML = `<defs><symbol id="landdots" viewBox="0 0 ${MAP_W} ${MAP_H}"><path d="${d}"/></symbol></defs>`;
+  document.body.appendChild(svg);
+}
+// Ciudades: [lat, lon, código de país]
+const CITIES = {"Oviedo":[43.36,-5.85,"ES"],"Cádiz":[36.53,-6.29,"ES"],"Girona":[41.98,2.82,"ES"],"Madrid":[40.42,-3.7,"ES"],"Lugo":[43.01,-7.56,"ES"],"Pamplona":[42.81,-1.64,"ES"],
+  "Salamanca":[40.96,-5.66,"ES"],"A Coruña":[43.36,-8.41,"ES"],"Valencia":[39.47,-.38,"ES"],"Bilbao":[43.26,-2.93,"ES"],"Granada":[37.18,-3.6,"ES"],"Zaragoza":[41.65,-.88,"ES"],
+  "Cáceres":[39.47,-6.37,"ES"],"Murcia":[37.99,-1.13,"ES"],"Tarragona":[41.12,1.25,"ES"],"Santander":[43.46,-3.8,"ES"],"Sevilla":[37.39,-5.98,"ES"],"Barcelona":[41.39,2.17,"ES"],
+  "London":[51.51,-.13,"GB"],"Edinburgh":[55.95,-3.19,"GB"],"Lyon":[45.76,4.84,"FR"],"Paris":[48.86,2.35,"FR"],"Lisboa":[38.72,-9.14,"PT"],"Porto":[41.15,-8.61,"PT"],"Dublin":[53.35,-6.26,"IE"],
+  "Bergen":[60.39,5.32,"NO"],"Berlin":[52.52,13.4,"DE"],"Roma":[41.9,12.5,"IT"],"Amsterdam":[52.37,4.9,"NL"],"København":[55.68,12.57,"DK"],"Praha":[50.08,14.44,"CZ"],"Athína":[37.98,23.73,"GR"],
+  "Stockholm":[59.33,18.07,"SE"],"Marrakech":[31.63,-8,"MA"],"New York":[40.71,-74.01,"US"],"Montréal":[45.5,-73.57,"CA"],"Ciudad de México":[19.43,-99.13,"MX"],"Bogotá":[4.71,-74.07,"CO"],
+  "Lima":[-12.05,-77.04,"PE"],"Buenos Aires":[-34.6,-58.38,"AR"],"Santiago":[-33.45,-70.67,"CL"],"São Paulo":[-23.55,-46.63,"BR"],"Tokyo":[35.68,139.69,"JP"],"Sydney":[-33.87,151.21,"AU"],
+  "Cape Town":[-33.92,18.42,"ZA"],"Istanbul":[41.01,28.98,"TR"]};
+const HOME_BY_ZONE = {"Asturias":"Oviedo","Cádiz":"Cádiz","Girona":"Girona","Madrid":"Madrid","Lugo":"Lugo","Navarra":"Pamplona","Salamanca":"Salamanca","A Coruña":"A Coruña","Valencia":"Valencia",
+  "Bizkaia":"Bilbao","Granada":"Granada","Zaragoza":"Zaragoza","Cáceres":"Cáceres","Murcia":"Murcia","Tarragona":"Tarragona","London, UK":"London","Lyon, France":"Lyon","Lisboa, Portugal":"Lisboa",
+  "Dublin, Ireland":"Dublin","Bergen, Norway":"Bergen","Cantabria":"Santander","Santander":"Santander","Torrelavega":"Santander","Sevilla":"Sevilla","Barcelona":"Barcelona","Bilbao":"Bilbao","Oviedo":"Oviedo"};
+const homeOf = zona => { if (!zona) return null; const k = Object.keys(HOME_BY_ZONE).find(z => zona.toLowerCase().includes(z.toLowerCase().split(",")[0])); return k ? HOME_BY_ZONE[k] : null; };
+// Lugares con los que cada perfil de ejemplo se ha carteado (uno por correspondencia, elegidos de forma fija)
+const POOL = Object.keys(CITIES);
+people.forEach(p => { p.home = homeOf(p.zona); const n = p.corr || 0, out = []; let seed = p.id * 7919;
+  for (let i = 0; i < n; i++){ seed = (seed * 9301 + 49297) % 233280; let c = POOL[seed % POOL.length]; if (c === p.home) c = POOL[(seed+3) % POOL.length]; out.push(c); }
+  p.places = out; });
+const countriesOf = places => new Set(places.map(c => CITIES[c] && CITIES[c][2]).filter(Boolean)).size;
+
+function mapHTML(home, places, opts={}){
+  ensureLandSymbol();
+  const H = CITIES[home], uniq = [...new Set(places)].filter(c => CITIES[c]);
+  const hp = H ? proj(H[0], H[1]) : null;
+  const arcs = hp ? uniq.map(c => { const [x,y] = proj(CITIES[c][0], CITIES[c][1]); const mx = (hp[0]+x)/2, my = Math.min(hp[1], y) - Math.max(8, Math.abs(x-hp[0])*.22);
+    return `<path d="M${hp[0].toFixed(1)} ${hp[1].toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}" class="m-arc"/>`; }).join("") : "";
+  const pts = uniq.map((c,i) => { const [x,y] = proj(CITIES[c][0], CITIES[c][1]); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" class="m-pt" style="animation-delay:${(i*.35).toFixed(2)}s"><title>${esc(c)}</title></circle>`; }).join("");
+  const homeDot = hp ? `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="3.2" class="m-home"><title>${esc(home)}</title></circle>` : "";
+  return `<div class="wmap ${opts.sm?"sm":""}">
+    <svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="${L("Mapa de las cartas","Letter map")}: ${esc(uniq.join(", ")) || L("sin cartas aún","no letters yet")}"><use href="#landdots" class="m-land" width="${MAP_W}" height="${MAP_H}"/>${arcs}${pts}${homeDot}</svg>
+    ${uniq.length ? `<div class="m-legend"><span><i class="lg-home"></i>${L("Escribe desde","Writes from")} ${esc(home || "—")}</span><span><i class="lg-pt"></i>${L("Cartas enviadas y recibidas","Letters sent and received")}</span></div>` : `<div class="m-empty">${L("Todavía no ha enviado cartas. Su mapa empieza con la primera.","No letters yet. The map starts with the first one.")}</div>`}
+  </div>`;
+}
+// Bloque de prestigio: correspondencias, países y valoración
+function statsHTML(corr, places, avg, n){
+  return `<div class="stats">
+    <div class="st main"><b>${corr}</b><span>${plural(corr,"correspondencia","correspondencias","correspondence","correspondences")}</span></div>
+    <div class="st"><b>${countriesOf(places)}</b><span>${plural(countriesOf(places),"país","países","country","countries")}</span></div>
+    <div class="st"><b>${n ? fmtNum(avg) : "—"}</b><span>${L("valoración","rating")}</span></div>
+  </div>`;
+}
+
 function trust(p){
   if ((p.ghosts||0) >= 2) return `<span class="tbad">${L("Nunca contesta","Never replies")}</span><span class="tcount">${p.ghosts} ${L("matches perdidos","lost matches")}</span>`;
   if (!p.corr) return `<span class="tnew">${NEW_LABEL()[p.g]||NEW_LABEL().n}</span>`;
-  return `<span class="tcount">✉︎ ${p.corr} ${plural(p.corr,"correspondencia","correspondencias","correspondence","correspondences")}</span>${p.onTime?`<span class="tok">${L("Responde a tiempo","Replies on time")}</span>`:""}`;
+  return p.onTime ? `<span class="tok">${L("Responde a tiempo","Replies on time")}</span>` : "";
 }
 const myTags = () => me.intereses.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
 const common = p => p.tags.filter(t => myTags().includes(t.toLowerCase()));
@@ -550,7 +693,7 @@ function showNotifs(){
   o.querySelector("#n-ok").onclick = () => o.remove();
 }
 function badge(){const n=chats.filter(c=>c.unread).length;const b=$("#badge");b.textContent=n;b.hidden=!n}
-const pending = () => people.filter(p => !p.seen);
+const pending = () => people.filter(p => !p.seen && commonLangs(p).length);
 
 /* ---- Reglas y reloj simulado ---- */
 const FIRST_DAYS = 7, REPLY_DAYS = 14, POST_DAYS = 3, SUSPEND_DAYS = 3;
@@ -649,10 +792,13 @@ function descubrir(){
     <article class="card">
       <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?L("La foto se muestra si hay match","The photo is shown if you match"):L("Ha elegido no mostrar foto","Has chosen not to show a photo")}</div></div>
       <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(p.zona)}</div></div>
+      ${statsHTML(p.corr||0, p.places||[], p.rAvg, p.rN)}
       <div class="rate-row">${ratingHTML(p.rAvg, p.rN)}</div>
+      ${langsHTML(p)}
       <div class="trust">${trust(p)}</div>
       <p class="bio">${esc(p.bio)}</p>
       <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
+      ${mapHTML(p.home, p.places||[], {sm:true})}
       <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
       <div class="actions"><button class="plain" id="no">${L("Pasar","Pass")}</button><button id="yes" ${suspended()?"disabled":""}>${L("Quiero escribirle","I want to write")}</button></div>
     </article>
@@ -743,11 +889,11 @@ function ventana(c){
     <div class="chead">${photo(c.p,"md",true)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
     <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Sobre ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
-      <p>${esc(c.p.long || c.p.bio)}</p><small>${esc(c.p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(c.p.zona)}</small></details>
+      <p>${esc(c.p.long || c.p.bio)}</p>${langsHTML(c.p,{left:true})}${statsHTML(c.p.corr||0, c.p.places||[], c.p.rAvg, c.p.rN)}${mapHTML(c.p.home, c.p.places||[])}<small>${esc(c.p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(c.p.zona)}</small></details>
     ${deadlineBox(c)}
     ${c.closed?"":(c.meReveal&&c.themReveal
       ? `<div class="sendto"><span class="lbl">${L("Direcciones compartidas","Addresses shared")}</span><span class="addr">${L("Ya podéis escribiros directamente.","You can now write to each other directly.")}</span><span class="addr"><b>${esc(c.p.alias)}:</b> ${L("dirección de ejemplo","example address")}, ${esc(c.p.zona)}</span></div>`
-      : `<div class="sendto"><span class="lbl">${L("Sobre interior","Inner envelope")}</span><span>${L("Solo el código","Just the code")}: <span class="code">${esc(c.p.code)}</span></span><span class="lbl" style="margin-top:8px">${L("Sobre exterior","Outer envelope")}</span><span class="addr">${esc(CENTRAL)}</span><button class="linkbtn" id="howflow">${L("¿Cómo funciona?","How does it work?")}</button></div>`)}
+      : `<div class="sendto"><span class="lbl">${L("Idioma de la correspondencia","Correspondence language")}</span><span>${commonLangs(c.p).map(langName).join(" · ")}</span><span class="lbl" style="margin-top:8px">${L("Sobre interior","Inner envelope")}</span><span>${L("Solo el código","Just the code")}: <span class="code">${esc(c.p.code)}</span></span><span class="lbl" style="margin-top:8px">${L("Sobre exterior","Outer envelope")}</span><span class="addr">${esc(CENTRAL)}</span><button class="linkbtn" id="howflow">${L("¿Cómo funciona?","How does it work?")}</button></div>`)}
     <div class="timeline">${c.letters.length ? c.letters.map((l,i)=>letterCard(c,l,i)).join("")
       : `<div class="empty" style="padding:24px">${L("Todavía no hay cartas.","No letters yet.")}<br>${c.turn==="me"?L("Escribe la primera y prepárala con el doble sobre.","Write the first one and prepare it with the double envelope."):L(`Esperando la primera carta de ${esc(c.p.alias)}.`,`Waiting for ${esc(c.p.alias)}'s first letter.`)}</div>`}</div>
     ${c.closed?"":`<button class="bigbtn" id="sent" ${canSend?"":"disabled"}>${canSend?(c.letters.length?L("Ya he enviado mi respuesta","I've sent my reply"):L("Ya he enviado la primera carta","I've sent the first letter")):inc?L(`Esperando la carta de ${esc(c.p.alias)}`,`Waiting for ${esc(c.p.alias)}'s letter`):c.turn==="them"&&!c.letters.length?L(`${esc(c.p.alias)} escribe primero`,`${esc(c.p.alias)} writes first`):L("Carta enviada ✓","Letter sent ✓")}</button>
@@ -891,6 +1037,7 @@ function profileFields(){
     <div class="field"><label for="f-pr">${L("Profesión","Occupation")}</label><input id="f-pr" value="${esc(me.prof)}" placeholder="${L("A qué te dedicas","What you do")}"></div>
     <div class="field"><label for="f-e">${L("Edad","Age")} *</label><select id="f-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>${L("Se muestra como rango, nunca la edad exacta.","Shown as a range, never your exact age.")}</small></div>
     <div class="field"><label for="f-g">${L("Cómo quieres que te presentemos","How should we introduce you")}</label><select id="f-g" class="sel">${G_OPTS().map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
+    ${langPicker("f-langs")}
     <div class="field"><label for="f-z">${L("Escribes desde","Writing from")} *</label><input id="f-z" required value="${esc(me.zona)}" placeholder="${L("Región o provincia","Region or county")}"><small>${L("Nunca tu dirección.","Never your address.")}</small></div>
     <div class="field"><label for="f-b">${L("Biografía breve","Short bio")} *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="${L("Lo primero que leerán de ti","The first thing people will read about you")}">${esc(me.bio)}</textarea><small>${L("La ve todo el mundo en Descubrir. Máximo 200 caracteres.","Everyone sees it in Discover. Up to 200 characters.")}</small></div>
     <div class="field"><label for="f-l">${L("Biografía extensa","Long bio")}</label><textarea id="f-l" rows="5" maxlength="800" placeholder="${L("Cuéntate con más calma","Tell your story at your own pace")}">${esc(me.long)}</textarea><small>${L("Solo la ven las personas con las que haces match. Máximo 800 caracteres.","Only your matches see it. Up to 800 characters.")}</small></div>
@@ -901,11 +1048,13 @@ function bindProfile(rerender){
   $("#f-p").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
     r.onload = () => { readForm(); me.foto = r.result; rerender(); toast(L("Foto subida. Solo se verá tras un match","Photo uploaded. It will only be shown after a match")); }; r.readAsDataURL(f); };
   $("#f-s").onchange = e => { me.showFoto = e.target.checked; };
+  bindLangPicker("f-langs");
 }
 function readForm(){
   me.alias = $("#f-a").value.trim() || me.alias; me.prof = $("#f-pr").value.trim(); me.edad = $("#f-e").value; me.zona = $("#f-z").value.trim();
   me.bio = $("#f-b").value.trim(); me.long = $("#f-l").value.trim(); me.dir = $("#f-d").value.trim(); me.showFoto = $("#f-s").checked; me.g = $("#f-g").value;
   me.intereses = $("#f-i").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,3).join(", ");
+  const lg = readLangPicker("f-langs"); if (lg.length) me.langs = lg;
 }
 
 function perfil(){
@@ -913,7 +1062,9 @@ function perfil(){
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
   <div class="verified"><span class="vdot">✓</span><div><b>${L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">${L("Tu código","Your code")}: <b>${esc(me.code)}</b></div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div><div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">${L("Tu código","Your code")}: <b>${esc(me.code)}</b></div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
+      return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces)}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
     ${profileFields()}
     <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
     <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
@@ -994,8 +1145,8 @@ function showFlow(){
 let altaStep = 0;
 function landing(){
   const phrases = lang==="en"
-    ? ["Connect with people by letter","Find friends","A bond","A story","Words first","Slow-cooked mail","No rush","Waiting counts too","Real letters"]
-    : ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","Mensajería a fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
+    ? ["Connect with people by letter","Find friends","Learn a language","A bond","A story","Words first","Slow-cooked mail","Friends worldwide","No rush","Real letters"]
+    : ["Conecta por carta con personas","Encuentra amigos","Aprende un idioma","Un vínculo","Una historia","Primero las palabras","Mensajería a fuego lento","Amigos por todo el mundo","Sin prisas","Cartas de verdad"];
   $("#view").innerHTML = `<div class="land">
     <section class="hero">
       <div class="hero-text">
@@ -1016,11 +1167,25 @@ function landing(){
       <p>Find friends. A <em>bond</em>. A story.</p>
       <p>Words <em>first</em>. Faces later.</p>
       <p>Write without hurry. Read with <em>calm</em>.</p>
-      <p>Real letters, in <em>your mailbox</em>.</p>` : `<p>Conecta por carta con <em>personas</em>.</p>
+      <p>Real letters, in <em>your mailbox</em>.</p>
+      <p>New friends, new <em>languages</em>.</p>` : `<p>Conecta por carta con <em>personas</em>.</p>
       <p>Encuentra amigos. Un <em>vínculo</em>. Una historia.</p>
       <p>Primero las <em>palabras</em>. Después, la cara.</p>
       <p>Escribe sin prisas. Lee con <em>calma</em>.</p>
-      <p>Cartas de verdad, en <em>tu buzón</em>.</p>`}
+      <p>Cartas de verdad, en <em>tu buzón</em>.</p>
+      <p>Nuevos amigos, nuevos <em>idiomas</em>.</p>`}
+    </section>
+    <section class="world">
+      <span class="kicker">${L("Idiomas","Languages")}</span>
+      <h2 class="mega sm">${L("Haz amigos<br>por <em>todo el mundo</em>.","Make friends<br><em>all over the world</em>.")}</h2>
+      <div class="greet" aria-hidden="true">${[["Hola","es"],["Hello","en"],["Bonjour","fr"],["Olá","pt"],["Ciao","it"],["Hallo","de"],["Bon dia","ca"],["Kaixo","eu"],["Ola","gl"],["Hej","sv"],["Merhaba","tr"],["Ahoj","cs"]].map(([w],i)=>`<span class="gw g${i%4}" style="animation-delay:${(i*0.9).toFixed(1)}s">${w}</span>`).join("")}</div>
+      <div class="lcards">
+        <div><span class="lc-ic">✦</span><h3>${L("Aprende un idioma nuevo","Learn a new language")}</h3><p>${L("Escribe a alguien que habla la lengua que quieres aprender. Una carta se lee con calma, con diccionario al lado y sin presión por responder al momento.","Write to someone who speaks the language you want to learn. A letter is read slowly, dictionary at hand, with no pressure to answer on the spot.")}</p></div>
+        <div><span class="lc-ic">✎</span><h3>${L("Practica una lengua que ya conoces","Practise a language you already know")}</h3><p>${L("¿Estudiaste francés en el instituto o hablas inglés del trabajo? Mantenlo vivo escribiendo de verdad, sobre cosas que te importan.","Studied French at school or use English at work? Keep it alive by writing for real, about things you care about.")}</p></div>
+        <div><span class="lc-ic">◎</span><h3>${L("Conoce otros lugares","Discover other places")}</h3><p>${L("Recibe en tu buzón cómo es el invierno en Bergen o una tarde en Lisboa, con sello de allí. Remitee conecta personas de cualquier país.","Get winter in Bergen or an afternoon in Lisbon delivered to your mailbox, with a local stamp. Remitee connects people from any country.")}</p></div>
+      </div>
+      <div class="salut"><span>${L("Querida Mistral,","Dear Mistral,")}</span><span>Chère Lince,</span><span>Querido Heron,</span><span>Dear Lince,</span></div>
+      <p class="world-note">${L("Al crear tu perfil marcas los idiomas en los que escribes y lees. Te mostramos personas con las que compartes al menos uno.","When you create your profile you choose the languages you write and read in. We show you people who share at least one.")}</p>
     </section>
     <section class="slowbox">
       <span class="kicker">${L("El valor de la espera","The value of waiting")}</span>
@@ -1039,7 +1204,7 @@ function landing(){
     <section class="privacy">
       <h3>${L("Tu dirección no la ve nadie","Nobody sees your address")}</h3>
       <div class="flowcard">${flowHTML()}</div>
-      <ul class="perks"><li>${L("Tus cartas pasan por nuestra oficina y nunca se abren","Your letters go through our office and are never opened")}</li><li>${L("Foto y biografía completa, solo tras el match","Photo and full bio, only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Compartís direcciones solo si los dos queréis","You share addresses only if you both want to")}</li><li>${L("Valoraciones de 0 a 5 cartas para saber con quién escribes","Ratings from 0 to 5 letters, so you know who you're writing to")}</li></ul>
+      <ul class="perks"><li>${L("Tus cartas pasan por nuestra oficina y nunca se abren","Your letters go through our office and are never opened")}</li><li>${L("Foto y biografía completa, solo tras el match","Photo and full bio, only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Compartís direcciones solo si los dos queréis","You share addresses only if you both want to")}</li><li>${L("Valoraciones de 0 a 5 cartas para saber con quién escribes","Ratings from 0 to 5 letters, so you know who you're writing to")}</li><li>${L("Escribe en tu idioma o en otro, con personas de cualquier país","Write in your language or another, with people from any country")}</li><li>${L("Tu mapa de cartas: cada correspondencia, un punto en el mundo","Your letter map: every correspondence, a dot on the world")}</li></ul>
     </section>
     <section class="final">
       <h2 class="mega sm">${L("Escribe hoy.<br>Recibe <em>sin prisa</em>.","Write today.<br>Receive <em>slowly</em>.")}</h2>
@@ -1096,10 +1261,12 @@ const W = () => [
      <div class="field"><label for="w-e">${L("Edad","Age")}</label><select id="w-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>${L("Se muestra como rango.","Shown as a range.")}</small></div>
      <label class="agecheck" for="w-25"><input type="checkbox" id="w-25" ${me.over25?"checked":""}><span>${L("Confirmo que tengo 25 años o más","I confirm I'm 25 or older")}</span></label>
      <div class="field"><label for="w-g">${L("Cómo quieres que te presentemos","How should we introduce you")}</label><select id="w-g" class="sel">${[["f",L("En femenino (recién llegada)","Feminine")],["m",L("En masculino (recién llegado)","Masculine")],["n",L("Neutro (nueva en Remitee)","Neutral")]].map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
+     ${langPicker("w-langs")}
      <div class="field"><label for="w-z">${L("Escribes desde","Writing from")}</label><input id="w-z" value="${esc(me.zona)}" placeholder="${L("Región o provincia","Region or county")}"></div>
      <div class="field"><label for="w-pr">${L("Profesión (opcional)","Occupation (optional)")}</label><input id="w-pr" value="${esc(me.prof)}" placeholder="${L("A qué te dedicas","What you do")}"></div>`,
-   save:()=>{ me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.over25=$("#w-25").checked; me.g=$("#w-g").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
-     return !me.alias ? L("Escribe un alias para continuar","Enter an alias to continue") : !me.over25 ? L("Remitee es solo para mayores de 25 años","Remitee is for over 25s only") : !me.zona ? L("Indica desde dónde escribes","Tell us where you're writing from") : ""; }},
+   bind:()=>bindLangPicker("w-langs"),
+   save:()=>{ me.langs=readLangPicker("w-langs"); me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.over25=$("#w-25").checked; me.g=$("#w-g").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
+     return !me.alias ? L("Escribe un alias para continuar","Enter an alias to continue") : !me.over25 ? L("Remitee es solo para mayores de 25 años","Remitee is for over 25s only") : !me.langs.length ? L("Marca al menos un idioma","Pick at least one language") : !me.zona ? L("Indica desde dónde escribes","Tell us where you're writing from") : ""; }},
   {t:L("Añade tu foto si quieres","Add a photo if you like"), d:L("Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.","Nobody will see it before a match. You can also add it later from your profile."), skip:L("Más adelante","Later"),
    f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?L("Cambiar foto","Change photo"):L("Elegir foto","Choose photo")}</label><input type="file" id="w-p" accept="image/*" hidden></div>
      <label class="switch" for="w-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
@@ -1155,7 +1322,9 @@ function como(){
     <p class="art-lede">${L("Remitee pone en contacto a personas que quieren escribirse cartas en papel. La app sirve para encontraros; la relación ocurre por correo postal, sin chat y sin prisas.","Remitee connects people who want to write each other paper letters. The app is for finding each other; the relationship happens by post, with no chat and no rush.")}</p>
     <div class="flowcard">${flowHTML()}</div>
     <h3>${L("1. Tu perfil","1. Your profile")}</h3>
-    ${S("Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, una biografía breve y 3 intereses. Tu email nunca se muestra.","You sign up with Google to verify that you're a real person. Remitee is for over 25s only. Your profile has an alias, an age range, where you write from, your occupation, a short bio and 3 interests. Your email is never shown.")}
+    ${S("Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, los idiomas en los que escribes y lees, una biografía breve y 3 intereses. Tu email nunca se muestra.","You sign up with Google to verify that you're a real person. Remitee is for over 25s only. Your profile has an alias, an age range, where you write from, your occupation, the languages you write and read in, a short bio and 3 interests. Your email is never shown.")}
+    <h3>${L("Idiomas","Languages")}</h3>
+    ${S("Marcas los idiomas en los que puedes escribir y leer cartas. En Descubrir solo ves a personas con las que compartes al menos uno, de cualquier país, y en cada perfil se resaltan los idiomas que tenéis en común. Es una buena forma de practicar otro idioma o de cartearte con alguien de otro lugar.","You choose the languages you can write and read letters in. In Discover you only see people who share at least one, from any country, and each profile highlights the languages you have in common. It's a great way to practise a language or write to someone from somewhere else.")}
     <h3>${L("2. Match por intereses","2. Matching on interests")}</h3>
     ${S(`En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.`,`In Discover you read profiles without seeing photos. You can choose someone or pass. If you both choose each other, it's a match and the correspondence opens. Each day you can see ${VIEW_LIMIT} profiles; with Remitee Plus there's no limit.`)}
     <h3>${L("3. Lo que se desbloquea con el match","3. What a match unlocks")}</h3>
@@ -1173,6 +1342,8 @@ function como(){
     ${S(`Quien escribe primero tiene ${FIRST_DAYS} días tras el match. Cada vez que recibes una carta, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches.`,`Whoever writes first has ${FIRST_DAYS} days after the match. Each time you receive a letter, you have ${REPLY_DAYS} days to reply. If someone misses their deadline, the correspondence closes and their account is suspended for ${SUSPEND_DAYS} days, with no new matches.`)}
     <h3>${L("9. Valoraciones","9. Ratings")}</h3>
     ${S("Cuando te llega una carta, puedes valorarla de 0 a 5 cartas. La media aparece en el perfil de cada persona junto al número de valoraciones, para que sepas cómo de fiable y cuidadosa es como corresponsal.","When a letter reaches you, you can rate it from 0 to 5 letters. The average appears on each person's profile next to the number of ratings, so you know how reliable and thoughtful they are as a correspondent.")}
+    <h3>${L("Tu mapa de cartas","Your letter map")}</h3>
+    ${S("Cada perfil muestra públicamente cuántas correspondencias ha tenido esa persona, de cuántos países y su valoración media, junto a un mapamundi con los lugares a los que ha enviado cartas y desde los que las ha recibido. Solo se muestra la ciudad, nunca la dirección. Cuantas más cartas, más se llena tu mapa.","Each profile publicly shows how many correspondences that person has had, from how many countries and their average rating, alongside a world map of the places they've sent letters to and received them from. Only the city is shown, never the address. The more letters, the fuller your map.")}
     <h3>${L("10. Tu historial","10. Your track record")}</h3>
     ${S("En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada. Y quien ha perdido varios matches por no responder aparece marcado como «Nunca contesta».","Each profile shows how many correspondences that person has had and whether they always reply on time. Newcomers are marked as new. And anyone who has lost several matches by not replying is marked “Never replies”.")}
     <h3>${L("11. Cuánto cuesta","11. What it costs")}</h3>
