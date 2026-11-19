@@ -145,7 +145,6 @@ button.sm{padding:7px 13px;font-size:.82rem}
 .susp b{color:var(--bad)}
 .item.closed{opacity:.6}
 .item .s.urgent{color:var(--warm);font-weight:600}
-.passes{font-size:.8rem;color:var(--muted)}
 .paywall{margin-top:16px;background:var(--surface);border-radius:var(--r);padding:20px;text-align:center;display:grid;gap:10px;border:1px solid var(--accent-soft)}
 .paywall b{font-family:var(--head);font-weight:600;font-size:1.1rem}
 .paywall p{margin:0;color:var(--muted);font-size:.9rem}
@@ -214,6 +213,11 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .art h3{font-family:var(--head);font-weight:600;font-size:1.08rem;margin:18px 0 2px}
 .art p{margin:0;color:var(--ink);max-width:62ch}
 .code-inline{font-family:ui-monospace,Menlo,monospace;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:.9em}
+.views{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.8rem;color:var(--muted);margin-bottom:10px}
+.vbar{display:flex;gap:4px}
+.vbar i{width:18px;height:4px;border-radius:999px;background:var(--line)}
+.vbar i.used{background:var(--muted)}
+.vbar i.now{background:var(--accent)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -252,7 +256,7 @@ const people = [
   {id:4, alias:"Noria", zona:"Madrid", edad:"30–35", prof:"Diseñadora de interfaces", code:"VELA-2054", long:"Diseño aplicaciones para una empresa de Madrid, así que vivo pegada a una pantalla. Por eso me atrae tanto lo contrario: el papel, la espera, abrir un sobre. Voy a la filmoteca casi cada semana, escribo poemas que no enseño a nadie y me muevo por la ciudad en bici. Revelo mis propias fotos en un cuarto oscuro improvisado en el baño.", likesMe:true,  showFoto:true,  bio:"Trabajo con pantallas todo el día. Quiero algo que tarde en llegar y se pueda guardar en una caja.", tags:["cine","fotografía","bici"]},
   {id:5, alias:"Grulla", zona:"Lugo", edad:"55–60", prof:"Enfermera jubilada", code:"NUBE-6631", long:"He sido enfermera durante cuarenta años. Ahora tengo tiempo para lo que siempre dejé para después: recopilar las recetas de mi madre y escuchar las historias de la gente mayor del pueblo antes de que se pierdan.", likesMe:false, showFoto:true,  bio:"Jubilada y curiosa. Me encantan las recetas heredadas y las historias de pueblo.", tags:["recetas","historia","punto"]}
 ];
-// Más perfiles de ejemplo para poder probar el límite de pases
+// Más perfiles de ejemplo para poder probar el límite diario
 [["Brújula","Navarra","35–40","Ingeniero agrónomo",["viajes","huerto","cine"]],["Tilde","Salamanca","25–30","Correctora de textos",["poesía","teatro","café"]],
  ["Faro","A Coruña","45–50","Marinero",["mar","radio","fotografía"]],["Sauce","Valencia","30–35","Fisioterapeuta",["yoga","novela","cocina"]],
  ["Bruma","Bizkaia","40–45","Arquitecto",["dibujo","montaña","jazz"]],["Acuarela","Granada","50–55","Ilustradora",["pintura","plantas","viajes"]],
@@ -293,8 +297,8 @@ const addD = (d,n) => new Date(+d + n*DAY);
 const daysLeft = d => Math.max(0, Math.ceil((d - now)/DAY));
 // Cuántos días tarda cada perfil de ejemplo en responder tras recibir tu carta. null = nunca responde.
 const replyAfter = {1:4, 3:null, 4:6};
-const PASS_LIMIT = 10; let passesUsed = 0, passDay = now.toDateString(), plus = false;
-function passesLeft(){ if (passDay !== now.toDateString()){ passDay = now.toDateString(); passesUsed = 0; } return plus ? Infinity : PASS_LIMIT - passesUsed; }
+const VIEW_LIMIT = 5; let viewsUsed = 0, viewDay = now.toDateString(), plus = false;
+function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; } return plus ? Infinity : VIEW_LIMIT - viewsUsed; }
 const suspended = () => me.suspendedUntil && now < me.suspendedUntil;
 
 function tick(){
@@ -325,26 +329,29 @@ function suspBanner(){
 function descubrir(){
   const left = pending();
   const head = `<h2>Descubrir</h2><p class="sub">Primero los intereses. La foto, después del match.</p>${suspBanner()}`;
-  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">Has visto todos los perfiles por hoy.<br>Vuelve mañana: llegan personas nuevas.</div>`; return; }
+  if (!plus && viewsLeft()<=0){
+    $("#view").innerHTML = head + `<div class="paywall"><b>Ya has visto tus ${VIEW_LIMIT} perfiles de hoy</b><p>Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.</p><button id="sub">Suscribirme a Remitee Plus</button><small>Simulación: no se cobra nada.</small></div>${sim()}`;
+    bindSim(); $("#sub").onclick = () => { plus = true; toast("Ya eres de Remitee Plus: perfiles ilimitados"); descubrir(); }; return;
+  }
+  if (!left.length){ $("#view").innerHTML = head + `<div class="empty">Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.</div>${sim()}`; bindSim(); return; }
   const p = left[0];
   const shared = common(p);
   $("#view").innerHTML = head + `
+    <div class="views">${plus?"Remitee Plus · perfiles ilimitados":`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`}${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
     <article class="card">
       <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?"La foto se muestra si hay match":"Ha elegido no mostrar foto"}</div></div>
       <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} años · Escribe desde ${esc(p.zona)}</div></div>
       <p class="bio">${esc(p.bio)}</p>
       <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
       <div class="common">${shared.length?`${shared.length} ${shared.length===1?"interés":"intereses"} en común`:"Ningún interés en común, aún puede sorprenderte"}</div>
-      <div class="actions"><button class="plain" id="no" ${passesLeft()<=0?"disabled":""}>Pasar</button><button id="yes" ${suspended()?"disabled":""}>Quiero escribirle</button></div>
-      <div class="passes">${plus?"Remitee Plus · pases ilimitados":`${passesLeft()} de ${PASS_LIMIT} pases hoy`}</div>
+      <div class="actions"><button class="plain" id="no">Pasar</button><button id="yes" ${suspended()?"disabled":""}>Quiero escribirle</button></div>
     </article>
-    ${!plus && passesLeft()<=0 ? `<div class="paywall"><b>Has usado tus ${PASS_LIMIT} pases de hoy</b><p>Mañana tendrás ${PASS_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.</p><button id="sub">Suscribirme a Remitee Plus</button><small>Simulación: no se cobra nada.</small></div>` : ""}
     <p class="hint">Si los dos os elegís, se abre la correspondencia y tendrás ${FIRST_DAYS} días para enviar la primera carta.</p>${sim()}`;
   bindSim();
-  $("#no").onclick = () => { if (passesLeft()<=0) return; if (!plus) passesUsed++; p.seen = true; descubrir(); };
-  const sub = $("#sub"); if (sub) sub.onclick = () => { plus = true; toast("Ya eres de Remitee Plus: pases ilimitados"); descubrir(); };
+  const used = () => { if (!plus) viewsUsed++; p.seen = true; };
+  $("#no").onclick = () => { used(); descubrir(); };
   $("#yes").onclick = () => {
-    p.seen = true;
+    used();
     if (p.likesMe){ chats.unshift({p, letters:[], unread:true, turn:"me", deadline:addD(now, FIRST_DAYS), closed:null}); badge(); match(p); }
     else { toast(`Si ${p.alias} también te elige, os avisaremos`); }
     descubrir();
@@ -617,7 +624,7 @@ function como(){
     <h3>1. Tu perfil</h3>
     <p>Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, una biografía breve y 3 intereses. Tu email nunca se muestra.</p>
     <h3>2. Match por intereses</h3>
-    <p>En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Tienes 10 pases al día; con Remitee Plus son ilimitados.</p>
+    <p>En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.</p>
     <h3>3. Lo que se desbloquea con el match</h3>
     <p>Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y su biografía extensa, que solo leen sus matches.</p>
     <h3>4. Cómo viajan las cartas</h3>

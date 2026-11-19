@@ -18,7 +18,7 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 - **Penalización.** Quien no cumple su plazo cierra la correspondencia y su cuenta queda suspendida 3 días, sin poder hacer nuevos matches.
 - **Edad mínima.** Solo mayores de 25 años.
 - **Registro obligatorio.** Para entrar hay que registrarse con Google (en el prototipo, simulado) y crear el perfil.
-- **Pases.** 10 pases al día. Para pases ilimitados hay que suscribirse a Remitee Plus.
+- **Perfiles diarios.** Se pueden ver 5 perfiles al día. Para ver más hay que suscribirse a Remitee Plus.
 - **Tras el match.** Se desbloquean la foto, si la persona la comparte, y la biografía extensa.
 
 ## Qué se puede probar
