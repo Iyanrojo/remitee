@@ -107,6 +107,28 @@ input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;pad
 .tabs a[aria-current="page"]{color:var(--accent)}
 .tabs svg{width:23px;height:23px}
 .tabs .badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--accent);color:#fff;font-size:.62rem;font-weight:600;min-width:17px;height:17px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
+/* Fotos */
+.ph{flex:none;border-radius:50%;position:relative;overflow:hidden;display:grid;place-items:center;background-size:cover;background-position:center}
+.ph.big{width:110px;height:110px;margin:0 auto}
+.ph.md{width:68px;height:68px;border:4px solid var(--surface)}
+.ph.sm{width:52px;height:52px}
+.ph.locked::before{content:"";position:absolute;inset:-12px;background:inherit;filter:blur(14px)}
+.ph .lock{position:relative;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);display:grid;place-items:center;color:#2a2e45}
+.ph .lock svg{width:17px;height:17px}
+.ph .init{font-family:var(--head);font-weight:600;color:#2a2e45;font-size:1.2rem;position:relative}
+.ph.big .init{font-size:2rem}
+.phnote{font-size:.78rem;color:var(--muted);margin-top:8px}
+.common{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center;font-size:.8rem;color:var(--muted)}
+.chip.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.photo-pick{display:flex;gap:14px;align-items:center}
+.photo-pick input[type=file]{font-size:.85rem}
+.switch{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border-radius:var(--r);padding:14px 16px}
+.switch b{font-weight:600;font-size:.95rem}
+.switch small{display:block;color:var(--muted);font-size:.8rem}
+.switch input{width:46px;height:26px;appearance:none;-webkit-appearance:none;background:var(--line);border-radius:999px;position:relative;cursor:pointer;flex:none;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{left:23px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -127,15 +149,36 @@ input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;pad
 
 <script>
 const CENTRAL = "Remite · Apartado 123 · 39080 Santander";
-const me = {alias:"Tinta Azul", code:"MAR-1907", bio:"Escribo mejor de lo que hablo. Busco a alguien con quien contarse el mes, sin prisa.", intereses:"cine, fotografía analógica, viajes"};
+const me = {alias:"Tinta Azul", edad:"30–35", zona:"Cantabria", prof:"Profesor de inglés", code:"MAR-1907", bio:"Escribo mejor de lo que hablo. Busco a alguien con quien contarse el mes, sin prisa.",
+  intereses:"cine, fotografía, poesía", foto:null, showFoto:true};
 const tints = ["#ffe3d6","#dfe9ff","#dff5e8","#f3e1fb","#fff1c9"];
-const people = [
-  {id:1, alias:"Lince", zona:"Asturias", edad:32, code:"LUNA-4821", likesMe:true,  bio:"Colecciono sellos de países que no he pisado. Me gustan las cartas largas y las posdatas más largas todavía.", tags:["sellos","novela","montaña"]},
-  {id:2, alias:"Marea", zona:"Cádiz", edad:28, code:"SAL-0316", likesMe:false, bio:"Profesora de música. Te cuento qué suena en mi barrio si tú me cuentas qué se ve desde tu ventana.", tags:["música","mar","cocina"]},
-  {id:3, alias:"Ciprés", zona:"Girona", edad:41, code:"OLMO-7720", likesMe:true,  bio:"Escribo a mano desde niño y echo de menos abrir el buzón con ganas. Prometo buena letra.", tags:["caligrafía","jazz","plantas"]},
-  {id:4, alias:"Noria", zona:"Madrid", edad:34, code:"VELA-2054", likesMe:true,  bio:"Trabajo con pantallas todo el día. Quiero algo que tarde en llegar y se pueda guardar en una caja.", tags:["cine","poesía","bici"]},
-  {id:5, alias:"Grulla", zona:"Lugo", edad:58, code:"NUBE-6631", likesMe:false, bio:"Jubilada y curiosa. Me encantan las recetas heredadas y las historias de pueblo.", tags:["recetas","historia","punto"]}
+// "Fotos" de ejemplo: degradados en lugar de retratos reales. showFoto = la persona decide si la enseña tras el match.
+const shots = [
+  "radial-gradient(circle at 35% 30%,#ffd2b8 0 22%,transparent 23%),radial-gradient(ellipse at 50% 95%,#e8956f 0 38%,transparent 39%),linear-gradient(160deg,#ffe9dc,#f6b99a)",
+  "radial-gradient(circle at 50% 34%,#c9d8ff 0 21%,transparent 22%),radial-gradient(ellipse at 50% 100%,#6f8fe0 0 40%,transparent 41%),linear-gradient(160deg,#eef3ff,#a9bdf3)",
+  "radial-gradient(circle at 55% 33%,#cdeedd 0 21%,transparent 22%),radial-gradient(ellipse at 52% 100%,#5fae86 0 40%,transparent 41%),linear-gradient(160deg,#eefaf3,#9fd9bb)",
+  "radial-gradient(circle at 45% 32%,#ecd2f7 0 21%,transparent 22%),radial-gradient(ellipse at 48% 100%,#a874c9 0 40%,transparent 41%),linear-gradient(160deg,#faf0ff,#d3aee8)",
+  "radial-gradient(circle at 50% 33%,#fff0bf 0 21%,transparent 22%),radial-gradient(ellipse at 50% 100%,#d9a83a 0 40%,transparent 41%),linear-gradient(160deg,#fffbea,#f2d68a)"
 ];
+const people = [
+  {id:1, alias:"Lince", zona:"Asturias", edad:"30–35", prof:"Bibliotecaria", code:"LUNA-4821", likesMe:true,  showFoto:true,  bio:"Colecciono sellos de países que no he pisado. Me gustan las cartas largas y las posdatas más largas todavía.", tags:["sellos","viajes","montaña"]},
+  {id:2, alias:"Marea", zona:"Cádiz", edad:"25–30", prof:"Profesora de música", code:"SAL-0316", likesMe:false, showFoto:true,  bio:"Te cuento qué suena en mi barrio si tú me cuentas qué se ve desde tu ventana.", tags:["música","mar","cocina"]},
+  {id:3, alias:"Ciprés", zona:"Girona", edad:"40–45", prof:"Carpintero", code:"OLMO-7720", likesMe:true,  showFoto:false, bio:"Escribo a mano desde niño y echo de menos abrir el buzón con ganas. Prometo buena letra.", tags:["caligrafía","poesía","plantas"]},
+  {id:4, alias:"Noria", zona:"Madrid", edad:"30–35", prof:"Diseñadora de interfaces", code:"VELA-2054", likesMe:true,  showFoto:true,  bio:"Trabajo con pantallas todo el día. Quiero algo que tarde en llegar y se pueda guardar en una caja.", tags:["cine","fotografía","bici"]},
+  {id:5, alias:"Grulla", zona:"Lugo", edad:"55–60", prof:"Enfermera jubilada", code:"NUBE-6631", likesMe:false, showFoto:true,  bio:"Jubilada y curiosa. Me encantan las recetas heredadas y las historias de pueblo.", tags:["recetas","historia","punto"]}
+];
+const myTags = () => me.intereses.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
+const common = p => p.tags.filter(t => myTags().includes(t.toLowerCase()));
+const LOCK = `<span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>`;
+// Foto de una persona. matched=false → bloqueada (borrosa con candado).
+function photo(p, size, matched){
+  if (!p.showFoto) return `<div class="ph ${size}" style="background:${tint(p)}"><span class="init">${esc(p.alias[0])}</span></div>`;
+  return `<div class="ph ${size} ${matched?"":"locked"}" style="background:${shots[(p.id-1)%shots.length]}" role="img" aria-label="${matched?`Foto de ${esc(p.alias)} (ejemplo)`:"Foto oculta hasta el match"}">${matched?"":LOCK}</div>`;
+}
+function myPhoto(size){
+  if (me.foto && me.showFoto) return `<div class="ph ${size}" style="background-image:url('${me.foto}')" role="img" aria-label="Tu foto"></div>`;
+  return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:#fff">${esc(me.alias[0])}</span></div>`;
+}
 let idx = 0, openId = null;
 const chats = []; // {p, letters:[{mine, at, delivered}], unread}
 
@@ -153,12 +196,14 @@ function descubrir(){
   const left = pending();
   if (!left.length){ $("#view").innerHTML = `<h2>Descubrir</h2><p class="sub">Personas que también quieren escribir.</p><div class="empty">Has visto todos los perfiles por hoy.<br>Vuelve mañana: llegan personas nuevas.</div>`; return; }
   const p = left[0];
-  $("#view").innerHTML = `<h2>Descubrir</h2><p class="sub">Elige por cómo escribe, no por su foto.</p>
+  const shared = common(p);
+  $("#view").innerHTML = `<h2>Descubrir</h2><p class="sub">Primero los intereses. La foto, después del match.</p>
     <article class="card">
-      ${av(p)}
-      <div><p class="name">${esc(p.alias)}, ${p.edad}</p><div class="where">${esc(p.zona)}</div></div>
+      <div>${photo(p,"big",false)}<div class="phnote">${p.showFoto?"La foto se muestra si hay match":"Ha elegido no mostrar foto"}</div></div>
+      <div><p class="name">${esc(p.alias)}</p><div class="where">${esc(p.prof)}</div><div class="where">${esc(p.edad)} años · Escribe desde ${esc(p.zona)}</div></div>
       <p class="bio">${esc(p.bio)}</p>
-      <div class="chips">${p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
+      <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
+      <div class="common">${shared.length?`${shared.length} ${shared.length===1?"interés":"intereses"} en común`:"Ningún interés en común, aún puede sorprenderte"}</div>
       <div class="actions"><button class="plain" id="no">Pasar</button><button id="yes">Quiero escribirle</button></div>
     </article>
     <p class="hint">Si los dos os elegís, se abre la correspondencia.</p>`;
@@ -174,9 +219,9 @@ function descubrir(){
 function match(p){
   const o = document.createElement("div"); o.className = "overlay";
   o.innerHTML = `<div class="modal" role="dialog" aria-label="Match">
-    <div class="pair">${meAv}${av(p)}</div>
+    <div class="pair">${myPhoto("md")}${photo(p,"md",true)}</div>
     <h3>¡Es mutuo!</h3>
-    <p style="margin:0;color:var(--muted)">Tú y ${esc(p.alias)} queréis escribiros. Ya podéis empezar la correspondencia.</p>
+    <p style="margin:0;color:var(--muted)">Tú y ${esc(p.alias)} queréis escribiros. ${p.showFoto?"Ya podéis ver vuestras fotos y empezar la correspondencia.":`${esc(p.alias)} prefiere no mostrar foto. Ya podéis empezar la correspondencia.`}</p>
     <button id="go">Abrir correspondencia</button><button class="plain" id="later">Más tarde</button></div>`;
   document.body.appendChild(o);
   o.querySelector("#go").onclick = () => { o.remove(); openId = p.id; location.hash = "#cartas"; route(); };
@@ -193,7 +238,7 @@ function lastLine(c){
 function cartas(){
   if (openId){ return ventana(chats.find(c => c.p.id === openId)); }
   $("#view").innerHTML = `<h2>Cartas</h2><p class="sub">Tus correspondencias abiertas.</p>` + (chats.length
-    ? `<div class="list">${chats.map(c=>`<button class="item" data-id="${c.p.id}">${av(c.p)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(lastLine(c))}</div></div>${c.unread?'<span class="dot" aria-label="Novedad"></span>':""}</button>`).join("")}</div>`
+    ? `<div class="list">${chats.map(c=>`<button class="item" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(lastLine(c))}</div></div>${c.unread?'<span class="dot" aria-label="Novedad"></span>':""}</button>`).join("")}</div>`
     : `<div class="empty">Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.</div>`);
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = +b.dataset.id; cartas(); });
 }
@@ -203,7 +248,7 @@ function ventana(c){
   const last = c.letters[c.letters.length-1];
   const waiting = last && last.mine;
   $("#view").innerHTML = `<button class="back" id="back">← Cartas</button>
-    <div class="chead">${av(c.p)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.zona)} · ${c.letters.length} ${c.letters.length===1?"carta":"cartas"}</div></div></div>
+    <div class="chead">${photo(c.p,"md",true)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)} · ${c.letters.length} ${c.letters.length===1?"carta":"cartas"}</div></div></div>
     <div class="sendto"><span class="lbl">Escribe en el sobre</span><span class="addr">${esc(CENTRAL)}</span><span>Para: <span class="code">${esc(c.p.code)}</span></span></div>
     <div class="timeline">${c.letters.length ? c.letters.map(l=>`
       <div class="letter ${l.mine?"mine":""}"><div class="ic">✉︎</div><div><div class="t">${l.mine?"Tu carta":`Carta de ${esc(c.p.alias)}`}</div><div class="d">Enviada el ${fmt(l.at)}</div></div>
@@ -225,14 +270,22 @@ function ventana(c){
 function perfil(){
   $("#view").innerHTML = `<h2>Perfil</h2><p class="sub">Esto es lo que ven los demás. Sin teléfono ni email.</p>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${meAv}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc(me.prof)} · ${esc(me.edad)} · ${esc(me.zona)}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div></div></div>
+    <div class="field"><label for="f-p">Foto</label><div class="photo-pick"><input type="file" id="f-p" accept="image/*"></div><small>${me.foto?"Foto subida.":"Opcional."} Nadie la ve antes del match.</small></div>
+    <label class="switch" for="f-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="f-s" ${me.showFoto?"checked":""}></label>
     <div class="field"><label for="f-a">Alias</label><input id="f-a" value="${esc(me.alias)}"></div>
-    <div class="field"><label for="f-b">Sobre ti</label><textarea id="f-b" rows="3">${esc(me.bio)}</textarea></div>
-    <div class="field"><label for="f-i">Intereses</label><input id="f-i" value="${esc(me.intereses)}"></div>
+    <div class="field"><label for="f-pr">Profesión</label><input id="f-pr" value="${esc(me.prof)}"></div>
+    <div class="field"><label for="f-e">Edad</label><select id="f-e" style="font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0">${["18–24","25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"].map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango, nunca la edad exacta.</small></div>
+    <div class="field"><label for="f-z">Escribes desde</label><input id="f-z" value="${esc(me.zona)}"><small>Región o provincia. Nunca tu dirección.</small></div>
+    <div class="field"><label for="f-b">Biografía breve</label><textarea id="f-b" rows="3" maxlength="200">${esc(me.bio)}</textarea><small>Máximo 200 caracteres.</small></div>
+    <div class="field"><label for="f-i">3 intereses</label><input id="f-i" value="${esc(me.intereses)}"><small>Separados por comas. Se usan para el match.</small></div>
     <div class="field"><label for="f-d">Dirección postal</label><input id="f-d" value="C/ Ejemplo 1 · Torrelavega"><small>Privada. Nadie la ve: solo se usa para reenviarte las cartas.</small></div>
     <button type="submit">Guardar</button>
   </form>`;
-  $("#pf").onsubmit = e => { e.preventDefault(); me.alias = $("#f-a").value.trim() || me.alias; me.bio = $("#f-b").value; me.intereses = $("#f-i").value; toast("Perfil guardado"); perfil(); };
+  $("#f-p").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
+    r.onload = () => { me.foto = r.result; perfil(); toast("Foto subida. Solo se verá tras un match"); }; r.readAsDataURL(f); };
+  $("#f-s").onchange = e => { me.showFoto = e.target.checked; perfil(); toast(me.showFoto?"Tu foto se mostrará tras el match":"Tu foto queda oculta"); };
+  $("#pf").onsubmit = e => { e.preventDefault(); me.alias = $("#f-a").value.trim() || me.alias; me.bio = $("#f-b").value; me.intereses = $("#f-i").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,3).join(", "); me.prof = $("#f-pr").value; me.edad = $("#f-e").value; me.zona = $("#f-z").value; toast("Perfil guardado"); perfil(); };
 }
 
 const views = {descubrir, cartas, perfil};
