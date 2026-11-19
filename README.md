@@ -74,6 +74,17 @@ Qué se guarda:
 
 Pendiente: mostrar en Descubrir los perfiles reales, matches entre usuarios, fotos (Firebase Storage) y envío real de emails.
 
+## Email de bienvenida («¿Y ahora qué?»)
+
+Al crear el perfil, la web deja el email en la colección `mail` de Firestore. La extensión **Trigger Email from Firestore** de Firebase lo envía. Plantilla: `emails/welcome.js` (vistas previas en `emails/bienvenida-es.html` y `emails/welcome-en.html`).
+
+Para activarlo:
+
+1. Firebase → **Extensions** → instalar **Trigger Email from Firestore**. Pide pasar al plan Blaze (pago por uso, con cuota gratuita).
+2. Configurar un servicio de envío SMTP (por ejemplo Resend o Brevo, con plan gratuito) y poner su URL SMTP en la extensión.
+3. Colección: `mail`. Remitente: `Remitee <hola@tu-dominio>`.
+4. Publicar las reglas de `firestore.rules`.
+
 ## Pendiente de decidir
 
 - Coste del reenvío (sello, sobre, gestión) y modelo de negocio: suscripción o pago por carta.

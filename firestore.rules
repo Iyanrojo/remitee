@@ -11,6 +11,12 @@ service cloud.firestore {
     match /private/{uid} {
       allow read, write: if verified() && request.auth.uid == uid;
     }
+    // Emails salientes (extensión Trigger Email): cada persona solo puede dejar uno de bienvenida, para su propio email
+    match /mail/{id} {
+      allow create: if verified() && id == "welcome_" + request.auth.uid
+        && request.resource.data.to == request.auth.token.email
+        && request.resource.data.uid == request.auth.uid;
+    }
     match /{document=**} {
       allow read, write: if false;
     }

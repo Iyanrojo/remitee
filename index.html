@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="emails/welcome.js"></script>
 <title>Remitee</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -503,6 +504,15 @@ async function cloudSave(){
   pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
   await FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true});
   await FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true});
+}
+// Email de bienvenida: se deja en la colección "mail" y la extensión Trigger Email de Firebase lo envía
+async function queueWelcome(){
+  if (!FB || !me.uid || !me.email || !window.welcomeEmail || me.welcomeSent) return;
+  const m = window.welcomeEmail(lang, me.alias, me.code, location.origin + location.pathname, me.g);
+  try {
+    await FB.db.collection("mail").doc("welcome_" + me.uid).set({ to: me.email, message: { subject: m.subject, html: m.html, text: m.text }, uid: me.uid, kind: "welcome", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    me.welcomeSent = true; saveLocal();
+  } catch(e){ console.warn("Welcome email:", e); }
 }
 async function cloudLoad(uid){
   const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
@@ -1409,7 +1419,7 @@ function wizard(){
   const first = o.querySelector("input:not([type=file]):not([type=checkbox]),textarea"); if (first) first.focus();
   o.querySelector("#wn").onclick = () => { const err = st.save(); if (err){ toast(err); return; }
     if (!last){ wStep++; wizard(); return; }
-    o.remove(); me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 0; wStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Perfil creado. Tu código de buzón es ${me.code}`,`Profile created. Your mailbox code is ${me.code}`)); };
+    o.remove(); me.created = true; me.code = me.code || newCode(); saveMe(); queueWelcome(); altaStep = 0; wStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Perfil creado. Tu código de buzón es ${me.code}`,`Profile created. Your mailbox code is ${me.code}`)); };
   const sk = o.querySelector("#wsk"); if (sk) sk.onclick = () => { st.save(); wStep++; wizard(); };
   const bk = o.querySelector("#wb"); if (bk) bk.onclick = () => { st.save(); wStep--; wizard(); };
   o.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.tagName==="INPUT") { e.preventDefault(); o.querySelector("#wn").click(); } });
