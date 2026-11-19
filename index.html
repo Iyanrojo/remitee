@@ -154,6 +154,19 @@ button.sm{padding:7px 13px;font-size:.82rem}
 .about summary{cursor:pointer;font-family:var(--head);font-weight:600;font-size:1rem;list-style-position:inside}
 .about p{margin:0 0 8px;font-size:.93rem}
 .about small{color:var(--muted);font-size:.8rem}
+.welcome{display:grid;gap:14px;text-align:center;padding-top:20px}
+.welcome h2{font-size:1.7rem;line-height:1.2}
+.perks{list-style:none;padding:0;margin:0 0 6px;display:grid;gap:8px;text-align:left;background:var(--surface);border-radius:var(--r);padding:16px 18px}
+.perks li{padding-left:24px;position:relative;font-size:.92rem}
+.perks li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+button.google{background:var(--surface);color:var(--ink);border:1px solid var(--line);width:100%;padding:15px}
+.gsim{background:var(--surface);border-radius:var(--r);padding:16px}
+.gsim .field{padding:0;background:transparent}
+.gsim input{border-bottom:1px solid var(--line);padding:8px 0}
+.verified{display:flex;gap:12px;align-items:center;background:var(--ok-soft);border-radius:var(--r);padding:12px 14px;margin-bottom:16px}
+.verified b{display:block;font-size:.92rem;color:var(--ok)}
+.verified small{color:var(--muted);font-size:.8rem}
+.vdot{width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -174,8 +187,8 @@ button.sm{padding:7px 13px;font-size:.82rem}
 
 <script>
 const CENTRAL = "Remitee · Apartado 123 · 39080 Santander";
-const me = {alias:"Tinta Azul", edad:"30–35", zona:"Norte peninsular", prof:"Fotógrafo", code:"MAR-1907", bio:"Escribo mejor de lo que hablo. Busco a alguien con quien contarse el mes, sin prisa.",
-  intereses:"cine, fotografía, poesía", long:"Perfil de ejemplo. Me gusta el cine de autor, revelar mis propios carretes y escribir a mano cuando nadie me mira. Busco a alguien que no tenga prisa.", foto:null, showFoto:true};
+const me = {created:false, email:"", verified:false, alias:"", edad:"30–35", zona:"", prof:"", code:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true};
+loadMe();
 const tints = ["#ffe3d6","#dfe9ff","#dff5e8","#f3e1fb","#fff1c9"];
 // "Fotos" de ejemplo: degradados en lugar de retratos reales. showFoto = la persona decide si la enseña tras el match.
 const shots = [
@@ -211,7 +224,7 @@ function photo(p, size, matched){
 }
 function myPhoto(size){
   if (me.foto && me.showFoto) return `<div class="ph ${size}" style="background-image:url('${me.foto}')" role="img" aria-label="Tu foto"></div>`;
-  return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:#fff">${esc(me.alias[0])}</span></div>`;
+  return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:#fff">${esc((me.alias||"?")[0])}</span></div>`;
 }
 let idx = 0, openId = null;
 const chats = []; // {p, letters:[{mine, at, delivered}], unread}
@@ -220,7 +233,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const tint = p => tints[(p.id-1) % tints.length];
 const av = (p, cls="") => `<div class="avatar ${cls}" style="background:${tint(p)};color:#2a2e45">${esc(p.alias[0])}</div>`;
-const meAv = `<div class="avatar" style="background:var(--accent);color:#fff">${esc(me.alias[0])}</div>`;
+const meAv = `<div class="avatar" style="background:var(--accent);color:#fff">${esc((me.alias||"?")[0])}</div>`;
 const fmt = d => d.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
 function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200)}
 function badge(){const n=chats.filter(c=>c.unread).length;const b=$("#badge");b.textContent=n;b.hidden=!n}
@@ -363,30 +376,84 @@ function ventana(c){
   };
 }
 
-function perfil(){
-  $("#view").innerHTML = `<h2>Perfil</h2><p class="sub">Esto es lo que ven los demás. Sin teléfono ni email.</p>
-  <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc(me.prof)} · ${esc(me.edad)} · ${esc(me.zona)}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div></div></div>
-    <div class="field"><label for="f-p">Foto</label><div class="photo-pick"><input type="file" id="f-p" accept="image/*"></div><small>${me.foto?"Foto subida.":"Opcional."} Nadie la ve antes del match.</small></div>
+/* ---- Perfil propio: se guarda en este navegador ---- */
+function saveMe(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); } catch(_){} } }
+function loadMe(){ try { const d = JSON.parse(localStorage.getItem("remitee-me")||"null"); if (d) Object.assign(me, d); } catch(e) {} }
+const RANGES = ["18–24","25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
+function newCode(){ const w=["MAR","LUNA","RIO","SOL","PINO","ALBA","NIDO","ROCA"]; return `${w[Math.floor(Math.random()*w.length)]}-${1000+Math.floor(Math.random()*9000)}`; }
+
+function profileFields(){
+  return `
+    <div class="field"><label for="f-p">Foto</label><div class="photo-pick">${myPhoto("sm")}<input type="file" id="f-p" accept="image/*"></div><small>Opcional. Nadie la ve antes del match.</small></div>
     <label class="switch" for="f-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="f-s" ${me.showFoto?"checked":""}></label>
-    <div class="field"><label for="f-a">Alias</label><input id="f-a" value="${esc(me.alias)}"></div>
-    <div class="field"><label for="f-pr">Profesión</label><input id="f-pr" value="${esc(me.prof)}"></div>
-    <div class="field"><label for="f-e">Edad</label><select id="f-e" style="font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0">${["18–24","25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"].map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango, nunca la edad exacta.</small></div>
-    <div class="field"><label for="f-z">Escribes desde</label><input id="f-z" value="${esc(me.zona)}"><small>Región o provincia. Nunca tu dirección.</small></div>
-    <div class="field"><label for="f-b">Biografía breve</label><textarea id="f-b" rows="3" maxlength="200">${esc(me.bio)}</textarea><small>La ve todo el mundo en Descubrir. Máximo 200 caracteres.</small></div>
-    <div class="field"><label for="f-l">Biografía extensa</label><textarea id="f-l" rows="5" maxlength="800">${esc(me.long)}</textarea><small>Solo la ven las personas con las que haces match. Máximo 800 caracteres.</small></div>
-    <div class="field"><label for="f-i">3 intereses</label><input id="f-i" value="${esc(me.intereses)}"><small>Separados por comas. Se usan para el match.</small></div>
-    <div class="field"><label for="f-d">Dirección postal</label><input id="f-d" value="C/ Ejemplo 1 · 00000 Ciudad"><small>Privada. Nadie la ve: solo se usa para reenviarte las cartas.</small></div>
-    <button type="submit">Guardar</button>
-  </form>`;
+    <div class="field"><label for="f-a">Alias *</label><input id="f-a" required maxlength="24" value="${esc(me.alias)}" placeholder="Cómo quieres que te llamen"></div>
+    <div class="field"><label for="f-pr">Profesión</label><input id="f-pr" value="${esc(me.prof)}" placeholder="A qué te dedicas"></div>
+    <div class="field"><label for="f-e">Edad *</label><select id="f-e" style="font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango, nunca la edad exacta.</small></div>
+    <div class="field"><label for="f-z">Escribes desde *</label><input id="f-z" required value="${esc(me.zona)}" placeholder="Región o provincia"><small>Nunca tu dirección.</small></div>
+    <div class="field"><label for="f-b">Biografía breve *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="Lo primero que leerán de ti">${esc(me.bio)}</textarea><small>La ve todo el mundo en Descubrir. Máximo 200 caracteres.</small></div>
+    <div class="field"><label for="f-l">Biografía extensa</label><textarea id="f-l" rows="5" maxlength="800" placeholder="Cuéntate con más calma">${esc(me.long)}</textarea><small>Solo la ven las personas con las que haces match. Máximo 800 caracteres.</small></div>
+    <div class="field"><label for="f-i">3 intereses *</label><input id="f-i" required value="${esc(me.intereses)}" placeholder="cine, montaña, poesía"><small>Separados por comas. Se usan para el match.</small></div>
+    <div class="field"><label for="f-d">Dirección postal *</label><input id="f-d" required value="${esc(me.dir||"")}" placeholder="Calle, número, código postal, ciudad"><small>Privada. Nadie la ve: solo se usa para reenviarte las cartas.</small></div>`;
+}
+function bindProfile(rerender){
   $("#f-p").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
-    r.onload = () => { me.foto = r.result; perfil(); toast("Foto subida. Solo se verá tras un match"); }; r.readAsDataURL(f); };
-  $("#f-s").onchange = e => { me.showFoto = e.target.checked; perfil(); toast(me.showFoto?"Tu foto se mostrará tras el match":"Tu foto queda oculta"); };
-  $("#pf").onsubmit = e => { e.preventDefault(); me.alias = $("#f-a").value.trim() || me.alias; me.bio = $("#f-b").value; me.long = $("#f-l").value; me.intereses = $("#f-i").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,3).join(", "); me.prof = $("#f-pr").value; me.edad = $("#f-e").value; me.zona = $("#f-z").value; toast("Perfil guardado"); perfil(); };
+    r.onload = () => { readForm(); me.foto = r.result; rerender(); toast("Foto subida. Solo se verá tras un match"); }; r.readAsDataURL(f); };
+  $("#f-s").onchange = e => { me.showFoto = e.target.checked; };
+}
+function readForm(){
+  me.alias = $("#f-a").value.trim() || me.alias; me.prof = $("#f-pr").value.trim(); me.edad = $("#f-e").value; me.zona = $("#f-z").value.trim();
+  me.bio = $("#f-b").value.trim(); me.long = $("#f-l").value.trim(); me.dir = $("#f-d").value.trim(); me.showFoto = $("#f-s").checked;
+  me.intereses = $("#f-i").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,3).join(", ");
+}
+
+function perfil(){
+  $("#view").innerHTML = `<h2>Perfil</h2><p class="sub">Esto es lo que ven los demás. Tu email nunca se muestra.</p>
+  <div class="verified"><span class="vdot">✓</span><div><b>Identidad verificada con Google</b><small>${esc(me.email||"")}</small></div></div>
+  <form class="form" id="pf">
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div></div></div>
+    ${profileFields()}
+    <button type="submit">Guardar cambios</button>
+    <button type="button" class="plain" id="logout">Cerrar sesión</button>
+  </form>`;
+  bindProfile(perfil);
+  $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast("Perfil guardado"); perfil(); };
+  $("#logout").onclick = () => { try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
+}
+
+/* ---- Alta: Google (simulado) + creación de perfil ---- */
+let altaStep = 1;
+function alta(){
+  if (altaStep === 1){
+    $("#view").innerHTML = `<div class="welcome">
+      <h2>Cartas de verdad con personas nuevas</h2>
+      <p class="sub">Haz match por intereses y escribíos por correo postal. Sin chat, sin prisas.</p>
+      <ul class="perks"><li>Tu dirección nunca se comparte</li><li>Foto y biografía completa solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li></ul>
+      <button class="google" id="g">Continuar con Google</button>
+      <div class="gsim" id="gsim" hidden>
+        <p class="note" style="margin:0 0 10px;text-align:left">En la versión real aquí se abre el inicio de sesión de Google. En el prototipo, escribe un email para simularlo.</p>
+        <div class="field"><label for="f-email">Email de tu cuenta de Google</label><input id="f-email" type="email" placeholder="nombre@gmail.com"></div>
+        <button id="gok" style="width:100%;margin-top:10px">Verificar y continuar</button>
+      </div>
+      <p class="note">Usamos tu cuenta solo para verificar tu identidad. Tu email no aparece en tu perfil.</p></div>`;
+    $("#g").onclick = () => { $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
+    $("#gok").onclick = () => { const v = $("#f-email").value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast("Escribe un email válido, por ejemplo nombre@gmail.com"); return; }
+      me.email = v; me.verified = true; altaStep = 2; alta(); };
+    return;
+  }
+  $("#view").innerHTML = `<div class="verified"><span class="vdot">✓</span><div><b>Cuenta verificada</b><small>${esc(me.email)}</small></div></div>
+    <h2>Crea tu perfil</h2><p class="sub">Los campos con * son obligatorios. Podrás cambiarlos cuando quieras.</p>
+    <form class="form" id="af">${profileFields()}<button type="submit">Crear perfil</button></form>`;
+  bindProfile(alta);
+  $("#af").onsubmit = e => { e.preventDefault(); readForm();
+    if (me.intereses.split(",").filter(Boolean).length < 3) { toast("Añade 3 intereses separados por comas"); return; }
+    me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 1; location.hash = "#descubrir"; route(); toast(`Perfil creado. Tu código es ${me.code}`); };
 }
 
 const views = {descubrir, cartas, perfil};
 function route(){
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb;
+  if (onb){ alta(); window.scrollTo(0,0); return; }
   const v = (location.hash || "#descubrir").slice(1), name = views[v] ? v : "descubrir";
   if (name !== "cartas") openId = null;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v===name ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));

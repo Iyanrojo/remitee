@@ -16,6 +16,7 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 
 - **Plazos.** Tras el match hay 7 días para enviar la primera carta y marcarla en la app. Cada carta recibida da 14 días para responder.
 - **Penalización.** Quien no cumple su plazo cierra la correspondencia y su cuenta queda suspendida 3 días, sin poder hacer nuevos matches.
+- **Registro obligatorio.** Para entrar hay que registrarse con Google (en el prototipo, simulado) y crear el perfil.
 - **Pases.** 10 pases al día. Para pases ilimitados hay que suscribirse a Remitee Plus.
 - **Tras el match.** Se desbloquean la foto, si la persona la comparte, y la biografía extensa.
 
