@@ -203,6 +203,8 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .share{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border-radius:var(--r);padding:14px 16px;margin-top:14px}
 .share b{font-weight:600;font-size:.95rem}
 .share small{display:block;color:var(--muted);font-size:.8rem}
+.agecheck{display:flex;gap:10px;align-items:center;font-size:.9rem;padding:4px 2px}
+.agecheck input{width:20px;height:20px;accent-color:var(--accent);flex:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -245,7 +247,7 @@ const people = [
 [["Brújula","Navarra","35–40","Ingeniero agrónomo",["viajes","huerto","cine"]],["Tilde","Salamanca","25–30","Correctora de textos",["poesía","teatro","café"]],
  ["Faro","A Coruña","45–50","Marinero",["mar","radio","fotografía"]],["Sauce","Valencia","30–35","Fisioterapeuta",["yoga","novela","cocina"]],
  ["Bruma","Bizkaia","40–45","Arquitecto",["dibujo","montaña","jazz"]],["Acuarela","Granada","50–55","Ilustradora",["pintura","plantas","viajes"]],
- ["Cometa","Zaragoza","18–24","Estudiante de historia",["historia","cine","cómic"]],["Raíz","Cáceres","60+","Maestro jubilado",["huerto","recetas","poesía"]],
+ ["Cometa","Zaragoza","25–30","Investigadora de historia",["historia","cine","cómic"]],["Raíz","Cáceres","60+","Maestro jubilado",["huerto","recetas","poesía"]],
  ["Lunar","Murcia","30–35","Veterinaria",["animales","fotografía","bici"]],["Delta","Tarragona","35–40","Cocinero",["cocina","vino","música"]]
 ].forEach((d,i)=>people.push({id:6+i, alias:d[0], zona:d[1], edad:d[2], prof:d[3], code:`${d[0].slice(0,4).toUpperCase()}-${3100+i*37}`,
   likesMe:i%4===1, showFoto:i%3!==2, long:"Escribo desde casa, normalmente por la noche. Me gusta contar el día con detalle y preguntar mucho. Tengo paciencia para esperar una carta y ganas de que me sorprendan.", bio:"Me apetece escribir y recibir cartas de verdad. Cuéntame algo que no le contarías a nadie en un mensaje.", tags:d[4]}));
@@ -423,7 +425,7 @@ function ventana(c){
 /* ---- Perfil propio: se guarda en este navegador ---- */
 function saveMe(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); } catch(_){} } }
 function loadMe(){ try { const d = JSON.parse(localStorage.getItem("remitee-me")||"null"); if (d) Object.assign(me, d); } catch(e) {} }
-const RANGES = ["18–24","25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
+const RANGES = ["25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
 function newCode(){ const w=["MAR","LUNA","RIO","SOL","PINO","ALBA","NIDO","ROCA"]; return `${w[Math.floor(Math.random()*w.length)]}-${1000+Math.floor(Math.random()*9000)}`; }
 
 function profileFields(){
@@ -523,14 +525,14 @@ function alta(){
       <h2>Cartas de verdad con personas nuevas</h2>
       <p class="sub">Haz match por intereses y escribíos por correo postal. Sin chat, sin prisas.</p>
       <div class="flowcard">${flowHTML()}</div>
-      <ul class="perks"><li>Tu dirección nunca se comparte</li><li>Foto y biografía completa solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li></ul>
+      <ul class="perks"><li>Tu dirección nunca se comparte</li><li>Foto y biografía completa solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li><li>Solo para mayores de 25 años</li></ul>
       <button class="google" id="g">Continuar con Google</button>
       <div class="gsim" id="gsim" hidden>
         <p class="note" style="margin:0 0 10px;text-align:left">En la versión real aquí se abre el inicio de sesión de Google. En el prototipo, escribe un email para simularlo.</p>
         <div class="field"><label for="f-email">Email de tu cuenta de Google</label><input id="f-email" type="email" placeholder="nombre@gmail.com"></div>
         <button id="gok" style="width:100%;margin-top:10px">Verificar y continuar</button>
       </div>
-      <p class="note">Usamos tu cuenta solo para verificar tu identidad. Tu email no aparece en tu perfil.</p></div>`;
+      <p class="note">Remitee es solo para mayores de 25 años. Usamos tu cuenta solo para verificar tu identidad; tu email no aparece en tu perfil.</p></div>`;
     startFlow($(".flowcard"));
     $("#g").onclick = () => { $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
     $("#gok").onclick = () => { const v = $("#f-email").value.trim();
@@ -547,10 +549,11 @@ const W = [
   {t:"Pon tu alias", d:"Es el nombre con el que te conocerán. No hace falta que sea el real.",
    f:()=>`<div class="field"><label for="w-a">Alias</label><input id="w-a" maxlength="24" value="${esc(me.alias)}" placeholder="Por ejemplo, Tinta Azul"></div>
      <div class="field"><label for="w-e">Edad</label><select id="w-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango.</small></div>
+     <label class="agecheck" for="w-25"><input type="checkbox" id="w-25" ${me.over25?"checked":""}><span>Confirmo que tengo 25 años o más</span></label>
      <div class="field"><label for="w-z">Escribes desde</label><input id="w-z" value="${esc(me.zona)}" placeholder="Región o provincia"></div>
      <div class="field"><label for="w-pr">Profesión (opcional)</label><input id="w-pr" value="${esc(me.prof)}" placeholder="A qué te dedicas"></div>`,
-   save:()=>{ me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
-     return !me.alias ? "Escribe un alias para continuar" : !me.zona ? "Indica desde dónde escribes" : ""; }},
+   save:()=>{ me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.over25=$("#w-25").checked; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
+     return !me.alias ? "Escribe un alias para continuar" : !me.over25 ? "Remitee es solo para mayores de 25 años" : !me.zona ? "Indica desde dónde escribes" : ""; }},
   {t:"Añade tu foto si quieres", d:"Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.", skip:"Más adelante",
    f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?"Cambiar foto":"Elegir foto"}</label><input type="file" id="w-p" accept="image/*" hidden></div>
      <label class="switch" for="w-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
