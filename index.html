@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Remite</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: columna central de lectura; cada vista es un "sobre" con ribete de correo aéreo solo donde importa (el sobre de la carta). */
+:root{
+  --paper:#f6f7f9; --card:#ffffff; --ink:#1b2340; --muted:#5d6580; --line:#d9dce6;
+  --air-red:#c8323b; --air-blue:#2a4fa8; --stamp:#e9edf7; --ok:#2f7d55; --warn:#a86a12;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Newsreader", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11141f; --card:#1a1f2e; --ink:#e7e9f2; --muted:#9aa1b8; --line:#2c3347;
+  --air-red:#e0626a; --air-blue:#7d9ae6; --stamp:#232a3d; --ok:#5fbf8a; --warn:#e0a54a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11141f; --card:#1a1f2e; --ink:#e7e9f2; --muted:#9aa1b8; --line:#2c3347;
+  --air-red:#e0626a; --air-blue:#7d9ae6; --stamp:#232a3d; --ok:#5fbf8a; --warn:#e0a54a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:760px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px;padding-block:28px 12px}
+.brand{font-family:var(--display);font-weight:700;font-size:2rem;letter-spacing:-.02em;margin:0}
+.brand small{display:block;font-family:var(--mono);font-size:.7rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.proto{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--air-red);border:1px dashed var(--air-red);padding:3px 8px;border-radius:3px}
+nav{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:24px}
+nav a{font-family:var(--display);font-weight:500;font-size:.95rem;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px}
+nav a[aria-current="page"]{background:var(--ink);color:var(--paper)}
+nav a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--air-blue);outline-offset:2px}
+.badge{font-family:var(--mono);font-size:.7rem;background:var(--air-red);color:#fff;border-radius:999px;padding:1px 6px;margin-left:4px}
+h2{font-family:var(--display);font-weight:700;font-size:1.5rem;letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:500;font-size:1.1rem;margin:0}
+.lede{color:var(--muted);margin:0 0 22px;max-width:62ch}
+.label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.code{font-family:var(--mono);font-weight:500;letter-spacing:.06em}
+button{font-family:var(--display);font-weight:500;font-size:.95rem;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--paper)}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* Descubrir */
+.profile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px;display:grid;gap:14px}
+.profile .meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+.profile .alias{font-family:var(--display);font-weight:700;font-size:1.6rem}
+.profile blockquote{margin:0;font-size:1.15rem;font-style:italic;max-width:60ch}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:.75rem;background:var(--stamp);padding:3px 9px;border-radius:4px}
+.intent{font-family:var(--mono);font-size:.75rem;border:1px solid var(--air-blue);color:var(--air-blue);padding:2px 8px;border-radius:4px}
+.counter{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.notice{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--stamp);font-size:.95rem}
+
+/* Sobre */
+.envelope{position:relative;background:var(--card);border-radius:6px;padding:22px 22px 22px;margin:14px 0;
+  border:8px solid transparent;border-image:repeating-linear-gradient(-45deg,var(--air-red) 0 14px,var(--card) 14px 22px,var(--air-blue) 22px 36px,var(--card) 36px 44px) 8;
+  display:grid;grid-template-columns:1fr auto;gap:14px;min-height:190px}
+.envelope .from{font-size:.85rem;color:var(--muted)}
+.stampbox{width:70px;height:84px;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:.6rem;text-align:center;color:var(--muted);padding:4px}
+.envelope .to{grid-column:1 / -1;justify-self:center;font-family:var(--mono);font-size:.95rem;line-height:1.6;padding-left:12%}
+.envelope .to .code{display:inline-block;margin-top:4px;background:var(--stamp);padding:2px 8px;border-radius:3px;color:var(--air-red)}
+
+/* Cartas */
+.thread{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px;margin-bottom:16px}
+.thread-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.steps li{font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;padding-top:8px;border-top:3px solid var(--line);color:var(--muted)}
+.steps li.done{border-color:var(--ok);color:var(--ink)}
+.steps li.now{border-color:var(--air-blue);color:var(--air-blue)}
+.reveal{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.92rem;padding-top:12px;border-top:1px dashed var(--line)}
+.pill{font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.pill.yes{color:var(--ok)} .pill.no{color:var(--muted)} .pill.wait{color:var(--warn)}
+.addr{font-family:var(--mono);font-size:.85rem;background:var(--stamp);padding:8px 10px;border-radius:6px}
+.empty{color:var(--muted);font-style:italic}
+
+/* Buzón central */
+.lookup{display:flex;flex-wrap:wrap;gap:10px}
+.lookup input{flex:1 1 220px;min-width:0}
+input,textarea,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.code-in{font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.tablebox{overflow-x:auto;margin-top:18px}
+.result{margin-top:14px;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card)}
+
+/* Perfil */
+form{display:grid;gap:16px;max-width:600px}
+.field{display:grid;gap:5px}
+.field label{font-family:var(--display);font-weight:500;font-size:.95rem}
+.hint{font-size:.85rem;color:var(--muted)}
+.private{border-left:3px solid var(--air-red);padding-left:12px}
+.check{display:flex;gap:8px;align-items:center}
+.check input{width:auto}
+
+/* Cómo funciona */
+.flow{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.flow li{counter-increment:s;display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start}
+.flow li::before{content:counter(s);font-family:var(--display);font-weight:700;font-size:1.2rem;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--stamp)}
+.flow p{margin:2px 0 0;color:var(--muted);max-width:60ch}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);font-family:var(--display);padding:10px 18px;border-radius:999px;font-size:.95rem;max-width:calc(100% - 32px)}
+@media (max-width:520px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.envelope{grid-template-columns:1fr}.stampbox{display:none}.envelope .to{padding-left:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1 class="brand"><small>Correspondencia entre desconocidos</small>Remite</h1>
+    <span class="proto">Prototipo · datos de ejemplo</span>
+  </header>
+  <nav id="nav">
+    <a href="#descubrir" data-v="descubrir">Descubrir</a>
+    <a href="#cartas" data-v="cartas">Mis correspondencias <span class="badge" id="nThreads" hidden>0</span></a>
+    <a href="#buzon" data-v="buzon">Buzón central</a>
+    <a href="#perfil" data-v="perfil">Mi perfil</a>
+    <a href="#como" data-v="como">Cómo funciona</a>
+  </nav>
+
+  <section id="v-descubrir"></section>
+  <section id="v-cartas" hidden></section>
+  <section id="v-buzon" hidden></section>
+  <section id="v-perfil" hidden></section>
+  <section id="v-como" hidden></section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const CENTRAL = {nombre:"Remite · Apartado de Correos 123", cp:"39080 Santander", pais:"España"};
+const MAX_OPEN = 3;
+const STEPS = ["Escrita","En el buzón central","Reenviada","Entregada"];
+
+const me = {alias:"Tinta Azul", code:"MAR-1907", texto:"Escribo mejor de lo que hablo. Busco a alguien con quien contarse el mes, sin prisa.",
+  intereses:"cine, fotografía analógica, viajes en furgoneta", intencion:"Amistad, y lo que surja", foto:false,
+  direccion:"C/ Ejemplo 1, 2ºB · 39300 Torrelavega (dato de ejemplo)"};
+
+// Perfiles de ejemplo. likesMe = ya te eligió (habrá match).
+const people = [
+  {id:1, alias:"Lince de Papel", code:"LUNA-4821", zona:"Norte peninsular", edad:"30–35", intencion:"Amistad", likesMe:true,
+   texto:"Colecciono sellos de países que no he pisado. Me gustan las cartas largas y las posdatas más largas todavía.",
+   tags:["sellos","novela rusa","senderismo"], dir:"(dirección real de ejemplo · Oviedo)"},
+  {id:2, alias:"Marea Baja", code:"SAL-0316", zona:"Andalucía", edad:"25–30", intencion:"Conocer a alguien", likesMe:false,
+   texto:"Profesora de música. Te contaré qué suena en mi barrio cada semana si tú me cuentas qué se ve desde tu ventana.",
+   tags:["música","mar","cocina"], dir:"(dirección real de ejemplo · Cádiz)"},
+  {id:3, alias:"Ciprés", code:"OLMO-7720", zona:"Cataluña", edad:"40–45", intencion:"Amistad", likesMe:true,
+   texto:"Escribo a mano desde niño y echo de menos abrir el buzón con ganas. Prometo buena letra.",
+   tags:["caligrafía","jardinería","jazz"], dir:"(dirección real de ejemplo · Girona)"},
+  {id:4, alias:"Noria", code:"VELA-2054", zona:"Madrid", edad:"30–35", intencion:"Conocer a alguien", likesMe:true,
+   texto:"Trabajo con pantallas todo el día. Quiero algo que tarde en llegar y que se pueda guardar en una caja.",
+   tags:["cine","poesía","bici"], dir:"(dirección real de ejemplo · Madrid)"},
+  {id:5, alias:"Grulla", code:"NUBE-6631", zona:"Galicia", edad:"55–60", intencion:"Amistad", likesMe:false,
+   texto:"Jubilada y curiosa. Me encantan las recetas heredadas y las historias de los pueblos.",
+   tags:["recetas","historia local","punto"], dir:"(dirección real de ejemplo · Lugo)"}
+];
+
+let idx = 0;
+const threads = []; // {p, step, meReveal, themReveal}
+// Cartas que han llegado al buzón central (simulación del lado de la plataforma)
+const inbox = [];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2600)}
+
+function envelope(from, toAlias, code){
+  return `<div class="envelope" aria-label="Vista previa del sobre">
+    <div class="from"><span class="label">Remite</span><br>${esc(from)} · <span class="code">${esc(me.code)}</span><br>${esc(CENTRAL.nombre)}</div>
+    <div class="stampbox">SELLO<br>ordinario</div>
+    <div class="to">${esc(CENTRAL.nombre)}<br>${esc(CENTRAL.cp)} · ${esc(CENTRAL.pais)}<br><span class="code">Para: ${esc(code)}</span></div>
+  </div>
+  <p class="hint">Así se escribe el sobre: va a la dirección central con el código de ${esc(toAlias)}. Nadie ve el domicilio de nadie.</p>`;
+}
+
+/* ---------- Vistas ---------- */
+function renderDescubrir(){
+  const v = $("#v-descubrir");
+  const open = threads.length;
+  const remaining = people.filter(p => !threads.some(t => t.p.id === p.id));
+  if (idx >= people.length) idx = 0;
+  let p = people[idx];
+  while (p && threads.some(t => t.p.id === p.id) && remaining.length) { idx = (idx+1) % people.length; p = people[idx]; }
+  let html = `<h2>Descubrir</h2><p class="lede">Sin fotos de entrada: eliges por cómo escribe alguien y por lo que le interesa. Si los dos os elegís, se abre la correspondencia.</p>`;
+  if (!remaining.length){ v.innerHTML = html + `<p class="empty">Ya has visto todos los perfiles de ejemplo.</p>`; return; }
+  html += `<article class="profile">
+    <div class="meta"><span class="alias">${esc(p.alias)}</span><span class="label">${esc(p.zona)} · ${esc(p.edad)} años</span><span class="intent">${esc(p.intencion)}</span></div>
+    <blockquote>“${esc(p.texto)}”</blockquote>
+    <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <div class="row">
+      <button class="ghost" id="skip">Pasar</button>
+      <button id="like" ${open>=MAX_OPEN?"disabled":""}>Quiero escribirle</button>
+      <span class="counter">${open}/${MAX_OPEN} correspondencias abiertas</span>
+    </div>
+  </article>`;
+  if (open >= MAX_OPEN) html += `<div class="notice">Has llegado al límite de ${MAX_OPEN} correspondencias a la vez. Cierra una o espera: aquí se escribe con calma.</div>`;
+  html += `<div id="matchBox"></div>`;
+  v.innerHTML = html;
+  $("#skip").onclick = () => { idx = (idx+1) % people.length; renderDescubrir(); };
+  $("#like").onclick = () => {
+    if (p.likesMe){
+      threads.push({p, step:0, meReveal:false, themReveal:false});
+      updateBadge();
+      idx = (idx+1) % people.length;
+      renderDescubrir();
+      $("#matchBox").innerHTML = `<div class="notice" style="margin-top:20px"><h3>Match con ${esc(p.alias)}</h3>
+        <p style="margin:4px 0 0">Su código de buzón es <span class="code">${esc(p.code)}</span>. Puedes escribirle la primera carta.</p></div>${envelope(me.alias, p.alias, p.code)}`;
+    } else {
+      toast(`Le has elegido. Si ${p.alias} también te elige, se abrirá la correspondencia.`);
+      idx = (idx+1) % people.length; renderDescubrir();
+    }
+  };
+}
+
+function renderCartas(){
+  const v = $("#v-cartas");
+  let html = `<h2>Mis correspondencias</h2><p class="lede">Cada carta pasa por el buzón central, que la reenvía al domicilio real. Aquí ves en qué punto está y si queréis revelaros la dirección.</p>`;
+  if (!threads.length){ v.innerHTML = html + `<p class="empty">Todavía no tienes correspondencias. Empieza en Descubrir.</p>`; return; }
+  threads.forEach((t,i) => {
+    const steps = STEPS.map((s,k)=>`<li class="${k<t.step?"done":k===t.step?"now":""}">${s}</li>`).join("");
+    const both = t.meReveal && t.themReveal;
+    html += `<article class="thread">
+      <div class="thread-head"><h3>${esc(t.p.alias)}</h3><span class="label">Código <span class="code">${esc(t.p.code)}</span></span></div>
+      <ol class="steps" aria-label="Estado de tu última carta">${steps}</ol>
+      <div class="row">
+        <button data-a="advance" data-i="${i}" ${t.step>=STEPS.length-1?"disabled":""}>${t.step>=STEPS.length-1?"Entregada":"Simular siguiente paso"}</button>
+        <button class="ghost" data-a="newletter" data-i="${i}">Escribir otra carta</button>
+        <button class="ghost" data-a="close" data-i="${i}">Cerrar correspondencia</button>
+      </div>
+      <div class="reveal">
+        <span>Revelar direcciones:</span>
+        <span>Tú <span class="pill ${t.meReveal?"yes":"no"}">${t.meReveal?"aceptas":"no"}</span></span>
+        <span>${esc(t.p.alias)} <span class="pill ${t.themReveal?"yes":t.meReveal?"wait":"no"}">${t.themReveal?"acepta":t.meReveal?"pendiente":"no"}</span></span>
+        ${t.meReveal?`<button class="ghost" data-a="unreveal" data-i="${i}">Retirar</button>`:`<button class="ghost" data-a="reveal" data-i="${i}">Quiero revelar la mía</button>`}
+      </div>
+      ${both?`<div class="addr"><span class="label">Dirección de ${esc(t.p.alias)}</span><br>${esc(t.p.dir)}</div>`:`<p class="hint" style="margin:0">La dirección solo aparece cuando los dos aceptáis. Ninguno sabe si el otro ha dicho que no.</p>`}
+    </article>`;
+  });
+  v.innerHTML = html;
+  v.querySelectorAll("button[data-a]").forEach(b => b.onclick = () => {
+    const t = threads[+b.dataset.i]; const a = b.dataset.a;
+    if (a==="advance"){ t.step++; if (t.step===1) inbox.unshift({code:t.p.code, from:me.code, at:new Date()}); }
+    if (a==="newletter"){ t.step=0; toast(`Nueva carta para ${t.p.alias}: sobre a la dirección central con el código ${t.p.code}.`); }
+    if (a==="close"){ threads.splice(+b.dataset.i,1); updateBadge(); toast("Correspondencia cerrada. Ninguna dirección se ha compartido."); }
+    if (a==="reveal"){ t.meReveal=true; setTimeout(()=>{ if(t.meReveal){ t.themReveal = t.p.id!==4; renderCartas(); }}, 1600); }
+    if (a==="unreveal"){ t.meReveal=false; t.themReveal=false; }
+    renderCartas();
+  });
+}
+
+function renderBuzon(){
+  const v = $("#v-buzon");
+  const directory = [{alias:me.alias, code:me.code, dir:me.direccion}, ...people.map(p=>({alias:p.alias, code:p.code, dir:p.dir}))];
+  let rows = inbox.length ? inbox.map(m=>`<tr><td class="code">${esc(m.code)}</td><td class="code">${esc(m.from)}</td><td>${m.at.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}</td><td>Reenviar en sobre nuevo</td></tr>`).join("")
+    : `<tr><td colspan="4" class="empty">Aún no ha llegado ninguna carta. Haz match y avanza una carta en «Mis correspondencias».</td></tr>`;
+  v.innerHTML = `<h2>Buzón central</h2>
+    <p class="lede">La vista de la plataforma. Llega un sobre con un código, se busca a quién corresponde y se reenvía al domicilio real, que solo conoce el buzón.</p>
+    <div class="lookup"><label for="codeIn" class="label" style="flex-basis:100%">Código escrito en el sobre</label>
+      <input id="codeIn" class="code-in" placeholder="Ej. LUNA-4821" autocomplete="off"><button id="look">Resolver código</button></div>
+    <div id="lookRes"></div>
+    <div class="tablebox"><table><thead><tr><th>Para (código)</th><th>Remite (código)</th><th>Llegada</th><th>Acción</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const run = () => {
+    const c = $("#codeIn").value.trim().toUpperCase();
+    const hit = directory.find(d => d.code === c);
+    $("#lookRes").innerHTML = hit
+      ? `<div class="result"><span class="label">Destinatario</span><br><strong>${esc(hit.alias)}</strong><br><span class="addr" style="display:inline-block;margin-top:6px">${esc(hit.dir)}</span><p class="hint" style="margin:8px 0 0">Esta dirección solo la ve quien gestiona el buzón. Se imprime en el sobre de reenvío.</p></div>`
+      : `<div class="result">No hay nadie con el código <span class="code">${esc(c||"—")}</span>. Revisa que tenga el formato PALABRA-0000.</div>`;
+  };
+  $("#look").onclick = run;
+  $("#codeIn").onkeydown = e => { if (e.key==="Enter") run(); };
+}
+
+function renderPerfil(){
+  const v = $("#v-perfil");
+  v.innerHTML = `<h2>Mi perfil</h2><p class="lede">Lo que ven los demás es tu alias, tu texto y tus intereses. No hay campo de teléfono ni de email: el único canal son las cartas.</p>
+  <form id="pf">
+    <div class="field"><label for="f-alias">Alias</label><input id="f-alias" value="${esc(me.alias)}"><span class="hint">Tu código de buzón: <span class="code">${esc(me.code)}</span></span></div>
+    <div class="field"><label for="f-texto">Preséntate por escrito</label><textarea id="f-texto" rows="4">${esc(me.texto)}</textarea><span class="hint">Es lo primero que leen. Escribe como escribirías una carta.</span></div>
+    <div class="field"><label for="f-int">Intereses</label><input id="f-int" value="${esc(me.intereses)}"></div>
+    <div class="field"><label for="f-intent">Qué buscas</label><select id="f-intent">${["Amistad","Conocer a alguien","Amistad, y lo que surja","Practicar un idioma"].map(o=>`<option ${o===me.intencion?"selected":""}>${o}</option>`).join("")}</select></div>
+    <div class="check"><input type="checkbox" id="f-foto" ${me.foto?"checked":""}><label for="f-foto">Mostrar una foto solo después del match (opcional)</label></div>
+    <div class="field private"><label for="f-dir">Dirección postal</label><input id="f-dir" value="${esc(me.direccion)}"><span class="hint">Privada. Solo la usa el buzón central para reenviarte cartas, y solo se revela a alguien si los dos lo aceptáis.</span></div>
+    <div><button type="submit">Guardar perfil</button></div>
+  </form>`;
+  $("#pf").onsubmit = e => { e.preventDefault();
+    me.alias=$("#f-alias").value.trim()||me.alias; me.texto=$("#f-texto").value; me.intereses=$("#f-int").value;
+    me.intencion=$("#f-intent").value; me.foto=$("#f-foto").checked; me.direccion=$("#f-dir").value; toast("Perfil guardado"); };
+}
+
+function renderComo(){
+  $("#v-como").innerHTML = `<h2>Cómo funciona</h2><p class="lede">El recorrido completo de una carta, de la app al buzón de la otra persona.</p>
+  <ol class="flow">
+    <li><div><h3>Perfil escrito</h3><p>Alias, un texto de presentación e intereses. Sin teléfono ni email. La dirección se guarda en privado.</p></div></li>
+    <li><div><h3>Match mutuo</h3><p>Solo si los dos os elegís se abre la correspondencia. Máximo ${MAX_OPEN} abiertas a la vez.</p></div></li>
+    <li><div><h3>Sobre con código</h3><p>Escribes a la dirección central de Remite y pones el código de la otra persona, por ejemplo <span class="code">LUNA-4821</span>.</p></div></li>
+    <li><div><h3>Reenvío</h3><p>El buzón central resuelve el código y mete la carta en un sobre nuevo hacia el domicilio real.</p></div></li>
+    <li><div><h3>Revelado opcional</h3><p>Cuando los dos queráis, os mostramos las direcciones y podéis escribiros directamente.</p></div></li>
+  </ol>
+  <div class="notice">Pendiente de decidir: coste del reenvío (sello, sobre y gestión), suscripción o pago por carta, y qué pasa con cartas que no corresponden a ningún código.</div>`;
+}
+
+function updateBadge(){ const b=$("#nThreads"); b.textContent=threads.length; b.hidden=!threads.length; }
+
+const views = {descubrir:renderDescubrir, cartas:renderCartas, buzon:renderBuzon, perfil:renderPerfil, como:renderComo};
+function route(){
+  const v = (location.hash||"#descubrir").slice(1); const name = views[v] ? v : "descubrir";
+  Object.keys(views).forEach(k => $("#v-"+k).hidden = k!==name);
+  document.querySelectorAll("#nav a").forEach(a => a.dataset.v===name ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
+  views[name]();
+}
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
