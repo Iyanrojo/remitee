@@ -1,4 +1,4 @@
-# Remite
+# Remitee
 
 Prototipo de una app para poner en contacto a desconocidos que quieren escribirse cartas en papel. Una especie de "Tinder epistolar": la app sirve para encontrarse y la relación ocurre por correo postal.
 
