@@ -205,6 +205,15 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .share small{display:block;color:var(--muted);font-size:.8rem}
 .agecheck{display:flex;gap:10px;align-items:center;font-size:.9rem;padding:4px 2px}
 .agecheck input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.helpbtn{background:var(--accent-soft);color:var(--accent);padding:8px 13px;font-size:.8rem}
+.art{display:grid;gap:4px;padding-bottom:10px}
+.art-kicker{font-size:.74rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.art h2{font-size:1.6rem;margin-bottom:6px}
+.art-lede{font-size:1.02rem;margin:0 0 14px;color:var(--ink)}
+.art .flowcard{margin-bottom:10px}
+.art h3{font-family:var(--head);font-weight:600;font-size:1.08rem;margin:18px 0 2px}
+.art p{margin:0;color:var(--ink);max-width:62ch}
+.code-inline{font-family:ui-monospace,Menlo,monospace;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:.9em}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -212,7 +221,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo">remitee<span>.</span></h1><div class="topr"><span class="demo">Prototipo</span><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo">remitee<span>.</span></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
@@ -397,7 +406,7 @@ function ventana(c){
     ${deadlineBox(c)}
     ${c.closed?"":(c.meReveal&&c.themReveal
       ? `<div class="sendto"><span class="lbl">Direcciones compartidas</span><span class="addr">Ya podéis escribiros directamente.</span><span class="addr"><b>${esc(c.p.alias)}:</b> dirección de ejemplo, ${esc(c.p.zona)}</span></div>`
-      : `<div class="sendto"><span class="lbl">Escribe en el sobre</span><span class="addr">${esc(CENTRAL)}</span><span>Para: <span class="code">${esc(c.p.code)}</span></span><button class="linkbtn" id="howflow">¿Cómo viajan las cartas?</button></div>`)}
+      : `<div class="sendto"><span class="lbl">Escribe en el sobre</span><span class="addr">${esc(CENTRAL)}</span><span>Para: <span class="code">${esc(c.p.code)}</span></span><button class="linkbtn" id="howflow">¿Cómo funciona?</button></div>`)}
     <div class="timeline">${c.letters.length ? c.letters.map(l=>{ const arrived = now >= l.arrive;
       return `<div class="letter ${l.mine?"mine":""}"><div class="ic">✉︎</div><div><div class="t">${l.mine?"Tu carta":`Carta de ${esc(c.p.alias)}`}</div><div class="d">Enviada el ${fmt(l.at)}</div></div>
       ${l.mine?`<span class="status ${arrived?"ok":"way"}">${arrived?"Entregada":"En camino"}</span>`:`<span class="status ${arrived?"ok":"way"}">${arrived?"Recibida":"En camino"}</span>`}</div>`; }).join("")
@@ -512,9 +521,10 @@ function startFlow(root){
 }
 function showFlow(){
   const o = document.createElement("div"); o.className = "overlay";
-  o.innerHTML = `<div class="modal"><h3 style="font-size:1.25rem">¿Cómo viajan las cartas?</h3>${flowHTML()}<button id="fl-ok">Entendido</button></div>`;
+  o.innerHTML = `<div class="modal"><h3 style="font-size:1.25rem">¿Cómo funciona Remitee?</h3>${flowHTML()}<button id="fl-more">Saber más</button><button class="plain" id="fl-ok">Entendido</button></div>`;
   document.body.appendChild(o); startFlow(o);
   o.querySelector("#fl-ok").onclick = () => o.remove();
+  o.querySelector("#fl-more").onclick = () => { o.remove(); location.hash = "#como"; };
 }
 
 /* ---- Alta: Google (simulado) + creación de perfil ---- */
@@ -597,9 +607,37 @@ function wizard(){
   o.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.tagName==="INPUT") { e.preventDefault(); o.querySelector("#wn").click(); } });
 }
 
-const views = {descubrir, cartas, perfil};
+function como(){
+  $("#view").innerHTML = `<button class="back" id="back">← Volver</button>
+  <article class="art">
+    <span class="art-kicker">Guía</span>
+    <h2>Cómo funciona Remitee</h2>
+    <p class="art-lede">Remitee pone en contacto a personas que quieren escribirse cartas en papel. La app sirve para encontraros; la relación ocurre por correo postal, sin chat y sin prisas.</p>
+    <div class="flowcard">${flowHTML()}</div>
+    <h3>1. Tu perfil</h3>
+    <p>Te registras con Google para verificar que eres una persona real. Remitee es solo para mayores de 25 años. Tu perfil tiene un alias, un rango de edad, desde dónde escribes, tu profesión, una biografía breve y 3 intereses. Tu email nunca se muestra.</p>
+    <h3>2. Match por intereses</h3>
+    <p>En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Tienes 10 pases al día; con Remitee Plus son ilimitados.</p>
+    <h3>3. Lo que se desbloquea con el match</h3>
+    <p>Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y su biografía extensa, que solo leen sus matches.</p>
+    <h3>4. Cómo viajan las cartas</h3>
+    <p>Nunca escribes a la casa de nadie. Envías tu carta a nuestra oficina con el código de buzón de la otra persona, por ejemplo <span class="code-inline">LUNA-4821</span>. Allí la metemos en un sobre nuevo y la reenviamos a su dirección. Su respuesta hace el mismo camino hasta ti.</p>
+    <h3>5. Marca tus cartas como enviadas</h3>
+    <p>Cuando eches una carta al buzón, pulsa «Ya he enviado la carta». Así la otra persona sabe que va en camino y se para tu plazo.</p>
+    <h3>6. Plazos y suspensiones</h3>
+    <p>Tras el match tienes ${FIRST_DAYS} días para enviar la primera carta. Cada vez que recibes una, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches. Así nadie se queda esperando una carta que no llega.</p>
+    <h3>7. Compartir direcciones</h3>
+    <p>Cuando os conozcáis, podéis compartir vuestras direcciones para escribiros directamente. Solo ocurre si los dos aceptáis, y nadie sabe si el otro ha dicho que no.</p>
+    <h3>Tu privacidad</h3>
+    <p>Tu dirección solo la conoce Remitee y solo se usa para reenviarte cartas. No hay teléfonos ni emails en los perfiles, y puedes ocultar tu foto cuando quieras.</p>
+  </article>`;
+  $("#back").onclick = () => history.length > 1 ? history.back() : (location.hash = "#descubrir");
+  startFlow($(".flowcard"));
+}
+
+const views = {descubrir, cartas, perfil, como};
 function route(){
-  const onb = !me.created; document.querySelector(".tabs").hidden = onb;
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#helpBtn").hidden = onb;
   if (onb){ alta(); window.scrollTo(0,0); return; }
   const v = (location.hash || "#descubrir").slice(1), name = views[v] ? v : "descubrir";
   if (name !== "cartas") openId = null;
@@ -619,6 +657,7 @@ function setTheme(t){
 }
 let saved = null; try { saved = localStorage.getItem("remitee-theme"); } catch(e) {}
 setTheme(saved === "dark" ? "dark" : "light");
+$("#helpBtn").onclick = showFlow;
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
 route();
 </script>
