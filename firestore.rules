@@ -11,6 +11,10 @@ service cloud.firestore {
     match /private/{uid} {
       allow read, write: if verified() && request.auth.uid == uid;
     }
+    // Galería de fotos de intereses: de momento solo la lee su dueño (cuando haya matches reales, también sus matches)
+    match /gallery/{uid} {
+      allow read, write: if verified() && request.auth.uid == uid;
+    }
     // Emails salientes (extensión Trigger Email): cada persona solo puede dejar uno de bienvenida, para su propio email
     match /mail/{id} {
       allow create: if verified() && id == "welcome_" + request.auth.uid

@@ -471,7 +471,33 @@ body.wide .app{max-width:1040px}
 .vicon rect{fill:var(--accent)} .vicon path{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
 .verify button{width:100%}
 .verify .linkbtn{width:auto}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.phbtn{background:none;padding:0;border-radius:50%;cursor:zoom-in;line-height:0}
+.pair .phbtn{margin-left:-14px}
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 12px}
+.gal-it{position:relative;background:none;padding:0;border-radius:14px;overflow:hidden;cursor:zoom-in;text-align:left;display:grid}
+.gal-img{display:block;aspect-ratio:1;width:100%;background-size:cover!important;background-position:center!important;border-radius:14px}
+.gal-cap{position:absolute;left:6px;right:6px;bottom:6px;font-size:.68rem;font-weight:600;color:#fff;background:rgba(20,22,35,.55);padding:2px 7px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:fit-content;max-width:calc(100% - 12px)}
+.gal.mine .gal-it{cursor:default;gap:4px}
+.gal-open{background:none;padding:0;cursor:zoom-in;line-height:0}
+.gal-capin{font-size:.78rem;padding:4px 6px!important;border:1px solid var(--line)!important;border-radius:8px;background:var(--surface)!important}
+.gal-del{position:absolute;top:5px;right:5px;width:24px;height:24px;padding:0;border-radius:50%;background:rgba(20,22,35,.6);color:#fff;font-size:1rem;line-height:1;display:grid;place-items:center}
+.gal-add{aspect-ratio:1;border:1.5px dashed var(--line);border-radius:14px;display:grid;place-content:center;justify-items:center;cursor:pointer;color:var(--accent)}
+.gal-add span{font-size:1.6rem;line-height:1}
+.gal-add small{font-size:.72rem;font-weight:600}
+.gal-empty{font-size:.8rem;color:var(--muted)}
+.about .sechead{margin-top:12px}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(10,12,20,.92);display:grid;place-items:center;padding:calc(56px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:lbIn .25s ease}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
+.lb-fig{margin:0;display:grid;gap:12px;justify-items:center;max-width:min(92vw,900px)}
+.lb-fig img{max-width:100%;max-height:78vh;border-radius:16px;display:block;object-fit:contain}
+.lb-ph{width:min(80vw,520px);aspect-ratio:1;border-radius:20px}
+.lb-fig figcaption{color:#fff;font-size:.95rem;text-align:center;display:flex;gap:8px;align-items:center}
+.lb-ex,.lb-n{font-size:.72rem;color:rgba(255,255,255,.65)}
+.lb-x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));width:42px;height:42px;padding:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.6rem;line-height:1}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;padding:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.8rem;line-height:1}
+.lb-nav.prev{left:max(10px,env(safe-area-inset-left,0px))} .lb-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
+@media (prefers-reduced-motion:reduce){.lightbox{animation:none}}
+.toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -504,6 +530,7 @@ async function cloudSave(){
   const pub = {}; PUBLIC_FIELDS.forEach(k => pub[k] = me[k] ?? null);
   pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
   await FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true});
+  await FB.db.collection("gallery").doc(me.uid).set({items:(me.gallery||[]).map(g => ({src:g.src, cap:g.cap||""}))});
   await FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true});
 }
 // Email de bienvenida: se deja en la colección "mail" y la extensión Trigger Email de Firebase lo envía
@@ -519,7 +546,9 @@ async function cloudLoad(uid){
   const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
   if (!a.exists) return false;
   const pub = a.data(); delete pub.updatedAt;
-  Object.assign(me, pub, b.exists ? b.data() : {}, {uid, created:true}); saveLocal(); return true;
+  Object.assign(me, pub, b.exists ? b.data() : {}, {uid, created:true});
+  try { const g = await FB.db.collection("gallery").doc(uid).get(); if (g.exists) me.gallery = g.data().items || []; } catch(e){}
+  saveLocal(); return true;
 }
 async function googleLogin(){
   const r = await FB.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -716,9 +745,43 @@ function trust(p){
   if (!p.corr) return `<span class="tnew">${NEW_LABEL()[p.g]||NEW_LABEL().n}</span>`;
   return p.onTime ? `<span class="tok">${L("Responde a tiempo","Replies on time")}</span>` : "";
 }
+// Galerías de ejemplo: una "foto" por interés (degradados, no imágenes reales)
+const GPAL = [["#ffd6c2","#e98a62"],["#d6e2ff","#6f8fe0"],["#d3f1e1","#4fa77c"],["#efd9fb","#a874c9"],["#fff0c2","#d9a83a"],["#d9f1f5","#3f9bb0"],["#fde0e6","#d0657f"]];
+people.forEach(p => { p.gallery = (p.tags||[]).slice(0,3).concat(p.id%2 ? [L("mi mesa de escribir","my writing desk")] : []).map((t,i) => {
+  const [a,b] = GPAL[(p.id + i) % GPAL.length]; return {bg:`radial-gradient(circle at ${30+i*15}% 35%, ${a} 0 18%, transparent 19%), linear-gradient(${140+i*25}deg, ${a}, ${b})`, cap:t, ex:true}; }); });
 const myTags = () => me.intereses.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
 const common = p => p.tags.filter(t => myTags().includes(t.toLowerCase()));
 const LOCK = `<span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>`;
+/* ---- Visor de fotos: ampliar la foto de perfil y la galería ---- */
+function openLightbox(items, start = 0){
+  if (!items || !items.length) return;
+  let i = start;
+  const o = document.createElement("div"); o.className = "lightbox"; o.setAttribute("role","dialog"); o.setAttribute("aria-label", L("Foto ampliada","Enlarged photo"));
+  const render = () => { const it = items[i];
+    o.innerHTML = `<button class="lb-x" aria-label="${L("Cerrar","Close")}">×</button>
+      ${items.length > 1 ? `<button class="lb-nav prev" aria-label="${L("Anterior","Previous")}">‹</button><button class="lb-nav next" aria-label="${L("Siguiente","Next")}">›</button>` : ""}
+      <figure class="lb-fig">${it.src ? `<img src="${it.src}" alt="${esc(it.cap||"")}">` : `<div class="lb-ph" style="background:${it.bg}"></div>`}
+        <figcaption>${esc(it.cap||"")}${it.ex ? ` <span class="lb-ex">${L("ejemplo","example")}</span>` : ""}${items.length > 1 ? ` <span class="lb-n">${i+1}/${items.length}</span>` : ""}</figcaption></figure>`;
+    o.querySelector(".lb-x").onclick = close;
+    const pv = o.querySelector(".prev"), nx = o.querySelector(".next");
+    if (pv) pv.onclick = e => { e.stopPropagation(); i = (i - 1 + items.length) % items.length; render(); };
+    if (nx) nx.onclick = e => { e.stopPropagation(); i = (i + 1) % items.length; render(); };
+  };
+  const close = () => { o.remove(); document.removeEventListener("keydown", key); };
+  const key = e => { if (e.key === "Escape") close(); if (items.length > 1 && e.key === "ArrowRight"){ i = (i+1)%items.length; render(); } if (items.length > 1 && e.key === "ArrowLeft"){ i = (i-1+items.length)%items.length; render(); } };
+  o.addEventListener("click", e => { if (e.target === o) close(); });
+  let x0 = null; o.addEventListener("touchstart", e => x0 = e.touches[0].clientX, {passive:true});
+  o.addEventListener("touchend", e => { if (x0 == null || items.length < 2) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40){ i = (i + (dx < 0 ? 1 : -1) + items.length) % items.length; render(); } x0 = null; });
+  document.addEventListener("keydown", key); document.body.appendChild(o); render();
+}
+const profilePhotoItem = p => p.showFoto ? {bg: shots[(p.id-1)%shots.length], cap: p.alias, ex:true} : null;
+function galleryHTML(list, opts={}){
+  if (!list || !list.length) return opts.empty ? `<div class="gal-empty">${opts.empty}</div>` : "";
+  return `<div class="gal">${list.map((g,i)=>`<button type="button" class="gal-it" data-gi="${i}" aria-label="${L("Ampliar foto","Enlarge photo")}: ${esc(g.cap||"")}">
+    <span class="gal-img" style="${g.src?`background-image:url('${g.src}')`:`background:${g.bg}`}"></span>${g.cap?`<span class="gal-cap">${esc(g.cap)}</span>`:""}</button>`).join("")}</div>`;
+}
+function bindGallery(root, list){ (root||document).querySelectorAll(".gal-it").forEach(b => b.onclick = () => openLightbox(list, +b.dataset.gi)); }
+
 function photo(p, size, matched){
   if (!p.showFoto) return `<div class="ph ${size}" style="background:${tint(p)}"><span class="init">${esc(p.alias[0])}</span></div>`;
   return `<div class="ph ${size} ${matched?"":"locked"}" style="background:${shots[(p.id-1)%shots.length]}" role="img" aria-label="${matched?L(`Foto de ${esc(p.alias)} (ejemplo)`,`Photo of ${esc(p.alias)} (example)`):L("Foto oculta hasta el match","Photo hidden until you match")}">${matched?"":LOCK}</div>`;
@@ -857,7 +920,7 @@ function descubrir(){
       <div class="trust">${trust(p)}</div>
       <p class="bio">${esc(p.bio)}</p>
       <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
-      <div class="maplock">${LOCK}<span>${L("Su mapa de cartas se muestra cuando hay match","Their letter map is shown once you match")}</span></div>
+      <div class="maplock">${LOCK}<span>${(p.gallery||[]).length ? L(`Su mapa de cartas y ${p.gallery.length} fotos de sus intereses se muestran cuando hay match`,`Their letter map and ${p.gallery.length} photos of their interests are shown once you match`) : L("Su mapa de cartas se muestra cuando hay match","Their letter map is shown once you match")}</span></div>
       <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
       <div class="actions"><button class="plain" id="no">${L("Pasar","Pass")}</button><button id="yes" ${suspended()?"disabled":""}>${L("Quiero escribirle","I want to write")}</button></div>
     </article>
@@ -877,7 +940,7 @@ function matchModal(p, iFirst){
   document.querySelector(".overlay.mt")?.remove();
   const o = document.createElement("div"); o.className = "overlay mt";
   o.innerHTML = `<div class="modal" role="dialog" aria-label="Match">
-    <div class="pair">${myPhoto("md")}${photo(p,"md",true)}</div>
+    <div class="pair">${myPhoto("md")}<button type="button" class="phbtn" id="mtPh" aria-label="${L("Ampliar foto","Enlarge photo")}">${photo(p,"md",true)}</button></div>
     <h3>${L("¡Es mutuo!","It's mutual!")}</h3>
     <p style="margin:0;color:var(--muted)">${iFirst?L(`${esc(p.alias)} ya te había elegido.`,`${esc(p.alias)} had already chosen you.`):L(`${esc(p.alias)} también te ha elegido.`,`${esc(p.alias)} has chosen you too.`)} ${p.showFoto?L("Ya podéis ver vuestras fotos y biografías completas.","You can now see each other's photos and full bios."):L(`${esc(p.alias)} prefiere no mostrar foto, pero ya puedes leer su biografía completa.`,`${esc(p.alias)} prefers not to show a photo, but you can now read their full bio.`)}</p>
     <div class="whofirst ${iFirst?"me":""}">${iFirst?`<b>${L("Te toca escribir primero","You write first")}</b>${L(`Has completado el match. Tienes ${FIRST_DAYS} días para enviar la primera carta.`,`You completed the match. You have ${FIRST_DAYS} days to send the first letter.`)}`:`<b>${L(`${esc(p.alias)} escribirá primero`,`${esc(p.alias)} will write first`)}</b>${L(`Ha completado el match. Tiene ${FIRST_DAYS} días para enviarte la primera carta.`,`They completed the match. They have ${FIRST_DAYS} days to send you the first letter.`)}`}</div>
@@ -885,6 +948,7 @@ function matchModal(p, iFirst){
   document.body.appendChild(o);
   o.querySelector("#go").onclick = () => { o.remove(); openId = p.id; location.hash = "#cartas"; route(); };
   o.querySelector("#later").onclick = () => o.remove();
+  o.querySelector("#mtPh").onclick = () => { const it = profilePhotoItem(p); if (it) openLightbox([it, ...(p.gallery||[])]); else if ((p.gallery||[]).length) openLightbox(p.gallery); };
 }
 
 function lastLine(c){
@@ -945,10 +1009,12 @@ function ventana(c){
   const inc = incoming(c);
   const canSend = !c.closed && c.turn==="me" && !inc;
   $("#view").innerHTML = `<button class="back" id="back">← ${L("Cartas","Letters")}</button>
-    <div class="chead">${photo(c.p,"md",true)}<div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
+    <div class="chead"><button type="button" class="phbtn" id="chPh" aria-label="${L("Ampliar foto","Enlarge photo")}">${photo(c.p,"md",true)}</button><div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
     <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Sobre ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
-      <p>${esc(c.p.long || c.p.bio)}</p>${langsHTML(c.p,{left:true})}${statsHTML(c.p.corr||0, c.p.places||[], c.p.rAvg, c.p.rN)}${mapHTML(c.p.home, c.p.places||[])}<small>${esc(c.p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(c.p.zona)}</small></details>
+      <p>${esc(c.p.long || c.p.bio)}</p>
+      ${(c.p.gallery||[]).length ? `<div class="sechead">${L("Fotos de sus intereses","Photos of their interests")}</div>${galleryHTML(c.p.gallery)}` : ""}
+      ${langsHTML(c.p,{left:true})}${statsHTML(c.p.corr||0, c.p.places||[], c.p.rAvg, c.p.rN)}${mapHTML(c.p.home, c.p.places||[])}<small>${esc(c.p.edad)} ${L("años","years old")} · ${L("Escribe desde","Writes from")} ${esc(c.p.zona)}</small></details>
     ${deadlineBox(c)}
     ${c.closed?"":(c.meReveal&&c.themReveal
       ? `<div class="sendto"><span class="lbl">${L("Direcciones compartidas","Addresses shared")}</span><span class="addr">${L("Ya podéis escribiros directamente.","You can now write to each other directly.")}</span><span class="addr"><b>${esc(c.p.alias)}:</b> ${L("dirección de ejemplo","example address")}, ${esc(c.p.zona)}</span></div>`
@@ -962,6 +1028,8 @@ function ventana(c){
     ${sim()}`;
   $("#back").onclick = () => { openId = null; cartas(); };
   const hf = $("#howflow"); if (hf) hf.onclick = showFlow;
+  bindGallery($(".about"), c.p.gallery);
+  $("#chPh").onclick = () => { const it = profilePhotoItem(c.p); if (it) openLightbox([it, ...(c.p.gallery||[])]); else if ((c.p.gallery||[]).length) openLightbox(c.p.gallery); else toast(L(`${c.p.alias} ha elegido no mostrar foto`,`${c.p.alias} has chosen not to show a photo`)); };
   document.querySelectorAll("[data-arrived]").forEach(b => b.onclick = () => { const l = c.letters[+b.dataset.arrived]; l.confirmedAt = now; l.ls = 3;
     c.deadline = addD(now, REPLY_DAYS); toast(L(`Carta marcada como recibida. Tienes ${REPLY_DAYS} días para responder`,`Letter marked as received. You have ${REPLY_DAYS} days to reply`)); ventana(c); });
   // Valorar una carta recibida
@@ -1114,6 +1182,25 @@ function compressPhoto(file, max = 640, q = .82){
     img.src = url;
   });
 }
+const GAL_MAX = 6;
+function myGalleryHTML(){
+  const g = me.gallery || [];
+  return `<div class="field"><label>${L("Fotos de tus intereses","Photos of your interests")}</label>
+    <div class="gal mine">${g.map((it,i)=>`<div class="gal-it"><button type="button" class="gal-open" data-gi="${i}" aria-label="${L("Ampliar foto","Enlarge photo")}"><span class="gal-img" style="background-image:url('${it.src}')"></span></button>
+      <input class="gal-capin" data-ci="${i}" maxlength="40" value="${esc(it.cap||"")}" placeholder="${L("Pie de foto","Caption")}" aria-label="${L("Pie de foto","Caption")}">
+      <button type="button" class="gal-del" data-di="${i}" aria-label="${L("Quitar foto","Remove photo")}">×</button></div>`).join("")}
+      ${g.length < GAL_MAX ? `<label class="gal-add" for="g-add"><span>+</span><small>${L("Añadir","Add")}</small></label><input type="file" id="g-add" accept="image/*" multiple hidden>` : ""}</div>
+    <small>${L(`Hasta ${GAL_MAX} fotos de lo que te gusta: tu mesa, tus libros, tus paseos… Solo las ven tus matches.`,`Up to ${GAL_MAX} photos of what you love: your desk, your books, your walks… Only your matches see them.`)}</small></div>`;
+}
+function bindMyGallery(rerender){
+  const add = $("#g-add"); if (add) add.onchange = async e => { const files = [...e.target.files].slice(0, GAL_MAX - (me.gallery||[]).length); if (!files.length) return;
+    if (typeof readForm === "function" && $("#f-a")) readForm();
+    for (const f of files){ try { const src = await compressPhoto(f, 900, .78); me.gallery = [...(me.gallery||[]), {src, cap:""}]; } catch(_){ toast(L("Alguna imagen no se ha podido leer.","Some images couldn't be read.")); } }
+    saveMe(); rerender(); toast(L("Fotos guardadas","Photos saved")); };
+  document.querySelectorAll(".gal.mine .gal-del").forEach(b => b.onclick = () => { if ($("#f-a")) readForm(); me.gallery.splice(+b.dataset.di, 1); saveMe(); rerender(); });
+  document.querySelectorAll(".gal.mine .gal-capin").forEach(inp => inp.onchange = () => { me.gallery[+inp.dataset.ci].cap = inp.value.trim(); saveMe(); });
+  document.querySelectorAll(".gal.mine .gal-open").forEach(b => b.onclick = () => openLightbox(me.gallery, +b.dataset.gi));
+}
 async function setMyPhoto(file){
   try { me.foto = await compressPhoto(file); saveMe(); return true; }
   catch(e){ toast(L("No se ha podido leer esa imagen. Prueba con otra foto (JPG o PNG).","Couldn't read that image. Try another photo (JPG or PNG).")); return false; }
@@ -1140,13 +1227,15 @@ function perfil(){
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
       return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces)}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
     ${profileFields()}
+    ${myGalleryHTML()}
     <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
     <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
     <label class="switch" for="f-na"><span><b>${L("En la app","In the app")}</b><small>${L("Notificaciones en el móvil","Notifications on your phone")}</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
     <button type="submit">${L("Guardar cambios","Save changes")}</button>
     <button type="button" class="plain" id="logout">${L("Cerrar sesión","Sign out")}</button>
   </form>`;
-  bindProfile(perfil);
+  bindProfile(perfil); bindMyGallery(perfil);
+  const myPh = document.querySelector(".form > div .ph"); if (myPh && me.foto){ myPh.style.cursor = "zoom-in"; myPh.onclick = () => openLightbox([{src:me.foto, cap:me.alias}, ...(me.gallery||[])]); }
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
@@ -1395,10 +1484,11 @@ const W = () => [
    bind:()=>bindLangPicker("w-langs"),
    save:()=>{ me.langs=readLangPicker("w-langs"); me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.over25=$("#w-25").checked; me.g=$("#w-g").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
      return !me.alias ? L("Escribe un alias para continuar","Enter an alias to continue") : !me.over25 ? L("Remitee es solo para mayores de 25 años","Remitee is for over 25s only") : !me.langs.length ? L("Marca al menos un idioma","Pick at least one language") : !me.zona ? L("Indica desde dónde escribes","Tell us where you're writing from") : ""; }},
-  {t:L("Añade tu foto si quieres","Add a photo if you like"), d:L("Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.","Nobody will see it before a match. You can also add it later from your profile."), skip:L("Más adelante","Later"),
+  {t:L("Añade tus fotos si quieres","Add your photos if you like"), d:L("Una foto tuya y, si quieres, unas fotos de tus intereses. Nadie las verá antes del match. También puedes añadirlas más adelante desde tu perfil.","A photo of you and, if you like, a few photos of your interests. Nobody will see them before a match. You can also add them later from your profile."), skip:L("Más adelante","Later"),
    f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?L("Cambiar foto","Change photo"):L("Elegir foto","Choose photo")}</label><input type="file" id="w-p" accept="image/*" hidden></div>
-     <label class="switch" for="w-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
-   bind:()=>{ $("#w-p").onchange = async e => { const f=e.target.files[0]; if(!f) return; if (await setMyPhoto(f)) wizard(); }; },
+     <label class="switch" for="w-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>
+     ${myGalleryHTML()}`,
+   bind:()=>{ $("#w-p").onchange = async e => { const f=e.target.files[0]; if(!f) return; if (await setMyPhoto(f)) wizard(); }; bindMyGallery(() => { me.showFoto = $("#w-s") ? $("#w-s").checked : me.showFoto; wizard(); }); },
    save:()=>{ me.showFoto=$("#w-s").checked; return ""; }},
   {t:L("Una breve biografía","A short bio"), d:L("Para que las personas sepan cómo eres. Es lo primero que leerán en Descubrir, junto con tus 3 intereses.","So people know what you're like. It's the first thing they'll read in Discover, along with your 3 interests."),
    f:()=>`<div class="field"><label for="w-b">${L("Biografía breve","Short bio")}</label><textarea id="w-b" rows="3" maxlength="200" placeholder="${L("Escribo mejor de lo que hablo...","I write better than I talk...")}">${esc(me.bio)}</textarea><small><span id="w-bc">${me.bio.length}</span>/200</small></div>
@@ -1456,7 +1546,7 @@ function como(){
     <h3>${L("2. Match por intereses","2. Matching on interests")}</h3>
     ${S(`En Descubrir lees perfiles sin ver fotos. Puedes elegir a alguien o pasar. Si los dos os elegís, hay match y se abre la correspondencia. Cada día puedes ver ${VIEW_LIMIT} perfiles; con Remitee Plus no hay límite.`,`In Discover you read profiles without seeing photos. You can choose someone or pass. If you both choose each other, it's a match and the correspondence opens. Each day you can see ${VIEW_LIMIT} profiles; with Remitee Plus there's no limit.`)}
     <h3>${L("3. Lo que se desbloquea con el match","3. What a match unlocks")}</h3>
-    ${S("Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y su biografía extensa, que solo leen sus matches.","After a match you can see the other person's photo, if they've chosen to show it, and their long bio, which only their matches can read.")}
+    ${S("Tras el match puedes ver la foto de la otra persona, si ha decidido mostrarla, y ampliarla con un toque. También ves su biografía extensa, su mapa de cartas y una pequeña galería con fotos de sus intereses. Tú puedes subir hasta 6 fotos de lo que te gusta desde tu perfil.","After a match you can see the other person's photo, if they've chosen to show it, and enlarge it with a tap. You also see their long bio, their letter map and a small gallery of photos of their interests. You can upload up to 6 photos of what you love from your profile.")}
     <h3>${L("4. Quién escribe primero","4. Who writes first")}</h3>
     ${S("Escribe primero quien completa el match, es decir, quien dice que sí en segundo lugar. La app lo indica en la pantalla del match, así nunca se cruzan dos cartas ni os quedáis esperando el uno al otro.","Whoever completes the match writes first, that is, whoever says yes second. The app shows it on the match screen, so two letters never cross and nobody is left waiting for the other.")}
     <h3>${L("5. Cómo viajan las cartas","5. How letters travel")}</h3>
