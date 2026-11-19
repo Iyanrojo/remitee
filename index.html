@@ -295,7 +295,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .sechead{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
 @media (max-width:440px){.demo{display:none}}
 body.wide .app{max-width:1040px}
-.land{display:grid;gap:56px;padding-bottom:30px}
+.land{display:grid;gap:clamp(64px,10vw,120px);padding-bottom:40px}
 .hero{display:grid;gap:18px;padding-top:24px}
 .kicker{font-size:.78rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
 .mega{font-family:var(--head);font-weight:700;font-size:clamp(2.8rem,11vw,6.4rem);line-height:.98;letter-spacing:-.035em;margin:0;text-wrap:balance}
@@ -306,7 +306,7 @@ body.wide .app{max-width:1040px}
 .hero-cta button{padding:15px 26px;font-size:1rem}
 .hero-note{color:var(--muted);font-size:.82rem}
 .marquee{overflow:hidden;margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));background:var(--accent);padding-block:14px}
-.mq{display:flex;gap:34px;width:max-content;animation:mq 28s linear infinite}
+.mq{display:flex;gap:34px;width:max-content;animation:mq 110s linear infinite}
 .mq span{font-family:var(--head);font-weight:600;font-size:1.25rem;color:#fff;white-space:nowrap;display:flex;align-items:center;gap:34px}
 .mq span::after{content:"✉︎";opacity:.6}
 @keyframes mq{to{transform:translateX(-50%)}}
@@ -325,6 +325,32 @@ body.wide .app{max-width:1040px}
 .final{display:grid;gap:20px;justify-items:start;padding-block:10px 20px}
 .final button{padding:15px 28px;font-size:1rem}
 @media (prefers-reduced-motion:reduce){.mq{animation:none}}
+.hero-row{display:grid;grid-template-columns:1fr;gap:10px;align-items:center}
+@media (min-width:760px){.hero-row{grid-template-columns:1fr 240px}}
+.drift{width:100%;max-width:240px;justify-self:end}
+.drift-path{fill:none;stroke:var(--muted);opacity:.45;stroke-width:2;stroke-dasharray:3 7}
+.drift-env{offset-path:path("M10 140 C 60 120, 90 40, 210 30");offset-rotate:0deg;animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{from{offset-distance:4%}to{offset-distance:92%}}
+.slow-in p{animation:slowIn 2.4s ease both}
+.slow-in p:nth-child(2){animation-delay:1.2s}.slow-in p:nth-child(3){animation-delay:2.4s}.slow-in p:nth-child(4){animation-delay:3.6s}.slow-in p:nth-child(5){animation-delay:4.8s}
+@keyframes slowIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+.statements{gap:18px}
+.slowbox{display:grid;gap:22px}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.compare>div{background:var(--surface);border-radius:24px;padding:24px;display:grid;gap:6px}
+.compare>div:last-child{background:var(--accent-soft)}
+.compare .big{font-family:var(--head);font-weight:700;font-size:clamp(2.2rem,7vw,3.4rem);letter-spacing:-.03em;line-height:1}
+.compare>div:last-child .big{color:var(--accent)}
+.compare p{margin:0;color:var(--muted)}
+.transit{background:var(--surface);border-radius:24px;padding:20px 22px;display:grid;gap:10px}
+.transit-top{display:flex;justify-content:space-between;font-weight:600;font-size:.95rem}
+.tbar{height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.tbar span{display:block;height:100%;width:30%;background:var(--accent);border-radius:999px;animation:tbar 40s ease-in-out infinite alternate}
+@keyframes tbar{from{width:12%}to{width:88%}}
+.transit small{color:var(--muted)}
+.slow-quote{margin:0;font-family:var(--head);font-weight:700;font-size:clamp(2.4rem,9vw,5rem);line-height:1;letter-spacing:-.035em;color:var(--ink);text-align:center;padding-block:20px;text-wrap:balance}
+.slow-quote em{font-style:normal;color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.drift-env,.slow-in p,.tbar span{animation:none!important}.drift-env{offset-distance:50%}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -823,22 +849,33 @@ function showFlow(){
 /* ---- Alta: Google (simulado) + creación de perfil ---- */
 let altaStep = 0;
 function landing(){
-  const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","Cartas de verdad","Sin prisas"];
+  const phrases = ["Conecta por carta con personas","Encuentra amigos","Un vínculo","Una historia","Primero las palabras","A fuego lento","Sin prisas","La espera también cuenta","Cartas de verdad"];
   $("#view").innerHTML = `<div class="land">
     <section class="hero">
-      <span class="kicker">Correspondencia entre desconocidos</span>
-      <h2 class="mega">Tu privacidad,<br><em>nuestro objetivo.</em></h2>
-      <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección.</p>
+      <span class="kicker">Correspondencia a fuego lento</span>
+      <div class="hero-row"><h2 class="mega">Tu privacidad,<br><em>nuestro objetivo.</em></h2>
+        <svg class="drift" viewBox="0 0 220 160" aria-hidden="true"><path d="M10 140 C 60 120, 90 40, 210 30" class="drift-path"/>
+          <g class="drift-env"><rect x="-26" y="-17" width="52" height="34" rx="4" class="pp-env"/><path d="M-24 -15 L0 3 L24 -15" class="pp-flap"/></g></svg></div>
+      <p class="hero-sub">Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.</p>
       <div class="hero-cta"><button id="start">Crear mi perfil</button><button class="plain" id="how">Cómo funciona</button></div>
       <small class="hero-note">Gratis · Solo mayores de 25 años</small>
     </section>
     <div class="marquee" aria-hidden="true"><div class="mq">${[...phrases,...phrases].map(t=>`<span>${t}</span>`).join("")}</div></div>
-    <section class="statements">
+    <section class="statements slow-in">
       <p>Conecta por carta con <em>personas</em>.</p>
       <p>Encuentra amigos. Un <em>vínculo</em>. Una historia.</p>
       <p>Primero las <em>palabras</em>. Después, la cara.</p>
       <p>Escribe sin prisas. Lee con <em>calma</em>.</p>
       <p>Cartas de verdad, en <em>tu buzón</em>.</p>
+    </section>
+    <section class="slowbox">
+      <span class="kicker">El valor de la espera</span>
+      <div class="compare">
+        <div><span class="big">1 s</span><p>Lo que tarda un mensaje. Y lo que dura en la memoria.</p></div>
+        <div><span class="big">3–5 días</span><p>Lo que tarda una carta. Se lee despacio, se relee y se guarda en una caja.</p></div>
+      </div>
+      <div class="transit"><div class="transit-top"><span>Tu carta va de camino</span><span class="pp">✉︎</span></div><div class="tbar"><span></span></div><small>Sin prisa. Llega cuando llega.</small></div>
+      <p class="slow-quote">Relaciones a <em>fuego lento</em>.</p>
     </section>
     <section class="steps3">
       <div><span class="n">1</span><h3>Haz match por intereses</h3><p>Lees cómo escribe alguien y qué le gusta. Si los dos os elegís, se abre la correspondencia.</p></div>
@@ -851,7 +888,7 @@ function landing(){
       <ul class="perks"><li>Tus cartas pasan por nuestra oficina y nunca se abren</li><li>Foto y biografía completa, solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li><li>Compartís direcciones solo si los dos queréis</li></ul>
     </section>
     <section class="final">
-      <h2 class="mega sm">¿Le escribimos a <em>alguien</em>?</h2>
+      <h2 class="mega sm">Escribe hoy.<br>Recibe <em>sin prisa</em>.</h2>
       <button id="start2">Empezar ahora</button>
     </section>
   </div>`;
