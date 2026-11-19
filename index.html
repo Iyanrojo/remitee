@@ -503,8 +503,8 @@ body.wide .app{max-width:1040px}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;padding:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.8rem;line-height:1}
 .lb-nav.prev{left:max(10px,env(safe-area-inset-left,0px))} .lb-nav.next{right:max(10px,env(safe-area-inset-right,0px))}
 @media (prefers-reduced-motion:reduce){.lightbox{animation:none}}
-.hero-title .rot{display:inline-block;min-height:2em;transition:opacity .7s ease, filter .7s ease, transform .7s ease}
-.hero-title .rot.out{opacity:0;filter:blur(6px);transform:translateY(.12em)}
+.hero-title .rot{display:inline-block;transition:opacity .7s ease}
+.hero-title .rot.out{opacity:0}
 @media (prefers-reduced-motion:reduce){.hero-title .rot{transition:none}}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -538,9 +538,15 @@ async function cloudSave(){
   if (!FB || !me.uid) return;
   const pub = {}; PUBLIC_FIELDS.forEach(k => pub[k] = me[k] ?? null);
   pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-  await FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true});
-  await FB.db.collection("gallery").doc(me.uid).set({items:(me.gallery||[]).map(g => ({src:g.src, cap:g.cap||""}))});
-  await FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true});
+  // Cada documento se guarda por separado: si uno falla, los demás (y la foto) se guardan igualmente
+  const jobs = [
+    ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true})],
+    ["profiles", () => FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true})],
+    ["gallery", () => FB.db.collection("gallery").doc(me.uid).set({items:(me.gallery||[]).map(g => ({src:g.src, cap:g.cap||""}))})]
+  ];
+  const fails = [];
+  for (const [name, run] of jobs){ try { await run(); } catch(e){ console.warn("cloudSave", name, e); fails.push({name, code:e && e.code}); } }
+  if (fails.length){ const err = new Error("cloudSave"); err.fails = fails; throw err; }
 }
 // Email de bienvenida: se deja en la colección "mail" y la extensión Trigger Email de Firebase lo envía
 async function queueWelcome(){
@@ -555,7 +561,9 @@ async function cloudLoad(uid){
   const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
   if (!a.exists) return false;
   const pub = a.data(); delete pub.updatedAt;
-  Object.assign(me, pub, b.exists ? b.data() : {}, {uid, created:true});
+  const priv = b.exists ? b.data() : {};
+  if (!priv.foto) delete priv.foto;
+  Object.assign(me, pub, priv, {uid, created:true});
   try { const g = await FB.db.collection("gallery").doc(uid).get(); if (g.exists) me.gallery = g.data().items || []; } catch(e){}
   saveLocal(); return true;
 }
@@ -597,8 +605,18 @@ if (FB) FB.auth.onAuthStateChanged(async u => {
   if (u){
     const pw = u.providerData.some(x => x.providerId === "password") && !u.providerData.some(x => x.providerId === "google.com");
     if (pw && !u.emailVerified){ me.uid = u.uid; me.email = u.email; me.provider = "email"; me.verified = false; me.created = false; altaStep = 1.5; route(); return; }
-    if (!me.created || me.uid !== u.uid){ me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
-      try { if (await cloudLoad(u.uid)) route(); } catch(e){ console.warn(e); } } }
+    const fresh = !me.created || me.uid !== u.uid;
+    me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
+    try {
+      const localFoto = me.foto, localGal = me.gallery;
+      const had = await cloudLoad(u.uid);
+      // Si en la nube no hay foto pero en este navegador sí, se sube (recupera fotos que no llegaron a guardarse)
+      let restored = false;
+      if (had && !me.foto && localFoto && !fresh){ me.foto = localFoto; restored = true; }
+      if (had && !(me.gallery||[]).length && (localGal||[]).length && !fresh){ me.gallery = localGal; restored = true; }
+      if (restored) saveMe();
+      if (had && (fresh || location.hash === "#perfil")) route();
+    } catch(e){ console.warn(e); } }
   else if (me.created && me.uid){ Object.assign(me, {created:false, uid:null}); route(); }
 });
 
@@ -1159,7 +1177,17 @@ function startPrep(root){
 
 /* ---- Perfil propio: se guarda en este navegador ---- */
 function saveLocal(){ try { localStorage.setItem("remitee-me", JSON.stringify(me)); } catch(e) { try { const c = {...me, foto:null}; localStorage.setItem("remitee-me", JSON.stringify(c)); if (!FB) toast(L("La foto es demasiado grande para guardarla. Prueba con otra.","The photo is too large to save. Try another one.")); } catch(_){} } }
-function saveMe(){ saveLocal(); if (FB && me.uid) cloudSave().catch(e => toast(L("No se ha podido guardar en la nube. Revisa tu conexión.","Couldn't save to the cloud. Check your connection."))); }
+let saving = Promise.resolve();
+function saveMe(){ saveLocal(); if (!FB || !me.uid) return Promise.resolve(true);
+  // Los guardados se encadenan para que uno antiguo no pise a uno nuevo
+  saving = saving.catch(()=>{}).then(() => cloudSave()).then(() => true, e => { cloudError(e); return false; });
+  return saving; }
+function cloudError(e){
+  const f = (e && e.fails) || [], denied = f.some(x => x.code === "permission-denied");
+  const which = f.map(x => ({private:L("foto y datos privados","photo and private details"), profiles:L("perfil","profile"), gallery:L("galería","gallery")}[x.name] || x.name)).join(", ");
+  toast(denied ? L(`No se ha podido guardar (${which}): faltan por publicar las reglas de Firestore.`,`Couldn't save (${which}): the Firestore rules need publishing.`)
+               : L(`No se ha podido guardar en la nube (${which}). Revisa tu conexión.`,`Couldn't save to the cloud (${which}). Check your connection.`));
+}
 function loadMe(){ try { const d = JSON.parse(localStorage.getItem("remitee-me")||"null"); if (d) Object.assign(me, d); } catch(e) {} }
 const RANGES = ["25–30","30–35","35–40","40–45","45–50","50–55","55–60","60+"];
 function newCode(){ const w=["MAR","LUNA","RIO","SOL","PINO","ALBA","NIDO","ROCA"]; return `${w[Math.floor(Math.random()*w.length)]}-${1000+Math.floor(Math.random()*9000)}`; }
@@ -1204,19 +1232,22 @@ function myGalleryHTML(){
 function bindMyGallery(rerender){
   const add = $("#g-add"); if (add) add.onchange = async e => { const files = [...e.target.files].slice(0, GAL_MAX - (me.gallery||[]).length); if (!files.length) return;
     if (typeof readForm === "function" && $("#f-a")) readForm();
-    for (const f of files){ try { const src = await compressPhoto(f, 900, .78); me.gallery = [...(me.gallery||[]), {src, cap:""}]; } catch(_){ toast(L("Alguna imagen no se ha podido leer.","Some images couldn't be read.")); } }
-    saveMe(); rerender(); toast(L("Fotos guardadas","Photos saved")); };
+    for (const f of files){ try { const src = await compressPhoto(f, 720, .72); me.gallery = [...(me.gallery||[]), {src, cap:""}]; } catch(_){ toast(L("Alguna imagen no se ha podido leer.","Some images couldn't be read.")); } }
+    rerender(); const ok = await saveMe(); toast(ok ? L("Fotos guardadas","Photos saved") : L("Fotos guardadas solo en este dispositivo","Photos saved on this device only")); };
   document.querySelectorAll(".gal.mine .gal-del").forEach(b => b.onclick = () => { if ($("#f-a")) readForm(); me.gallery.splice(+b.dataset.di, 1); saveMe(); rerender(); });
   document.querySelectorAll(".gal.mine .gal-capin").forEach(inp => inp.onchange = () => { me.gallery[+inp.dataset.ci].cap = inp.value.trim(); saveMe(); });
   document.querySelectorAll(".gal.mine .gal-open").forEach(b => b.onclick = () => openLightbox(me.gallery, +b.dataset.gi));
 }
 async function setMyPhoto(file){
-  try { me.foto = await compressPhoto(file); saveMe(); return true; }
+  try { me.foto = await compressPhoto(file); }
   catch(e){ toast(L("No se ha podido leer esa imagen. Prueba con otra foto (JPG o PNG).","Couldn't read that image. Try another photo (JPG or PNG).")); return false; }
+  const ok = await saveMe();
+  if (FB && me.uid && ok) toast(L("Foto guardada en tu cuenta","Photo saved to your account"));
+  return true;
 }
 function bindProfile(rerender){
   $("#f-p").onchange = async e => { const f = e.target.files[0]; if (!f) return; readForm();
-    if (await setMyPhoto(f)){ rerender(); toast(L("Foto guardada. Solo se verá tras un match","Photo saved. It will only be shown after a match")); } };
+    if (await setMyPhoto(f)){ rerender(); if (!FB) toast(L("Foto guardada. Solo se verá tras un match","Photo saved. It will only be shown after a match")); } };
   $("#f-s").onchange = e => { me.showFoto = e.target.checked; };
   bindLangPicker("f-langs");
 }
@@ -1316,14 +1347,19 @@ function showFlow(){
 /* ---- Landing y alta ---- */
 // Frases que se van alternando en el titular
 const TAGLINES = () => lang === "en"
-  ? ["slow-cooked","in its purest form","between people","with commitment","made human","handwritten","with no rush","with a real stamp","worth the wait","worth keeping","with soul","for real","without screens","in paper and ink","to read again","that leaves a mark","there and back","without algorithms","with calm","from the heart"]
-  : ["a fuego lento","en estado puro","entre personas","con compromiso","humanizada","de puño y letra","sin prisas","con sello propio","que merece la espera","para guardar","con alma","de verdad","sin pantallas","en papel y tinta","para releer","que deja huella","de ida y vuelta","sin algoritmos","con calma","de corazón"];
+  ? ["slow-cooked","in its purest form","between people","with commitment","made human","handwritten","with no rush","with a real stamp","worth the wait","worth keeping","with soul","for real","without screens","in paper and ink","to read again","that leaves a mark","there and back","algorithm-free","with calm","from the heart"]
+  : ["a fuego lento","en estado puro","entre personas","con compromiso","humanizada","de puño y letra","sin prisas","con sello propio","que se espera","para guardar","con alma","de verdad","sin pantallas","en papel y tinta","para releer","que deja huella","de ida y vuelta","sin algoritmos","con calma","de corazón"];
 let rotTimer = 0;
 function startRotator(){
   clearInterval(rotTimer);
   const el = $("#rot"); if (!el) return;
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const T = TAGLINES(); let i = 0;
+  // Reserva solo el alto de la frase más larga, para que nada salte y no quede hueco de más
+  const fit = () => { if (!el.isConnected) return; const cur = el.textContent; el.style.minHeight = "";
+    let h = 0; T.forEach(t => { el.textContent = t + "."; h = Math.max(h, el.offsetHeight); }); el.textContent = cur; el.style.minHeight = h + "px"; };
+  fit(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.removeEventListener("resize", window.__rotFit || (()=>{})); window.__rotFit = fit; window.addEventListener("resize", fit);
   rotTimer = setInterval(() => {
     if (!el.isConnected){ clearInterval(rotTimer); return; }
     el.classList.add("out");
