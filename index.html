@@ -460,6 +460,15 @@ body.wide .app{max-width:1040px}
 .emailform button[type=submit]{width:100%;padding:14px}
 .loginlink{justify-self:start;padding:0;font-size:.9rem}
 #topLogin{padding:9px 14px}
+.maplock{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:14px;padding:10px 12px;font-size:.78rem;color:var(--muted)}
+.maplock .lock{width:26px;height:26px;flex:none}
+.maplock .lock svg{width:13px;height:13px}
+.verify{justify-items:center}
+.vicon{width:84px;height:84px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center}
+.vicon svg{width:44px;height:33px}
+.vicon rect{fill:var(--accent)} .vicon path{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.verify button{width:100%}
+.verify .linkbtn{width:auto}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -509,9 +518,12 @@ async function googleLogin(){
 async function emailAuth(email, pass, login){
   const r = login ? await FB.auth.signInWithEmailAndPassword(email, pass) : await FB.auth.createUserWithEmailAndPassword(email, pass);
   const u = r.user; me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified; me.provider = "email";
-  if (!login) { try { FB.auth.languageCode = lang; await u.sendEmailVerification(); } catch(e){} }
+  if (!login) await sendVerify(u);
+  if (!u.emailVerified) return "verify";
   return cloudLoad(u.uid);
 }
+const verifySettings = () => ({ url: location.origin + location.pathname });
+async function sendVerify(u){ try { FB.auth.languageCode = lang; await u.sendEmailVerification(verifySettings()); return true; } catch(e){ console.warn(e); return false; } }
 function authError(e){
   const c = (e && e.code) || "";
   const M = {
@@ -527,12 +539,16 @@ function authError(e){
     "auth/too-many-requests":["Demasiados intentos. Espera unos minutos y vuelve a probar.","Too many attempts. Wait a few minutes and try again."],
     "auth/account-exists-with-different-credential":["Ese email ya está registrado con otro método. Prueba con email y contraseña o con Google.","That email is registered with another method. Try email and password, or Google."],
     "auth/operation-not-allowed":["Este método de acceso no está activado en Firebase.","This sign-in method isn't enabled in Firebase."],
+    "auth/requires-recent-login":["Vuelve a iniciar sesión para continuar.","Please sign in again to continue."],
     "auth/network-request-failed":["No hay conexión. Revisa tu red e inténtalo de nuevo.","No connection. Check your network and try again."]
   };
   const m = M[c]; return m ? L(m[0], m[1]) : L("No se ha podido entrar. Inténtalo de nuevo.","Couldn't sign in. Please try again.") + (c ? ` (${c})` : "");
 }
 if (FB) FB.auth.onAuthStateChanged(async u => {
-  if (u){ if (!me.created || me.uid !== u.uid){ me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
+  if (u){
+    const pw = u.providerData.some(x => x.providerId === "password") && !u.providerData.some(x => x.providerId === "google.com");
+    if (pw && !u.emailVerified){ me.uid = u.uid; me.email = u.email; me.provider = "email"; me.verified = false; me.created = false; altaStep = 1.5; route(); return; }
+    if (!me.created || me.uid !== u.uid){ me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
       try { if (await cloudLoad(u.uid)) route(); } catch(e){ console.warn(e); } } }
   else if (me.created && me.uid){ Object.assign(me, {created:false, uid:null}); route(); }
 });
@@ -613,7 +629,7 @@ const readLangPicker = id => [...document.querySelectorAll(`#${id} .lpb.on`)].ma
 const NEW_LABEL = () => ({f:L("Recién llegada","New here"), m:L("Recién llegado","New here"), n:L("Nueva en Remitee","New to Remitee")});
 const plural = (n, es1, esN, en1, enN) => n===1 ? L(es1,en1) : L(esN,enN);
 
-/* ---- Valoraciones: de 0 a 5 cartas ---- */
+/* ---- Valoraciones: de 0 a 5 sobres ---- */
 // r: [media, número de valoraciones] de los perfiles de ejemplo
 const RATINGS = {16:[4.6,5],17:[4.9,3],19:[4.3,2],20:[4.8,9],1:[4.8,7],3:[3.1,3],4:[4.6,12],5:[4.9,18],6:[4.2,4],8:[4.7,10],9:[2.4,2],11:[4.5,8],13:[4.9,26],14:[3.8,3],15:[4.4,6]};
 people.forEach(p => { const r = RATINGS[p.id]; p.rAvg = r ? r[0] : 0; p.rN = r ? r[1] : 0; });
@@ -621,8 +637,8 @@ const ENV_SVG = `<svg viewBox="0 0 24 18" aria-hidden="true"><rect x="1" y="1" w
 const fmtNum = n => n.toLocaleString(lang==="en"?"en-GB":"es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
 function ratingHTML(avg, n, opts={}){
   const row = Array.from({length:5}, () => ENV_SVG).join("");
-  const label = n ? `${fmtNum(avg)} · ${n} ${plural(n,"valoración","valoraciones","rating","ratings")}` : L("Sin valoraciones aún","No ratings yet");
-  return `<span class="rating ${opts.sm?"sm":""}" role="img" aria-label="${n?L(`${fmtNum(avg)} de 5 cartas`,`${fmtNum(avg)} out of 5 letters`):label}">
+  const label = n ? `${fmtNum(avg)} ${L("sobres","envelopes")} · ${n} ${plural(n,"valoración","valoraciones","rating","ratings")}` : L("Sin valoraciones aún","No ratings yet");
+  return `<span class="rating ${opts.sm?"sm":""}" role="img" aria-label="${n?L(`${fmtNum(avg)} de 5 sobres`,`${fmtNum(avg)} out of 5 envelopes`):label}">
     <span class="r-icons"><span class="r-base">${row}</span><span class="r-fill" style="width:${n?avg/5*100:0}%">${row}</span></span><span class="r-txt">${label}</span></span>`;
 }
 const myRating = () => { const r = me.ratings || []; return [r.length ? r.reduce((a,b)=>a+b,0)/r.length : 0, r.length]; };
@@ -680,7 +696,7 @@ function statsHTML(corr, places, avg, n){
   return `<div class="stats">
     <div class="st main"><b>${corr}</b><span>${plural(corr,"correspondencia","correspondencias","correspondence","correspondences")}</span></div>
     <div class="st"><b>${countriesOf(places)}</b><span>${plural(countriesOf(places),"país","países","country","countries")}</span></div>
-    <div class="st"><b>${n ? fmtNum(avg) : "—"}</b><span>${L("valoración","rating")}</span></div>
+    <div class="st"><b>${n ? fmtNum(avg) : "—"}</b><span>${n ? L("sobres","envelopes") : L("sin valorar","not rated")}</span></div>
   </div>`;
 }
 
@@ -790,7 +806,7 @@ function checkPhases(c){
     while (l.ls < k){ l.ls++; const m = PHASE_MSG[l.mine?"mine":"theirs"][l.ls](c.p.alias); notify(m[0], m[1]);
       // Simulación: cuando tu carta llega, la otra persona la valora
       if (l.mine && l.ls === 3 && !l.ratedByThem){ l.ratedByThem = c.p.id === 3 ? 3 : (c.p.id % 2 ? 5 : 4); me.ratings = [...(me.ratings||[]), l.ratedByThem]; saveMe();
-        notify(`${c.p.alias} ha valorado tu carta: ${l.ratedByThem} de 5 cartas.`, `${c.p.alias} rated your letter: ${l.ratedByThem} out of 5 letters.`); } } });
+        notify(`${c.p.alias} ha valorado tu carta con ${l.ratedByThem} ${l.ratedByThem===1?"sobre":"sobres"}.`, `${c.p.alias} rated your letter ${l.ratedByThem} ${l.ratedByThem===1?"envelope":"envelopes"}.`); } } });
 }
 function sim(){
   return `<div class="sim"><span><b>${L("Simulación","Simulation")}</b> · ${L("Hoy es","Today is")} ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">${L("+1 día","+1 day")}</button><button class="soft sm" data-days="7">${L("+7 días","+7 days")}</button></span></div>`;
@@ -830,7 +846,7 @@ function descubrir(){
       <div class="trust">${trust(p)}</div>
       <p class="bio">${esc(p.bio)}</p>
       <div class="chips">${p.tags.map(t=>`<span class="chip ${shared.includes(t)?"on":""}">${esc(t)}</span>`).join("")}</div>
-      ${mapHTML(p.home, p.places||[], {sm:true})}
+      <div class="maplock">${LOCK}<span>${L("Su mapa de cartas se muestra cuando hay match","Their letter map is shown once you match")}</span></div>
       <div class="common">${shared.length?L(`${shared.length} ${shared.length===1?"interés":"intereses"} en común`,`${shared.length} ${shared.length===1?"interest":"interests"} in common`):L("Ningún interés en común, aún puede sorprenderte","No interests in common, but they may still surprise you")}</div>
       <div class="actions"><button class="plain" id="no">${L("Pasar","Pass")}</button><button id="yes" ${suspended()?"disabled":""}>${L("Quiero escribirle","I want to write")}</button></div>
     </article>
@@ -897,8 +913,8 @@ function deadlineBox(c){
 
 function rateBox(c, l, i){
   if (l.mine || stage(l) < 3) return "";
-  if (l.rated) return `<div class="ratebox done">${L("Tu valoración","Your rating")}: ${ratingHTML(l.rated, 1, {sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.rated} ${L("de 5","of 5")}</span>`)}</div>`;
-  return `<div class="ratebox"><span>${L("Valora esta carta","Rate this letter")}</span><span class="rate-pick" role="group" aria-label="${L("De 1 a 5 cartas","From 1 to 5 letters")}">${[1,2,3,4,5].map(v=>`<button type="button" class="rp" data-rate="${i}" data-v="${v}" aria-label="${v} ${L(v===1?"carta":"cartas",v===1?"letter":"letters")}">${ENV_SVG}</button>`).join("")}</span></div>`;
+  if (l.rated) return `<div class="ratebox done">${L("Tu valoración","Your rating")}: ${ratingHTML(l.rated, 1, {sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.rated} ${L(l.rated===1?"sobre":"sobres",l.rated===1?"envelope":"envelopes")}</span>`)}</div>`;
+  return `<div class="ratebox"><span>${L("Valora esta carta","Rate this letter")}</span><span class="rate-pick" role="group" aria-label="${L("De 1 a 5 sobres","From 1 to 5 envelopes")}">${[1,2,3,4,5].map(v=>`<button type="button" class="rp" data-rate="${i}" data-v="${v}" aria-label="${v} ${L(v===1?"sobre":"sobres",v===1?"envelope":"envelopes")}">${ENV_SVG}</button>`).join("")}</span></div>`;
 }
 
 function letterCard(c, l, i){
@@ -908,7 +924,7 @@ function letterCard(c, l, i){
       ${l.photo?`<div class="thumb" ${l.photo==="example"?"":`style="background-image:url('${l.photo}')"`} title="${L("Foto del sobre","Envelope photo")}">${l.photo==="example"?"✉︎":""}</div>`:""}</div>
     ${isLast||k<3?`<ol class="phases">${PH.map((ph,j)=>`<li class="${j<k?"done":j===k?"now":""}"><span>${ph}</span><small>${j<=k?fmt(phaseDate(l,j)):""}</small></li>`).join("")}</ol>`:""}
     ${!l.mine && k===2?`<button class="soft sm" data-arrived="${i}">${L("Ya me ha llegado","It has arrived")}</button>`:""}
-    ${l.mine && l.ratedByThem?`<div class="ratebox done">${L(`${esc(c.p.alias)} la ha valorado`,`${esc(c.p.alias)} rated it`)}: ${ratingHTML(l.ratedByThem,1,{sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.ratedByThem} ${L("de 5","of 5")}</span>`)}</div>`:""}
+    ${l.mine && l.ratedByThem?`<div class="ratebox done">${L(`${esc(c.p.alias)} la ha valorado`,`${esc(c.p.alias)} rated it`)}: ${ratingHTML(l.ratedByThem,1,{sm:true}).replace(/<span class="r-txt">.*?<\/span>/, `<span class="r-txt">${l.ratedByThem} ${L(l.ratedByThem===1?"sobre":"sobres",l.ratedByThem===1?"envelope":"envelopes")}</span>`)}</div>`:""}
     ${rateBox(c, l, i)}
   </div>`;
 }
@@ -944,7 +960,7 @@ function ventana(c){
     b.onmouseleave = () => grp.forEach(x => x.classList.remove("hov"));
     b.onclick = () => { const l = c.letters[+b.dataset.rate], v = +b.dataset.v; l.rated = v;
       c.p.rAvg = (c.p.rAvg * c.p.rN + v) / (c.p.rN + 1); c.p.rN += 1;
-      toast(L(`Has valorado la carta de ${c.p.alias} con ${v} de 5 cartas`,`You rated ${c.p.alias}'s letter ${v} out of 5 letters`)); ventana(c); };
+      toast(L(`Has valorado la carta de ${c.p.alias} con ${v} ${v===1?"sobre":"sobres"}`,`You rated ${c.p.alias}'s letter ${v} ${v===1?"envelope":"envelopes"}`)); ventana(c); };
   });
   const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
     if (c.meReveal && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (openId===c.p.id) ventana(c); } }, 1800);
@@ -1237,7 +1253,7 @@ function landing(){
     <section class="privacy">
       <h3>${L("Tu dirección no la ve nadie","Nobody sees your address")}</h3>
       <div class="flowcard">${flowHTML()}</div>
-      <ul class="perks"><li>${L("Tus cartas pasan por nuestra oficina y nunca se abren","Your letters go through our office and are never opened")}</li><li>${L("Foto y biografía completa, solo tras el match","Photo and full bio, only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Compartís direcciones solo si los dos queréis","You share addresses only if you both want to")}</li><li>${L("Valoraciones de 0 a 5 cartas para saber con quién escribes","Ratings from 0 to 5 letters, so you know who you're writing to")}</li><li>${L("Escribe en tu idioma o en otro, con personas de cualquier país","Write in your language or another, with people from any country")}</li><li>${L("Tu mapa de cartas: cada correspondencia, un punto en el mundo","Your letter map: every correspondence, a dot on the world")}</li></ul>
+      <ul class="perks"><li>${L("Tus cartas pasan por nuestra oficina y nunca se abren","Your letters go through our office and are never opened")}</li><li>${L("Foto y biografía completa, solo tras el match","Photo and full bio, only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Compartís direcciones solo si los dos queréis","You share addresses only if you both want to")}</li><li>${L("Valoraciones de 0 a 5 sobres para saber con quién escribes","Ratings from 0 to 5 envelopes, so you know who you're writing to")}</li><li>${L("Escribe en tu idioma o en otro, con personas de cualquier país","Write in your language or another, with people from any country")}</li><li>${L("Tu mapa de cartas: cada correspondencia, un punto en el mundo","Your letter map: every correspondence, a dot on the world")}</li></ul>
     </section>
     <section class="final">
       <h2 class="mega sm">${L("Escribe hoy.<br>Recibe <em>sin prisa</em>.","Write today.<br>Receive <em>slowly</em>.")}</h2>
@@ -1254,6 +1270,7 @@ function alta(){
   document.body.classList.toggle("wide", altaStep === 0);
   const tl = $("#topLogin"); if (tl) tl.hidden = altaStep !== 0;
   if (altaStep === 0) return landing();
+  if (altaStep === 1.5) return verifyScreen();
   if (altaStep === 1){
     const login = authMode === "login";
     $("#view").innerHTML = `<div class="welcome">
@@ -1275,6 +1292,7 @@ function alta(){
     document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { authMode = b.dataset.mode; alta(); });
     // Tras entrar: si ya tiene perfil, a Descubrir; si no, al tutorial
     const after = had => {
+      if (had === "verify"){ altaStep = 1.5; return alta(); }
       if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Hola de nuevo, ${me.alias}`,`Welcome back, ${me.alias}`)); }
       else { altaStep = 2; alta(); }
     };
@@ -1289,7 +1307,7 @@ function alta(){
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast(L("Escribe un email válido","Enter a valid email"));
       if (!login && pass.length < 8) return toast(L("La contraseña necesita al menos 8 caracteres","Your password needs at least 8 characters"));
       if (login && !pass) return toast(L("Escribe tu contraseña","Enter your password"));
-      if (!FB){ me.email = email; me.verified = true; return after(false); }
+      if (!FB){ me.email = email; me.provider = "email"; me.verified = false; return after("verify"); }
       const btn = $("#eok"), txt = btn.textContent; busy(btn, true, L("Un momento…","One moment…"));
       emailAuth(email, pass, login).then(after).catch(err => { busy(btn, false, txt); toast(authError(err)); });
     };
@@ -1302,6 +1320,39 @@ function alta(){
     return;
   }
   wizard();
+}
+
+/* ---- Verificación del email ---- */
+function verifyScreen(){
+  document.body.classList.remove("wide");
+  $("#view").innerHTML = `<div class="welcome verify">
+    <div class="vicon" aria-hidden="true"><svg viewBox="0 0 64 48"><rect x="2" y="2" width="60" height="44" rx="8"/><path d="M6 8 L32 27 L58 8"/></svg></div>
+    <h2>${L("Revisa tu email","Check your email")}</h2>
+    <p class="sub">${L(`Te hemos enviado un enlace de confirmación a <b>${esc(me.email)}</b>. Pulsa en él para verificar tu cuenta y vuelve aquí.`,`We've sent a confirmation link to <b>${esc(me.email)}</b>. Click it to verify your account, then come back here.`)}</p>
+    <button id="vdone">${L("Ya lo he verificado","I've verified it")}</button>
+    <button class="plain" id="vresend">${L("Reenviar el email","Resend the email")}</button>
+    <p class="note">${L("¿No lo encuentras? Mira en la carpeta de spam o promociones.","Can't find it? Check your spam or promotions folder.")}</p>
+    ${FB ? "" : `<p class="note" style="margin:0">${L("Prototipo: «Ya lo he verificado» simula que has pulsado el enlace.","Prototype: “I've verified it” simulates clicking the link.")}</p>`}
+    <button class="linkbtn" id="vout" style="justify-self:center">${L("Usar otra cuenta","Use another account")}</button>
+  </div>`;
+  $("#vdone").onclick = async () => {
+    if (!FB){ me.verified = true; altaStep = 2; toast(L("Email verificado","Email verified")); return alta(); }
+    const u = FB.auth.currentUser; if (!u) { altaStep = 1; return alta(); }
+    $("#vdone").disabled = true;
+    try { await u.reload(); await u.getIdToken(true); } catch(e){}
+    $("#vdone").disabled = false;
+    if (FB.auth.currentUser.emailVerified){ me.verified = true; toast(L("Email verificado","Email verified"));
+      const had = await cloudLoad(u.uid).catch(() => false);
+      if (had){ altaStep = 0; location.hash = "#descubrir"; route(); } else { altaStep = 2; alta(); } }
+    else toast(L("Todavía no aparece como verificado. Pulsa el enlace del email y vuelve a intentarlo.","It doesn't show as verified yet. Click the link in the email and try again."));
+  };
+  $("#vresend").onclick = async () => {
+    if (!FB) return toast(L(`Email reenviado a ${me.email}`,`Email resent to ${me.email}`));
+    const u = FB.auth.currentUser; if (!u) return;
+    const ok = await sendVerify(u);
+    toast(ok ? L(`Email reenviado a ${me.email}`,`Email resent to ${me.email}`) : L("Espera un poco antes de pedir otro email.","Wait a moment before requesting another email."));
+  };
+  $("#vout").onclick = () => { if (FB) FB.auth.signOut(); Object.assign(me, {uid:null, email:"", verified:false}); altaStep = 1; alta(); };
 }
 
 /* ---- Tutorial de alta: un pop-up por paso ---- */
@@ -1392,9 +1443,9 @@ function como(){
     <h3>${L("8. Plazos y suspensiones","8. Deadlines and suspensions")}</h3>
     ${S(`Quien escribe primero tiene ${FIRST_DAYS} días tras el match. Cada vez que recibes una carta, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches.`,`Whoever writes first has ${FIRST_DAYS} days after the match. Each time you receive a letter, you have ${REPLY_DAYS} days to reply. If someone misses their deadline, the correspondence closes and their account is suspended for ${SUSPEND_DAYS} days, with no new matches.`)}
     <h3>${L("9. Valoraciones","9. Ratings")}</h3>
-    ${S("Cuando te llega una carta, puedes valorarla de 0 a 5 cartas. La media aparece en el perfil de cada persona junto al número de valoraciones, para que sepas cómo de fiable y cuidadosa es como corresponsal.","When a letter reaches you, you can rate it from 0 to 5 letters. The average appears on each person's profile next to the number of ratings, so you know how reliable and thoughtful they are as a correspondent.")}
+    ${S("Cuando te llega una carta, puedes valorarla de 0 a 5 sobres. Por ejemplo, alguien con 4,8 sobres es un corresponsal muy valorado. La media aparece en el perfil de cada persona junto al número de valoraciones, para que sepas cómo de fiable y cuidadosa es como corresponsal.","When a letter reaches you, you can rate it from 0 to 5 envelopes. Someone with 4.8 envelopes, for example, is a highly rated correspondent. The average appears on each person's profile next to the number of ratings, so you know how reliable and thoughtful they are as a correspondent.")}
     <h3>${L("Tu mapa de cartas","Your letter map")}</h3>
-    ${S("Cada perfil muestra públicamente cuántas correspondencias ha tenido esa persona, de cuántos países y su valoración media, junto a un mapamundi con los lugares a los que ha enviado cartas y desde los que las ha recibido. Solo se muestra la ciudad, nunca la dirección. Cuantas más cartas, más se llena tu mapa.","Each profile publicly shows how many correspondences that person has had, from how many countries and their average rating, alongside a world map of the places they've sent letters to and received them from. Only the city is shown, never the address. The more letters, the fuller your map.")}
+    ${S("Cada perfil muestra públicamente cuántas correspondencias ha tenido esa persona, de cuántos países y su valoración media en sobres. Cuando hay match, también ves su mapamundi con los lugares a los que ha enviado cartas y desde los que las ha recibido. Solo se muestra la ciudad, nunca la dirección. Cuantas más cartas, más se llena tu mapa.","Each profile publicly shows how many correspondences that person has had, from how many countries and their average rating in envelopes. Once you match, you also see their world map of the places they've sent letters to and received them from. Only the city is shown, never the address. The more letters, the fuller your map.")}
     <h3>${L("10. Tu historial","10. Your track record")}</h3>
     ${S("En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada. Y quien ha perdido varios matches por no responder aparece marcado como «Nunca contesta».","Each profile shows how many correspondences that person has had and whether they always reply on time. Newcomers are marked as new. And anyone who has lost several matches by not replying is marked “Never replies”.")}
     <h3>${L("11. Cuánto cuesta","11. What it costs")}</h3>
