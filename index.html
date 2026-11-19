@@ -452,6 +452,14 @@ body.wide .app{max-width:1040px}
 .m-empty{font-size:.76rem;color:var(--muted);text-align:center}
 .about .stats,.about .wmap{margin:10px 0}
 @media (prefers-reduced-motion:reduce){.m-pt{animation:none}}
+.google{display:flex;align-items:center;justify-content:center;gap:10px}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.8rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.emailform{display:grid;gap:10px;text-align:left}
+.emailform .field{padding:12px 14px}
+.emailform button[type=submit]{width:100%;padding:14px}
+.loginlink{justify-self:start;padding:0;font-size:.9rem}
+#topLogin{padding:9px 14px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -459,7 +467,7 @@ body.wide .app{max-width:1040px}
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo">remitee<span>.</span><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo">remitee<span>.</span><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="soft sm" id="topLogin" hidden>Entrar</button><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
@@ -495,8 +503,33 @@ async function cloudLoad(uid){
 }
 async function googleLogin(){
   const r = await FB.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-  const u = r.user; me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
+  const u = r.user; me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified; me.provider = "google";
   return cloudLoad(u.uid);
+}
+async function emailAuth(email, pass, login){
+  const r = login ? await FB.auth.signInWithEmailAndPassword(email, pass) : await FB.auth.createUserWithEmailAndPassword(email, pass);
+  const u = r.user; me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified; me.provider = "email";
+  if (!login) { try { FB.auth.languageCode = lang; await u.sendEmailVerification(); } catch(e){} }
+  return cloudLoad(u.uid);
+}
+function authError(e){
+  const c = (e && e.code) || "";
+  const M = {
+    "auth/popup-closed-by-user":["Has cerrado la ventana de Google","You closed the Google window"],
+    "auth/cancelled-popup-request":["Has cerrado la ventana de Google","You closed the Google window"],
+    "auth/popup-blocked":["El navegador ha bloqueado la ventana de Google. Permite ventanas emergentes e inténtalo de nuevo.","Your browser blocked the Google window. Allow pop-ups and try again."],
+    "auth/unauthorized-domain":["Este dominio no está autorizado en Firebase. Añádelo en Authentication → Configuración → Dominios autorizados.","This domain isn't authorised in Firebase. Add it under Authentication → Settings → Authorised domains."],
+    "auth/email-already-in-use":["Ya hay una cuenta con ese email. Pulsa «Ya tengo cuenta» para entrar.","There's already an account with that email. Tap “I have an account” to sign in."],
+    "auth/invalid-credential":["El email o la contraseña no son correctos.","The email or password is incorrect."],
+    "auth/wrong-password":["La contraseña no es correcta.","The password is incorrect."],
+    "auth/user-not-found":["No hay ninguna cuenta con ese email. Crea una nueva.","There's no account with that email. Create a new one."],
+    "auth/weak-password":["La contraseña es demasiado débil. Usa al menos 8 caracteres.","That password is too weak. Use at least 8 characters."],
+    "auth/too-many-requests":["Demasiados intentos. Espera unos minutos y vuelve a probar.","Too many attempts. Wait a few minutes and try again."],
+    "auth/account-exists-with-different-credential":["Ese email ya está registrado con otro método. Prueba con email y contraseña o con Google.","That email is registered with another method. Try email and password, or Google."],
+    "auth/operation-not-allowed":["Este método de acceso no está activado en Firebase.","This sign-in method isn't enabled in Firebase."],
+    "auth/network-request-failed":["No hay conexión. Revisa tu red e inténtalo de nuevo.","No connection. Check your network and try again."]
+  };
+  const m = M[c]; return m ? L(m[0], m[1]) : L("No se ha podido entrar. Inténtalo de nuevo.","Couldn't sign in. Please try again.") + (c ? ` (${c})` : "");
 }
 if (FB) FB.auth.onAuthStateChanged(async u => {
   if (u){ if (!me.created || me.uid !== u.uid){ me.uid = u.uid; me.email = u.email; me.verified = !!u.emailVerified;
@@ -1059,7 +1092,7 @@ function readForm(){
 function perfil(){
   const [ra, rn] = myRating();
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
-  <div class="verified"><span class="vdot">✓</span><div><b>${L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
+  <div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">${L("Tu código","Your code")}: <b>${esc(me.code)}</b></div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
@@ -1141,7 +1174,7 @@ function showFlow(){
 }
 
 /* ---- Landing y alta ---- */
-let altaStep = 0;
+let altaStep = 0, authMode = "signup";
 function landing(){
   const phrases = lang==="en"
     ? ["Connect with people by letter","Find friends","Learn a language","A bond","A story","Words first","Slow-cooked mail","Friends worldwide","No rush","Real letters"]
@@ -1153,6 +1186,7 @@ function landing(){
         <h2 class="mega hero-title">${L("Mensajería a<br><em>fuego lento.</em>","Mail,<br><em>slow-cooked.</em>")}</h2>
         <p class="hero-sub">${L("Remitee conecta por carta a personas que quieren escribirse. Sin chat, sin prisas y sin que nadie conozca tu dirección. Aquí las cosas tardan unos días. Y eso es lo bonito.","Remitee connects people who want to write to each other by post. No chat, no rush, and nobody ever knows your address. Here things take a few days. That's the beauty of it.")}</p>
         <div class="hero-cta"><button id="start">${L("Crear mi perfil","Create my profile")}</button><button class="plain" id="how">${L("Cómo funciona","How it works")}</button></div>
+        <button class="linkbtn loginlink" id="loginLink">${L("¿Ya tienes cuenta? Entra","Already have an account? Sign in")}</button>
         <small class="hero-note">${L("Gratis · Solo mayores de 25 años","Free · Over 25s only")}</small>
       </div>
       <div class="hero-video">
@@ -1213,40 +1247,58 @@ function landing(){
   startFlow($(".privacy .flowcard"));
   const v = $("#heroVid"); if (v){ const show = () => { $("#vph").hidden = true; v.classList.add("ready"); };
     if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
-  const go = () => { altaStep = 1; alta(); window.scrollTo(0,0); };
-  $("#start").onclick = go; $("#start2").onclick = go; $("#how").onclick = showFlow;
+  const go = mode => { authMode = mode; altaStep = 1; alta(); window.scrollTo(0,0); };
+  $("#start").onclick = () => go("signup"); $("#start2").onclick = () => go("signup"); $("#loginLink").onclick = () => go("login"); $("#how").onclick = showFlow;
 }
 function alta(){
   document.body.classList.toggle("wide", altaStep === 0);
+  const tl = $("#topLogin"); if (tl) tl.hidden = altaStep !== 0;
   if (altaStep === 0) return landing();
   if (altaStep === 1){
+    const login = authMode === "login";
     $("#view").innerHTML = `<div class="welcome">
       <button class="back" id="toLand" style="justify-self:start">← ${L("Volver","Back")}</button>
-      <h2>${L("Entra en Remitee","Join Remitee")}</h2>
-      <p class="sub">${L("Usamos tu cuenta de Google solo para verificar que eres una persona real.","We only use your Google account to verify that you're a real person.")}</p>
-      <ul class="perks"><li>${L("Tu dirección nunca se comparte","Your address is never shared")}</li><li>${L("Foto y biografía completa solo tras el match","Photo and full bio only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Solo para mayores de 25 años","Over 25s only")}</li></ul>
-      <button class="google" id="g">${L("Continuar con Google","Continue with Google")}</button>
-      <div class="gsim" id="gsim" hidden>
-        <p class="note" style="margin:0 0 10px;text-align:left">${L("En la versión real aquí se abre el inicio de sesión de Google. En el prototipo, escribe un email para simularlo.","In the real version, Google sign-in opens here. In the prototype, type an email to simulate it.")}</p>
-        <div class="field"><label for="f-email">${L("Email de tu cuenta de Google","Your Google account email")}</label><input id="f-email" type="email" placeholder="${L("nombre@gmail.com","name@gmail.com")}"></div>
-        <button id="gok" style="width:100%;margin-top:10px">${L("Verificar y continuar","Verify and continue")}</button>
-      </div>
+      <h2>${login ? L("Entra en Remitee","Sign in to Remitee") : L("Crea tu cuenta","Create your account")}</h2>
+      <div class="seg" role="tablist"><button role="tab" class="${login?"":"on"}" data-mode="signup">${L("Crear cuenta","Create account")}</button><button role="tab" class="${login?"on":""}" data-mode="login">${L("Ya tengo cuenta","I have an account")}</button></div>
+      ${login ? "" : `<ul class="perks"><li>${L("Tu dirección nunca se comparte","Your address is never shared")}</li><li>${L("Foto y biografía completa solo tras el match","Photo and full bio only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Solo para mayores de 25 años","Over 25s only")}</li></ul>`}
+      <button class="google" id="g"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.5z"/><path fill="#34A853" d="M12 23.5c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.4 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3A11.5 11.5 0 0 0 12 23.5z"/><path fill="#FBBC05" d="M5.6 14.2a6.9 6.9 0 0 1 0-4.4v-3H1.8a11.5 11.5 0 0 0 0 10.4z"/><path fill="#EA4335" d="M12 5c1.7 0 3.2.6 4.4 1.7l3.3-3.3A11.5 11.5 0 0 0 1.8 6.8l3.8 3C6.5 7 9 5 12 5z"/></svg>${L("Continuar con Google","Continue with Google")}</button>
+      <div class="or"><span>${L("o con tu email","or with your email")}</span></div>
+      <form class="emailform" id="ef" novalidate>
+        <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" autocomplete="email" placeholder="${L("nombre@correo.com","name@email.com")}"></div>
+        <div class="field"><label for="f-pass">${L("Contraseña","Password")}</label><input id="f-pass" type="password" autocomplete="${login?"current-password":"new-password"}" placeholder="${login?"":L("Mínimo 8 caracteres","At least 8 characters")}"></div>
+        <button type="submit" id="eok">${login ? L("Entrar","Sign in") : L("Crear cuenta con email","Create account with email")}</button>
+        ${login ? `<button type="button" class="linkbtn" id="forgot" style="justify-self:center">${L("He olvidado mi contraseña","I forgot my password")}</button>` : ""}
+      </form>
+      ${FB ? "" : `<p class="note" style="margin:0">${L("Prototipo: aquí el acceso se simula. En la web publicada es real.","Prototype: sign-in is simulated here. On the published site it's real.")}</p>`}
       <p class="note">${L("Tu email no aparece en tu perfil.","Your email doesn't appear on your profile.")}</p></div>`;
     $("#toLand").onclick = () => { altaStep = 0; alta(); };
+    document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { authMode = b.dataset.mode; alta(); });
+    // Tras entrar: si ya tiene perfil, a Descubrir; si no, al tutorial
+    const after = had => {
+      if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Hola de nuevo, ${me.alias}`,`Welcome back, ${me.alias}`)); }
+      else { altaStep = 2; alta(); }
+    };
+    const busy = (btn, on, label) => { btn.disabled = on; if (label) btn.textContent = label; };
     $("#g").onclick = () => {
-      if (FB){
-        $("#g").disabled = true; $("#g").textContent = L("Conectando con Google…","Connecting to Google…");
-        googleLogin().then(had => {
-          if (had){ altaStep = 0; document.body.classList.remove("wide"); location.hash = "#descubrir"; route(); toast(L(`Hola de nuevo, ${me.alias}`,`Welcome back, ${me.alias}`)); }
-          else { altaStep = 2; alta(); }
-        }).catch(e => { $("#g").disabled = false; $("#g").textContent = L("Continuar con Google","Continue with Google");
-          toast(e && e.code === "auth/popup-closed-by-user" ? L("Has cerrado la ventana de Google","You closed the Google window") : L("No se ha podido iniciar sesión con Google. Inténtalo de nuevo.","Couldn't sign in with Google. Please try again.")); });
-        return;
-      }
-      $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
-    $("#gok").onclick = () => { const v = $("#f-email").value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast(L("Escribe un email válido, por ejemplo nombre@gmail.com","Enter a valid email, for example name@gmail.com")); return; }
-      me.email = v; me.verified = true; altaStep = 2; alta(); };
+      if (!FB){ me.email = "tu.cuenta@gmail.com"; me.verified = true; return after(false); }
+      busy($("#g"), true);
+      googleLogin().then(after).catch(e => { busy($("#g"), false); toast(authError(e)); });
+    };
+    $("#ef").onsubmit = e => { e.preventDefault();
+      const email = $("#f-email").value.trim(), pass = $("#f-pass").value;
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast(L("Escribe un email válido","Enter a valid email"));
+      if (!login && pass.length < 8) return toast(L("La contraseña necesita al menos 8 caracteres","Your password needs at least 8 characters"));
+      if (login && !pass) return toast(L("Escribe tu contraseña","Enter your password"));
+      if (!FB){ me.email = email; me.verified = true; return after(false); }
+      const btn = $("#eok"), txt = btn.textContent; busy(btn, true, L("Un momento…","One moment…"));
+      emailAuth(email, pass, login).then(after).catch(err => { busy(btn, false, txt); toast(authError(err)); });
+    };
+    const fg = $("#forgot"); if (fg) fg.onclick = () => {
+      const email = $("#f-email").value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast(L("Escribe primero tu email arriba","Type your email above first"));
+      if (!FB) return toast(L("Prototipo: en la web publicada te llegaría un email para cambiarla","Prototype: on the published site you'd get a reset email"));
+      FB.auth.sendPasswordResetEmail(email).then(() => toast(L(`Te hemos enviado un email a ${email} para cambiar la contraseña`,`We've sent a reset link to ${email}`))).catch(err => toast(authError(err)));
+    };
     return;
   }
   wizard();
@@ -1360,7 +1412,7 @@ function como(){
 
 const views = {descubrir, cartas, perfil, como};
 function route(){
-  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#bellBtn").hidden = onb;
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#bellBtn").hidden = onb; $("#topLogin").hidden = !onb || altaStep !== 0;
   if (onb && location.hash === "#como"){ document.body.classList.remove("wide"); como(); window.scrollTo(0,0); return; }
   if (onb){ alta(); window.scrollTo(0,0); return; }
   document.body.classList.remove("wide");
@@ -1376,7 +1428,8 @@ window.addEventListener("hashchange", route);
 function applyStatic(){
   document.documentElement.lang = lang;
   $(".slogan").textContent = L("Mensajería a fuego lento","Slow-cooked mail");
-  $(".demo").textContent = L("Prototipo","Prototype");
+  $(".demo").textContent = L("Prototipo","Prototype"); $(".demo").hidden = !!FB;
+  $("#topLogin").textContent = L("Entrar","Sign in");
   $("#helpBtn").innerHTML = `<span class="hl">${L("Cómo funciona","How it works")}</span><span class="hq" aria-hidden="true">?</span>`;
   $("#helpBtn").setAttribute("aria-label", L("Cómo funciona","How it works"));
   $("#bellBtn").setAttribute("aria-label", L("Avisos","Notifications"));
@@ -1399,6 +1452,7 @@ let saved = null; try { saved = localStorage.getItem("remitee-theme"); } catch(e
 setTheme(saved === "dark" ? "dark" : "light");
 applyStatic();
 $("#helpBtn").onclick = showFlow;
+$("#topLogin").onclick = () => { authMode = "login"; altaStep = 1; alta(); $("#topLogin").hidden = true; window.scrollTo(0,0); };
 $("#bellBtn").onclick = showNotifs;
 $("#langBtn").onclick = () => setLang(lang === "en" ? "es" : "en");
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
