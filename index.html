@@ -167,6 +167,42 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .verified b{display:block;font-size:.92rem;color:var(--ok)}
 .verified small{color:var(--muted);font-size:.8rem}
 .vdot{width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.wmodal{text-align:left;gap:12px;max-height:calc(100% - 20px);overflow:auto}
+.wtop{display:grid;gap:8px}
+.wstep{font-size:.75rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.wbar{height:5px;background:var(--line);border-radius:999px;overflow:hidden}
+.wbar span{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .3s}
+.wdesc{margin:0;color:var(--muted);font-size:.92rem}
+.wfields{display:grid;gap:10px}
+.wfields .field{background:var(--bg)}
+.wbtns{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.wphoto{display:grid;justify-items:center;gap:12px;padding:6px 0}
+.filebtn{font-weight:600;font-size:.9rem;color:var(--accent);background:var(--accent-soft);padding:9px 16px;border-radius:999px;cursor:pointer}
+.wfields .switch{background:var(--bg)}
+.sel{font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0}
+.lockline{font-size:.85rem;color:var(--ink);background:var(--ok-soft);border-radius:14px;padding:10px 12px}
+.wbg{opacity:.5}
+.flow{display:grid;gap:8px}
+.flow svg{width:100%;height:auto;display:block}
+.fl-line{stroke:var(--line);stroke-width:2;stroke-dasharray:4 5;fill:none}
+.fl-arc{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 5;fill:none;opacity:0;transition:opacity .4s}
+.fl-arc.show{opacity:.7}
+.fl-me{fill:var(--accent)} .fl-them{fill:#ffe3d6}
+.fl-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:#2a2e45}
+.fl-node:first-of-type .fl-init{fill:#fff}
+.fl-off{fill:var(--accent-soft)} .fl-house{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
+#fl-office{transition:opacity .4s} #fl-office.dim{opacity:.3}
+.fl-lbl{font-size:11px;text-anchor:middle;fill:var(--muted);font-family:var(--body)}
+.fl-envr{fill:var(--surface);stroke:var(--ink);stroke-width:1.6} .fl-envf{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
+.fl-txt{margin:0;min-height:3.1em;font-size:.92rem;text-align:center;color:var(--ink)}
+.fl-dots{display:flex;justify-content:center;gap:6px}
+.fl-dots span{width:6px;height:6px;border-radius:50%;background:var(--line);transition:background .3s,width .3s}
+.fl-dots span.on{background:var(--accent);width:18px;border-radius:999px}
+.flowcard{background:var(--surface);border-radius:var(--r);padding:14px 14px 12px}
+.linkbtn{background:none;color:var(--accent);padding:4px 0 0;font-size:.85rem;justify-self:start}
+.share{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border-radius:var(--r);padding:14px 16px;margin-top:14px}
+.share b{font-weight:600;font-size:.95rem}
+.share small{display:block;color:var(--muted);font-size:.8rem}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -357,15 +393,23 @@ function ventana(c){
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
       <p>${esc(c.p.long || c.p.bio)}</p><small>${esc(c.p.edad)} años · Escribe desde ${esc(c.p.zona)}</small></details>
     ${deadlineBox(c)}
-    ${c.closed?"":`<div class="sendto"><span class="lbl">Escribe en el sobre</span><span class="addr">${esc(CENTRAL)}</span><span>Para: <span class="code">${esc(c.p.code)}</span></span></div>`}
+    ${c.closed?"":(c.meReveal&&c.themReveal
+      ? `<div class="sendto"><span class="lbl">Direcciones compartidas</span><span class="addr">Ya podéis escribiros directamente.</span><span class="addr"><b>${esc(c.p.alias)}:</b> dirección de ejemplo, ${esc(c.p.zona)}</span></div>`
+      : `<div class="sendto"><span class="lbl">Escribe en el sobre</span><span class="addr">${esc(CENTRAL)}</span><span>Para: <span class="code">${esc(c.p.code)}</span></span><button class="linkbtn" id="howflow">¿Cómo viajan las cartas?</button></div>`)}
     <div class="timeline">${c.letters.length ? c.letters.map(l=>{ const arrived = now >= l.arrive;
       return `<div class="letter ${l.mine?"mine":""}"><div class="ic">✉︎</div><div><div class="t">${l.mine?"Tu carta":`Carta de ${esc(c.p.alias)}`}</div><div class="d">Enviada el ${fmt(l.at)}</div></div>
       ${l.mine?`<span class="status ${arrived?"ok":"way"}">${arrived?"Entregada":"En camino"}</span>`:`<span class="status ${arrived?"ok":"way"}">${arrived?"Recibida":"En camino"}</span>`}</div>`; }).join("")
       : `<div class="empty" style="padding:24px">Todavía no hay cartas.<br>Escribe la primera a mano y envíala a la dirección de arriba.</div>`}</div>
     ${c.closed?"":`<button class="bigbtn" id="sent" ${canSend?"":"disabled"}>${canSend?(c.letters.length?"Ya he enviado mi respuesta":"Ya he enviado la primera carta"):"Carta enviada ✓"}</button>
     <p class="note">${canSend?"Márcalo en cuanto eches la carta al buzón. Así se para tu plazo.":`Te avisaremos cuando ${esc(c.p.alias)} te responda.`}</p>`}
+    ${c.closed||!c.letters.length?"":`<div class="share"><div><b>Compartir direcciones</b><small>${c.meReveal&&c.themReveal?"Hecho. Las cartas ya no pasan por nuestra oficina.":c.meReveal?`Esperando a que ${esc(c.p.alias)} también acepte.`:"Solo se comparten si los dos aceptáis. Nadie sabe si el otro ha dicho que no."}</small></div>
+      ${c.meReveal&&c.themReveal?"":`<button class="${c.meReveal?"plain":"soft"} sm" id="share">${c.meReveal?"Retirar":"Aceptar"}</button>`}</div>`}
     ${sim()}`;
   $("#back").onclick = () => { openId = null; cartas(); };
+  const hf = $("#howflow"); if (hf) hf.onclick = showFlow;
+  const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
+    if (c.meReveal && c.p.id in replyAfter && replyAfter[c.p.id] != null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(`${c.p.alias} también ha aceptado compartir direcciones`); if (openId===c.p.id) ventana(c); } }, 1800);
+    if (!c.meReveal) c.themReveal = false; ventana(c); };
   bindSim();
   const btn = $("#sent"); if (!btn) return;
   btn.onclick = () => {
@@ -420,6 +464,57 @@ function perfil(){
   $("#logout").onclick = () => { try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
 }
 
+
+/* ---- Animación: cómo viajan las cartas ---- */
+const FLOW = [
+  {from:0,to:1,txt:"Escribes tu carta y la envías a nuestra oficina, con el código de la otra persona."},
+  {from:1,to:2,txt:"En la oficina la metemos en un sobre nuevo y la enviamos a su dirección."},
+  {from:2,to:1,txt:"Su respuesta hace el mismo camino: primero llega a nuestra oficina…"},
+  {from:1,to:0,txt:"…y de ahí, a tu buzón. Ninguno conoce la dirección del otro."},
+  {from:0,to:2,direct:true,txt:"Cuando los dos decidáis compartir direcciones, ya podéis escribiros directamente."}
+];
+function flowHTML(){
+  return `<div class="flow" aria-label="Cómo viajan las cartas">
+  <svg viewBox="0 0 340 150" role="img" aria-hidden="true">
+    <path class="fl-line" id="fl-l1" d="M58 92 H152"/><path class="fl-line" id="fl-l2" d="M188 92 H282"/>
+    <path class="fl-arc" id="fl-arc" d="M40 70 Q170 -6 300 70"/>
+    <g class="fl-node" transform="translate(40 92)"><circle r="22" class="fl-me"/><text y="5" class="fl-init">Tú</text></g>
+    <g class="fl-node" id="fl-office" transform="translate(170 92)"><rect x="-22" y="-22" width="44" height="44" rx="10" class="fl-off"/>
+      <path d="M-11 9 V-3 L0 -11 L11 -3 V9 Z M-4 9 V1 H4 V9" class="fl-house"/></g>
+    <g class="fl-node" transform="translate(300 92)"><circle r="22" class="fl-them"/><text y="5" class="fl-init">L</text></g>
+    <text x="40" y="134" class="fl-lbl">Tú</text><text x="170" y="134" class="fl-lbl">Oficina Remitee</text><text x="300" y="134" class="fl-lbl">Lince</text>
+    <g id="fl-env"><rect x="-13" y="-9" width="26" height="18" rx="3" class="fl-envr"/><path d="M-12 -8 L0 1 L12 -8" class="fl-envf"/></g>
+  </svg>
+  <p class="fl-txt" id="fl-txt" aria-live="polite"></p>
+  <div class="fl-dots">${FLOW.map((_,i)=>`<span data-i="${i}"></span>`).join("")}</div></div>`;
+}
+let flowRaf = 0;
+function startFlow(root){
+  cancelAnimationFrame(flowRaf);
+  const X = [40,170,300], env = root.querySelector("#fl-env"), txt = root.querySelector("#fl-txt");
+  const dots = [...root.querySelectorAll(".fl-dots span")], office = root.querySelector("#fl-office"), arc = root.querySelector("#fl-arc");
+  const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const MOVE = 1800, HOLD = 1300, PH = MOVE + HOLD; let t0 = performance.now(), last = -1;
+  const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+  function frame(now){
+    if (!root.isConnected) return;
+    const el = now - t0, i = Math.floor(el / PH) % FLOW.length, f = FLOW[i];
+    const k = reduce ? 1 : ease(Math.min(1, (el % PH) / MOVE));
+    const x = X[f.from] + (X[f.to]-X[f.from])*k, y = f.direct ? 70 - Math.sin(Math.PI*k)*42 : 70;
+    env.setAttribute("transform", `translate(${x} ${y})`);
+    if (i !== last){ last = i; txt.textContent = f.txt; dots.forEach((d,j)=>d.classList.toggle("on", j===i));
+      office.classList.toggle("dim", !!f.direct); arc.classList.toggle("show", !!f.direct); }
+    flowRaf = requestAnimationFrame(frame);
+  }
+  flowRaf = requestAnimationFrame(frame);
+}
+function showFlow(){
+  const o = document.createElement("div"); o.className = "overlay";
+  o.innerHTML = `<div class="modal"><h3 style="font-size:1.25rem">¿Cómo viajan las cartas?</h3>${flowHTML()}<button id="fl-ok">Entendido</button></div>`;
+  document.body.appendChild(o); startFlow(o);
+  o.querySelector("#fl-ok").onclick = () => o.remove();
+}
+
 /* ---- Alta: Google (simulado) + creación de perfil ---- */
 let altaStep = 1;
 function alta(){
@@ -427,6 +522,7 @@ function alta(){
     $("#view").innerHTML = `<div class="welcome">
       <h2>Cartas de verdad con personas nuevas</h2>
       <p class="sub">Haz match por intereses y escribíos por correo postal. Sin chat, sin prisas.</p>
+      <div class="flowcard">${flowHTML()}</div>
       <ul class="perks"><li>Tu dirección nunca se comparte</li><li>Foto y biografía completa solo tras el match</li><li>Cuentas verificadas: nada de perfiles falsos</li></ul>
       <button class="google" id="g">Continuar con Google</button>
       <div class="gsim" id="gsim" hidden>
@@ -435,19 +531,67 @@ function alta(){
         <button id="gok" style="width:100%;margin-top:10px">Verificar y continuar</button>
       </div>
       <p class="note">Usamos tu cuenta solo para verificar tu identidad. Tu email no aparece en tu perfil.</p></div>`;
+    startFlow($(".flowcard"));
     $("#g").onclick = () => { $("#gsim").hidden = false; $("#g").hidden = true; $("#f-email").focus(); };
     $("#gok").onclick = () => { const v = $("#f-email").value.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast("Escribe un email válido, por ejemplo nombre@gmail.com"); return; }
       me.email = v; me.verified = true; altaStep = 2; alta(); };
     return;
   }
-  $("#view").innerHTML = `<div class="verified"><span class="vdot">✓</span><div><b>Cuenta verificada</b><small>${esc(me.email)}</small></div></div>
-    <h2>Crea tu perfil</h2><p class="sub">Los campos con * son obligatorios. Podrás cambiarlos cuando quieras.</p>
-    <form class="form" id="af">${profileFields()}<button type="submit">Crear perfil</button></form>`;
-  bindProfile(alta);
-  $("#af").onsubmit = e => { e.preventDefault(); readForm();
-    if (me.intereses.split(",").filter(Boolean).length < 3) { toast("Añade 3 intereses separados por comas"); return; }
-    me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 1; location.hash = "#descubrir"; route(); toast(`Perfil creado. Tu código es ${me.code}`); };
+  wizard();
+}
+
+/* ---- Tutorial de alta: un pop-up por paso ---- */
+let wStep = 0;
+const W = [
+  {t:"Pon tu alias", d:"Es el nombre con el que te conocerán. No hace falta que sea el real.",
+   f:()=>`<div class="field"><label for="w-a">Alias</label><input id="w-a" maxlength="24" value="${esc(me.alias)}" placeholder="Por ejemplo, Tinta Azul"></div>
+     <div class="field"><label for="w-e">Edad</label><select id="w-e" class="sel">${RANGES.map(r=>`<option ${r===me.edad?"selected":""}>${r}</option>`).join("")}</select><small>Se muestra como rango.</small></div>
+     <div class="field"><label for="w-z">Escribes desde</label><input id="w-z" value="${esc(me.zona)}" placeholder="Región o provincia"></div>
+     <div class="field"><label for="w-pr">Profesión (opcional)</label><input id="w-pr" value="${esc(me.prof)}" placeholder="A qué te dedicas"></div>`,
+   save:()=>{ me.alias=$("#w-a").value.trim(); me.edad=$("#w-e").value; me.zona=$("#w-z").value.trim(); me.prof=$("#w-pr").value.trim();
+     return !me.alias ? "Escribe un alias para continuar" : !me.zona ? "Indica desde dónde escribes" : ""; }},
+  {t:"Añade tu foto si quieres", d:"Nadie la verá antes del match. También puedes añadirla más adelante desde tu perfil.", skip:"Más adelante",
+   f:()=>`<div class="wphoto">${myPhoto("big")}<label class="filebtn" for="w-p">${me.foto?"Cambiar foto":"Elegir foto"}</label><input type="file" id="w-p" accept="image/*" hidden></div>
+     <label class="switch" for="w-s"><span><b>Mostrar mi foto tras el match</b><small>Si lo desactivas, solo verán tu inicial.</small></span><input type="checkbox" id="w-s" ${me.showFoto?"checked":""}></label>`,
+   bind:()=>{ $("#w-p").onchange = e => { const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ me.foto=r.result; wizard(); }; r.readAsDataURL(f); }; },
+   save:()=>{ me.showFoto=$("#w-s").checked; return ""; }},
+  {t:"Una breve biografía", d:"Para que las personas sepan cómo eres. Es lo primero que leerán en Descubrir, junto con tus 3 intereses.",
+   f:()=>`<div class="field"><label for="w-b">Biografía breve</label><textarea id="w-b" rows="3" maxlength="200" placeholder="Escribo mejor de lo que hablo...">${esc(me.bio)}</textarea><small><span id="w-bc">${me.bio.length}</span>/200</small></div>
+     <div class="field"><label for="w-i">3 intereses</label><input id="w-i" value="${esc(me.intereses)}" placeholder="cine, montaña, poesía"><small>Separados por comas. Sirven para hacer match.</small></div>`,
+   bind:()=>{ $("#w-b").oninput = e => $("#w-bc").textContent = e.target.value.length; },
+   save:()=>{ me.bio=$("#w-b").value.trim(); me.intereses=$("#w-i").value.split(",").map(x=>x.trim()).filter(Boolean).slice(0,3).join(", ");
+     return !me.bio ? "Escribe una biografía breve" : me.intereses.split(",").filter(Boolean).length<3 ? "Añade 3 intereses separados por comas" : ""; }},
+  {t:"Una biografía extensa", d:"Solo la leerán las personas con las que hagas match. Cuéntate con calma: qué haces, qué te gusta, qué buscas.",
+   f:()=>`<div class="field"><label for="w-l">Biografía extensa</label><textarea id="w-l" rows="6" maxlength="800" placeholder="Cuéntate con más calma...">${esc(me.long)}</textarea><small><span id="w-lc">${me.long.length}</span>/800</small></div>`,
+   bind:()=>{ $("#w-l").oninput = e => $("#w-lc").textContent = e.target.value.length; },
+   save:()=>{ me.long=$("#w-l").value.trim(); return ""; }},
+  {t:"Tu dirección", d:"Es imprescindible. Nadie tiene acceso a ella: nosotros la usamos solo para reenviarte las cartas que te escriban.",
+   f:()=>`<div class="field"><label for="w-d">Dirección postal</label><textarea id="w-d" rows="3" placeholder="Calle, número, piso&#10;Código postal y ciudad">${esc(me.dir||"")}</textarea></div>
+     <div class="lockline">🔒 Las otras personas solo verán tu código de buzón, nunca tu dirección.</div>`,
+   save:()=>{ me.dir=$("#w-d").value.trim(); return me.dir.length<8 ? "La dirección es imprescindible para recibir cartas" : ""; }}
+];
+function wizard(){
+  const st = W[wStep], last = wStep === W.length-1;
+  $("#view").innerHTML = `<div class="wbg"><div class="verified"><span class="vdot">✓</span><div><b>Cuenta verificada</b><small>${esc(me.email)}</small></div></div><h2>Crea tu perfil</h2><p class="sub">Te guiamos en 5 pasos.</p></div>`;
+  document.querySelector(".overlay.wiz")?.remove();
+  const o = document.createElement("div"); o.className = "overlay wiz";
+  o.innerHTML = `<div class="modal wmodal" role="dialog" aria-labelledby="wt">
+    <div class="wtop"><span class="wstep">Paso ${wStep+1} de ${W.length}</span><div class="wbar"><span style="width:${(wStep+1)/W.length*100}%"></span></div></div>
+    <h3 id="wt">${st.t}</h3><p class="wdesc">${st.d}</p>
+    <div class="wfields">${st.f()}</div>
+    <div class="wbtns">${wStep>0?`<button class="plain" id="wb">Atrás</button>`:"<span></span>"}
+      <span class="row">${st.skip?`<button class="soft" id="wsk">${st.skip}</button>`:""}<button id="wn">${last?"Crear perfil":"Siguiente"}</button></span></div></div>`;
+  document.body.appendChild(o);
+  st.bind && st.bind();
+  const first = o.querySelector("input:not([type=file]):not([type=checkbox]),textarea"); if (first) first.focus();
+  const go = n => { const err = st.save(); if (n>0 && err){ toast(err); return; } wStep += n; wizard(); };
+  o.querySelector("#wn").onclick = () => { const err = st.save(); if (err){ toast(err); return; }
+    if (!last){ wStep++; wizard(); return; }
+    o.remove(); me.created = true; me.code = me.code || newCode(); saveMe(); altaStep = 1; wStep = 0; location.hash = "#descubrir"; route(); toast(`Perfil creado. Tu código de buzón es ${me.code}`); };
+  const sk = o.querySelector("#wsk"); if (sk) sk.onclick = () => { st.save(); wStep++; wizard(); };
+  const bk = o.querySelector("#wb"); if (bk) bk.onclick = () => { st.save(); wStep--; wizard(); };
+  o.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.tagName==="INPUT") { e.preventDefault(); o.querySelector("#wn").click(); } });
 }
 
 const views = {descubrir, cartas, perfil};
