@@ -282,6 +282,18 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 @keyframes ppGo{0%{transform:translateX(0)}100%{transform:translateX(118px)}}
 .pp-pop,.pp-pop2,.pp-rise,.pp-go,.pp-drop,.pp-drop2,.pp-in,.pp-in2{transform-box:fill-box;transform-origin:center}
 @media (prefers-reduced-motion:reduce){.sc.on *{animation:none!important}}
+.tbad{color:var(--bad);background:var(--bad-soft);padding:1px 9px;border-radius:999px;font-weight:600}
+.bell{position:relative}
+.nbadge{position:absolute;top:-3px;right:-3px;background:var(--bad);color:#fff;font-size:.6rem;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
+.npanel{text-align:left;max-height:calc(100% - 20px);overflow:auto}
+.nlist{display:grid;gap:8px}
+.nitem{background:var(--bg);border-radius:14px;padding:10px 12px;display:grid;gap:4px}
+.nitem.unread{background:var(--accent-soft)}
+.ntext{font-size:.88rem}
+.nmeta{display:flex;gap:6px;align-items:center;font-size:.74rem;color:var(--muted)}
+.nch{background:var(--surface);border:1px solid var(--line);padding:0 7px;border-radius:999px;font-weight:500}
+.sechead{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+@media (max-width:440px){.demo{display:none}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -289,7 +301,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo">remitee<span>.</span></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo">remitee<span>.</span></h1><div class="topr"><span class="demo">Prototipo</span><button class="helpbtn" id="helpBtn" hidden>Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
@@ -331,12 +343,13 @@ const people = [
 
 // g: cómo se presenta (f/m/n). corr: correspondencias completadas. onTime: responde siempre a tiempo.
 // likesLater: te elegirá N días después de que tú le elijas (así completa el match y escribe primero).
-const EXTRA = {1:{g:"f",corr:8,onTime:true},2:{g:"f",corr:0,likesLater:1},3:{g:"m",corr:3},4:{g:"f",corr:14,onTime:true},5:{g:"f",corr:21,onTime:true},
-  6:{g:"m",corr:5,onTime:true,likesLater:2},7:{g:"f",corr:0},8:{g:"m",corr:12,onTime:true},9:{g:"n",corr:2},10:{g:"m",corr:0,likesLater:1},
+const EXTRA = {1:{g:"f",corr:8,onTime:true},2:{g:"f",corr:0,likesLater:1},3:{g:"m",corr:3,ghosts:3},4:{g:"f",corr:14,onTime:true},5:{g:"f",corr:21,onTime:true},
+  6:{g:"m",corr:5,onTime:true,likesLater:2},7:{g:"f",corr:0},8:{g:"m",corr:12,onTime:true},9:{g:"n",corr:2,ghosts:2},10:{g:"m",corr:0,likesLater:1},
   11:{g:"f",corr:9,onTime:true},12:{g:"f",corr:0},13:{g:"m",corr:30,onTime:true},14:{g:"f",corr:4},15:{g:"m",corr:7,onTime:true}};
 people.forEach(p => Object.assign(p, EXTRA[p.id]||{g:"n",corr:0}));
 const NEW_LABEL = {f:"Recién llegada", m:"Recién llegado", n:"Nueva en Remitee"};
 function trust(p){
+  if ((p.ghosts||0) >= 2) return `<span class="tbad">Nunca contesta</span><span class="tcount">${p.ghosts} matches perdidos</span>`;
   if (!p.corr) return `<span class="tnew">${NEW_LABEL[p.g]||NEW_LABEL.n}</span>`;
   return `<span class="tcount">✉︎ ${p.corr} ${p.corr===1?"correspondencia":"correspondencias"}</span>${p.onTime?`<span class="tok">Responde a tiempo</span>`:""}`;
 }
@@ -362,6 +375,21 @@ const av = (p, cls="") => `<div class="avatar ${cls}" style="background:${tint(p
 const meAv = `<div class="avatar" style="background:var(--accent);color:#fff">${esc((me.alias||"?")[0])}</div>`;
 const fmt = d => d.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
 function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200)}
+const notifs = [];
+function notify(text){
+  const ch = []; if (me.nEmail !== false) ch.push("Email"); if (me.nApp !== false) ch.push("App");
+  notifs.unshift({at:new Date(+now), text, ch, read:false}); toast(text); nBadge();
+}
+function nBadge(){ const n = notifs.filter(x=>!x.read).length, b = $("#nBadge"); if (!b) return; b.textContent = n; b.hidden = !n; }
+function showNotifs(){
+  const o = document.createElement("div"); o.className = "overlay";
+  o.innerHTML = `<div class="modal npanel"><h3 style="font-size:1.25rem">Avisos</h3>
+    <p class="note" style="margin:0">${me.nEmail!==false?`Te los enviamos también a <b>${esc(me.email||"tu email")}</b>.`:"Los avisos por email están desactivados."}</p>
+    <div class="nlist">${notifs.length?notifs.map(n=>`<div class="nitem ${n.read?"":"unread"}"><div class="ntext">${esc(n.text)}</div><div class="nmeta">${fmt(n.at)}${n.ch.map(c=>`<span class="nch">${c}</span>`).join("")}</div></div>`).join(""):`<div class="empty" style="padding:20px">Sin avisos todavía.</div>`}</div>
+    <button class="plain" id="n-ok">Cerrar</button></div>`;
+  document.body.appendChild(o); notifs.forEach(n=>n.read=true); nBadge();
+  o.querySelector("#n-ok").onclick = () => o.remove();
+}
 function badge(){const n=chats.filter(c=>c.unread).length;const b=$("#badge");b.textContent=n;b.hidden=!n}
 const pending = () => people.filter(p => !p.seen);
 
@@ -395,6 +423,7 @@ function tick(){
     if (p.myYes && p.matchAt && !p.matched && now >= p.matchAt){
       p.matched = true;
       chats.unshift({p, letters:[], unread:true, turn:"them", firstByThem:true, deadline:addD(p.matchAt, FIRST_DAYS), replyAt:addD(p.matchAt, 2), closed:null});
+      notify(`Match con ${p.alias}. Completó el match, así que te escribirá primero.`);
       matchModal(p, false);
     }
   });
@@ -403,16 +432,26 @@ function tick(){
     if (c.turn==="them" && c.replyAt && now >= c.replyAt){
       const l = newLetter(false, c.replyAt); c.letters.push(l);
       c.turn = "me"; c.deadline = addD(l.due.delivered, 2 + REPLY_DAYS); c.replyAt = null; c.unread = true;
-      toast(`${c.p.alias} te ha enviado una carta. Va de camino a nuestra oficina`);
+      notify(`${c.p.alias} te ha escrito una carta. Va de camino a nuestra oficina.`);
     }
+    checkPhases(c);
     if (now > c.deadline){
-      if (c.turn==="me"){ c.closed="me"; me.suspendedUntil = addD(now, SUSPEND_DAYS);
-        toast(`No respondiste a tiempo a ${c.p.alias}. Cuenta suspendida ${SUSPEND_DAYS} días`); }
-      else { c.closed="them"; c.unread = true;
-        toast(`${c.p.alias} no escribió a tiempo. Su cuenta queda suspendida y la correspondencia se cierra`); }
+      if (c.turn==="me"){ c.closed="me"; me.suspendedUntil = addD(now, SUSPEND_DAYS); me.ghosts = (me.ghosts||0) + 1; saveMe();
+        notify(`No respondiste a tiempo a ${c.p.alias}. La correspondencia se cierra y tu cuenta queda suspendida ${SUSPEND_DAYS} días.`); }
+      else { c.closed="them"; c.unread = true; c.p.ghosts = (c.p.ghosts||0) + 1;
+        notify(`${c.p.alias} no escribió a tiempo. La correspondencia se cierra y su cuenta queda suspendida.`); }
     }
   });
   badge();
+}
+// Avisa de cada cambio de fase de una carta
+const PHASE_MSG = {
+  mine: [null, n=>`Tu carta está en nuestra oficina. Se la enviaremos a ${n}.`, n=>`Hemos enviado tu carta a ${n}.`, n=>`Tu carta ha llegado a ${n}.`],
+  theirs: [null, n=>`La carta de ${n} está en nuestra oficina. Te la enviaremos en breve.`, n=>`Te hemos enviado la carta de ${n}.`, n=>`La carta de ${n} debería estar ya en tu buzón.`]
+};
+function checkPhases(c){
+  c.letters.forEach(l => { const k = stage(l); if (l.ls == null) l.ls = 0;
+    while (l.ls < k){ l.ls++; notify(PHASE_MSG[l.mine?"mine":"theirs"][l.ls](c.p.alias)); } });
 }
 function sim(){
   return `<div class="sim"><span><b>Simulación</b> · Hoy es ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">+1 día</button><button class="soft sm" data-days="7">+7 días</button></span></div>`;
@@ -546,7 +585,7 @@ function ventana(c){
     ${sim()}`;
   $("#back").onclick = () => { openId = null; cartas(); };
   const hf = $("#howflow"); if (hf) hf.onclick = showFlow;
-  document.querySelectorAll("[data-arrived]").forEach(b => b.onclick = () => { const l = c.letters[+b.dataset.arrived]; l.confirmedAt = now;
+  document.querySelectorAll("[data-arrived]").forEach(b => b.onclick = () => { const l = c.letters[+b.dataset.arrived]; l.confirmedAt = now; l.ls = 3;
     c.deadline = addD(now, REPLY_DAYS); toast(`Carta marcada como recibida. Tienes ${REPLY_DAYS} días para responder`); ventana(c); });
   const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
     if (c.meReveal && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(`${c.p.alias} también ha aceptado compartir direcciones`); if (openId===c.p.id) ventana(c); } }, 1800);
@@ -582,7 +621,7 @@ function sendModal(c){
       const l = newLetter(true, now); l.photo = pic; c.letters.push(l); c.turn = "them";
       c.deadline = addD(l.due.delivered, REPLY_DAYS);
       const ra = c.p.id in replyAfter ? replyAfter[c.p.id] : 5; c.replyAt = ra==null ? null : addD(l.due.delivered, ra);
-      o.remove(); toast("Carta enviada. Te avisaremos cuando llegue a nuestra oficina"); ventana(c);
+      l.ls = 0; o.remove(); notify(`Has enviado tu carta para ${c.p.alias}. Te avisaremos cuando llegue a nuestra oficina.`); ventana(c);
     };
   };
   document.body.appendChild(o); render();
@@ -675,12 +714,17 @@ function perfil(){
   $("#view").innerHTML = `<h2>Perfil</h2><p class="sub">Esto es lo que ven los demás. Tu email nunca se muestra.</p>
   <div class="verified"><span class="vdot">✓</span><div><b>Identidad verificada con Google</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div><div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div style="color:var(--muted);font-size:.84rem">Tu código: <b>${esc(me.code)}</b></div><div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${profileFields()}
+    <div class="sechead">Avisos cuando una carta cambia de fase</div>
+    <label class="switch" for="f-ne"><span><b>Por email</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
+    <label class="switch" for="f-na"><span><b>En la app</b><small>Notificaciones en el móvil</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
     <button type="submit">Guardar cambios</button>
     <button type="button" class="plain" id="logout">Cerrar sesión</button>
   </form>`;
   bindProfile(perfil);
+  $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
+  $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast("Perfil guardado"); perfil(); };
   $("#logout").onclick = () => { try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true}); location.hash=""; route(); };
 }
@@ -856,8 +900,10 @@ function como(){
     <p>Quien escribe primero tiene ${FIRST_DAYS} días tras el match. Cada vez que recibes una carta, tienes ${REPLY_DAYS} días para responder. Si alguien no cumple su plazo, la correspondencia se cierra y su cuenta queda suspendida ${SUSPEND_DAYS} días, sin poder hacer nuevos matches.</p>
     <h3>9. Cuánto cuesta</h3>
     <p>Usar Remitee es gratis. Cada carta lleva dos sellos que pones tú, como con cualquier carta: uno para que nos llegue y otro para reenviarla. Remitee Plus es opcional y te deja ver más de ${VIEW_LIMIT} perfiles al día.</p>
+    <h3>Avisos en cada paso</h3>
+    <p>Cada vez que una carta cambia de fase te avisamos por email y en la app: cuando la envías, cuando llega a nuestra oficina, cuando la reenviamos y cuando llega a su destino. También cuando alguien te escribe, cuando hay un match o cuando se acerca un plazo. Puedes elegir los canales en tu perfil.</p>
     <h3>10. Tu historial</h3>
-    <p>En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada.</p>
+    <p>En cada perfil se ve cuántas correspondencias ha tenido esa persona y si responde siempre a tiempo. Quien acaba de llegar aparece como recién llegado o recién llegada. Y quien ha perdido varios matches por no responder aparece marcado como «Nunca contesta».</p>
     <h3>11. Compartir direcciones</h3>
     <p>Cuando os conozcáis, podéis compartir vuestras direcciones para escribiros directamente. Solo ocurre si los dos aceptáis, y nadie sabe si el otro ha dicho que no.</p>
     <h3>Tu privacidad</h3>
@@ -869,7 +915,7 @@ function como(){
 
 const views = {descubrir, cartas, perfil, como};
 function route(){
-  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#helpBtn").hidden = onb;
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#helpBtn").hidden = onb; $("#bellBtn").hidden = onb;
   if (onb){ alta(); window.scrollTo(0,0); return; }
   const v = (location.hash || "#descubrir").slice(1), name = views[v] ? v : "descubrir";
   if (name !== "cartas") openId = null;
@@ -890,6 +936,7 @@ function setTheme(t){
 let saved = null; try { saved = localStorage.getItem("remitee-theme"); } catch(e) {}
 setTheme(saved === "dark" ? "dark" : "light");
 $("#helpBtn").onclick = showFlow;
+$("#bellBtn").onclick = showNotifs;
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
 route();
 </script>

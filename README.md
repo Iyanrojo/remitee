@@ -27,6 +27,9 @@ Prototipo de una app para poner en contacto a desconocidos que quieren escribirs
 - **Coste.** La app es gratis; cada persona pone sus dos sellos. Remitee Plus es opcional.
 - **Historial.** Cada perfil muestra cuántas correspondencias ha tenido y si responde a tiempo. Quien acaba de llegar aparece como recién llegado, recién llegada o nueva en Remitee.
 
+- **Nunca contesta.** Quien ha perdido 2 o más matches por no responder lo muestra en su perfil.
+- **Avisos.** Cada cambio de fase de una carta se notifica por email y en la app a las dos personas (por ejemplo: «Tu carta está en nuestra oficina. Se la enviaremos a Lince»). Los canales se eligen en el perfil.
+
 ## Qué se puede probar
 
 | Vista | Qué enseña |
