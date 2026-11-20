@@ -19,17 +19,17 @@ html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 /* Layout: una sola columna estrecha tipo app móvil, barra de pestañas fija abajo, mucho aire y un único acento suave. */
 :root{
   --bg:#f7f8fc; --surface:#ffffff; --ink:#22263a; --muted:#8a90a6; --line:#eceef5;
-  --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea;
+  --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9;
   --head:"Outfit", "Segoe UI", system-ui, sans-serif;
   --body:"Inter", system-ui, -apple-system, sans-serif;
   --r:20px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
-  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; color-scheme:dark}}
+  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
-  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; color-scheme:dark}
+  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 110px}
@@ -573,6 +573,20 @@ body.wide .app{max-width:1040px}
 .fl-env rect{fill:var(--surface);stroke:var(--ink);stroke-width:1.5} .fl-env path{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
 .fl-env{transition:opacity .3s}
 .flow .fl-txt{transition:opacity .26s ease} .flow .fl-txt.fade{opacity:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.74rem;color:var(--muted);margin:-6px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.lg-mine i{background:var(--accent)} .lg-urgent i{background:var(--warm)} .lg-sent i{background:var(--ok)} .lg-incoming i{background:var(--sky)} .lg-closed i{background:var(--bad)}
+.item{position:relative;overflow:hidden;border-left:5px solid var(--line)}
+.item .txt{display:grid;gap:2px}
+.stpill{justify-self:start;font-size:.7rem;font-weight:600;padding:1px 9px;border-radius:999px}
+.item.st-mine{border-left-color:var(--accent)} .st-mine .stpill{background:var(--accent-soft);color:var(--accent)}
+.item.st-urgent{border-left-color:var(--warm);background:linear-gradient(90deg,var(--warm-soft),var(--surface) 55%)} .st-urgent .stpill{background:var(--warm-soft);color:var(--warm)}
+.item.st-sent{border-left-color:var(--ok)} .st-sent .stpill{background:var(--ok-soft);color:var(--ok)}
+.item.st-waiting{border-left-color:var(--muted)} .st-waiting .stpill{background:var(--bg);color:var(--muted)}
+.item.st-incoming{border-left-color:var(--sky)} .st-incoming .stpill{background:var(--sky-soft);color:var(--sky)}
+.item.st-closed{border-left-color:var(--bad);opacity:.7} .st-closed .stpill{background:var(--bad-soft);color:var(--bad)}
+.ring.them .rg-fg{stroke:var(--ok);opacity:.8}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -629,9 +643,11 @@ async function cloudLoad(uid){
   if (!a.exists) return false;
   const pub = a.data(); delete pub.updatedAt;
   const priv = b.exists ? b.data() : {};
+  const cloudChats = priv.chats, cloudNow = priv.simNow; delete priv.chats; delete priv.simNow;
   if (!priv.foto) delete priv.foto;
   Object.assign(me, pub, priv, {uid, created:true});
   try { const g = await FB.db.collection("gallery").doc(uid).get(); if (g.exists) me.gallery = g.data().items || []; } catch(e){}
+  loadLocalChats(); if (!chats.length && cloudChats) restoreChats({chats:cloudChats, now:cloudNow});
   saveLocal(); return true;
 }
 async function googleLogin(){
@@ -910,7 +926,43 @@ function showNotifs(){
   document.body.appendChild(o); notifs.forEach(n=>n.read=true); nBadge();
   o.querySelector("#n-ok").onclick = () => o.remove();
 }
-function badge(){const n=chats.filter(c=>c.unread).length;const b=$("#badge");b.textContent=n;b.hidden=!n}
+function badge(){const n=chats.filter(c=>c.unread).length;const b=$("#badge");if(b){b.textContent=n;b.hidden=!n} saveChats();}
+/* ---- Las correspondencias se guardan (en el navegador y en tu cuenta) ---- */
+const chatKey = () => "remitee-chats-" + (me.uid || "local");
+function serializeChats(){
+  const d = x => x ? +new Date(x) : null;
+  return chats.map(c => ({
+    pid: c.p.real ? null : c.p.id, uid: c.p.real ? c.p.uid : null,
+    person: c.p.real ? {alias:c.p.alias, edad:c.p.edad, zona:c.p.zona, prof:c.p.prof, bio:c.p.bio, long:c.p.long, intereses:c.p.tags.join(", "), langs:c.p.langs, g:c.p.g, code:c.p.code, showFoto:c.p.showFoto} : null,
+    turn:c.turn, deadline:d(c.deadline), replyAt:d(c.replyAt), closed:c.closed||null, unread:!!c.unread, meReveal:!!c.meReveal, themReveal:!!c.themReveal, firstByThem:!!c.firstByThem,
+    letters:c.letters.map(l => ({mine:l.mine, at:d(l.at), due:{office:d(l.due.office), forwarded:d(l.due.forwarded), delivered:d(l.due.delivered)}, confirmedAt:d(l.confirmedAt),
+      photo: l.photo === "example" ? "example" : (l.photo ? "own" : null), ls:l.ls||0, rated:l.rated||null, ratedByThem:l.ratedByThem||null}))
+  }));
+}
+let chatSaveTimer = 0, restoringChats = false;
+function saveChats(){
+  if (restoringChats) return;
+  try { localStorage.setItem(chatKey(), JSON.stringify({now:+now, chats:serializeChats()})); } catch(e){}
+  clearTimeout(chatSaveTimer);
+  if (FB && me.uid) chatSaveTimer = setTimeout(() => FB.db.collection("private").doc(me.uid).set({chats:serializeChats(), simNow:+now}, {merge:true}).catch(e => console.warn("chats", e)), 1200);
+}
+function restoreChats(data){
+  if (!data || !Array.isArray(data.chats) || chats.length) return;
+  restoringChats = true;
+  const D = x => x == null ? null : new Date(x);
+  if (data.now && data.now > +now) now = new Date(data.now);
+  data.chats.forEach(sc => {
+    let p = sc.uid ? people.find(x => x.uid === sc.uid) : people.find(x => x.id === sc.pid);
+    if (!p && sc.uid && sc.person){ p = toPerson(sc.uid, sc.person); people.push(p); }
+    if (!p) return;
+    p.matched = true; p.seen = true;
+    chats.push({p, turn:sc.turn, deadline:D(sc.deadline), replyAt:D(sc.replyAt), closed:sc.closed, unread:sc.unread, meReveal:sc.meReveal, themReveal:sc.themReveal, firstByThem:sc.firstByThem,
+      letters:(sc.letters||[]).map(l => ({mine:l.mine, at:D(l.at), due:{office:D(l.due.office), forwarded:D(l.due.forwarded), delivered:D(l.due.delivered)}, confirmedAt:D(l.confirmedAt),
+        photo:l.photo === "own" ? "example" : l.photo, ls:l.ls, rated:l.rated, ratedByThem:l.ratedByThem}))});
+  });
+  restoringChats = false; badge();
+}
+function loadLocalChats(){ try { restoreChats(JSON.parse(localStorage.getItem(chatKey()) || "null")); } catch(e){} }
 const pending = () => people.filter(p => !p.seen && commonLangs(p).length);
 
 /* ---- Reglas y reloj simulado ---- */
@@ -981,7 +1033,7 @@ function checkPhases(c){
 function sim(){
   return `<div class="sim"><span><b>${L("Simulación","Simulation")}</b> · ${L("Hoy es","Today is")} ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">${L("+1 día","+1 day")}</button><button class="soft sm" data-days="7">${L("+7 días","+7 days")}</button></span></div>`;
 }
-function bindSim(){ document.querySelectorAll("[data-days]").forEach(b => b.onclick = () => { now = addD(now, +b.dataset.days); tick(); route(); }); }
+function bindSim(){ document.querySelectorAll("[data-days]").forEach(b => b.onclick = () => { now = addD(now, +b.dataset.days); tick(); saveChats(); route(); }); }
 function suspBanner(){
   return suspended() ? `<div class="susp"><b>${L(`Cuenta suspendida hasta el ${fmt(me.suspendedUntil)}`,`Account suspended until ${fmt(me.suspendedUntil)}`)}</b><br>${L("No respondiste a una carta a tiempo. Mientras dure no puedes hacer nuevos matches.","You didn't reply to a letter in time. Until then you can't make new matches.")}</div>` : "";
 }
@@ -1153,13 +1205,27 @@ function lastLine(c){
   return L("Tu carta","Your letter") + ` · ${PHASES()[stage(l)].toLowerCase()}`;
 }
 
+/* ---- Estado de cada correspondencia, con color ---- */
+function chatState(c){
+  if (c.closed) return {k:"closed", t:L("Cerrada","Closed")};
+  if (incoming(c)) return {k:"incoming", t:L("Carta en camino hacia ti","Letter on its way to you")};
+  if (c.turn === "me") return daysLeft(c.deadline) <= 2 ? {k:"urgent", t:L("Se te agota el tiempo","Time is running out")} : {k:"mine", t:L("Te toca escribir","Your turn to write")};
+  if (!c.letters.length) return {k:"waiting", t:L("Esperando su primera carta","Waiting for their first letter")};
+  return {k:"sent", t:L(`Enviada · le toca a ${c.p.alias}`,`Sent · ${c.p.alias}'s turn`)};
+}
+const STATE_ORDER = {urgent:0, mine:1, incoming:2, sent:3, waiting:4, closed:5};
+function legendHTML(){
+  return `<div class="legend">${[["mine",L("Te toca","Your turn")],["urgent",L("Se agota el tiempo","Running out")],["sent",L("Enviada","Sent")],["incoming",L("En camino a ti","On its way")],["closed",L("Cerrada","Closed")]].map(([k,t])=>`<span class="lg-${k}"><i></i>${t}</span>`).join("")}</div>`;
+}
+
 function cartas(){
-  if (openId){ return ventana(chats.find(c => c.p.id === openId)); }
-  $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias abiertas.","Your open correspondences.")}</p>${suspBanner()}` + (chats.length
-    ? `<div class="list">${chats.map(c=>{ const urgent = !c.closed && c.turn==="me" && !incoming(c) && daysLeft(c.deadline)<=2;
-        return `<button class="item ${c.closed?"closed":""}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><div class="s ${urgent?"urgent":""}">${esc(lastLine(c))}</div></div>${ringHTML(c)}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
+  if (openId != null){ const oc = chats.find(c => String(c.p.id) === String(openId)); if (oc) return ventana(oc); openId = null; }
+  const sorted = [...chats].sort((a,b) => STATE_ORDER[chatState(a).k] - STATE_ORDER[chatState(b).k]);
+  $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias, ordenadas por lo que necesita tu atención.","Your correspondences, ordered by what needs your attention.")}</p>${suspBanner()}` + (chats.length
+    ? `${legendHTML()}<div class="list">${sorted.map(c=>{ const st = chatState(c);
+        return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c)}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
     : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
-  document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = +b.dataset.id; cartas(); });
+  document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = b.dataset.id; cartas(); });
   bindSim();
 }
 
@@ -1237,7 +1303,7 @@ function ventana(c){
       toast(L(`Has valorado la carta de ${c.p.alias} con ${v} ${v===1?"sobre":"sobres"}`,`You rated ${c.p.alias}'s letter ${v} ${v===1?"envelope":"envelopes"}`)); ventana(c); };
   });
   const sh = $("#share"); if (sh) sh.onclick = () => { c.meReveal = !c.meReveal;
-    if (c.meReveal && !c.p.real && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (openId===c.p.id) ventana(c); } }, 1800);
+    if (c.meReveal && !c.p.real && replyAfter[c.p.id] !== null) setTimeout(() => { if (c.meReveal){ c.themReveal = true; toast(L(`${c.p.alias} también ha aceptado compartir direcciones`,`${c.p.alias} has also agreed to share addresses`)); if (String(openId)===String(c.p.id)) ventana(c); } }, 1800);
     if (!c.meReveal) c.themReveal = false; ventana(c); };
   bindSim();
   const btn = $("#sent"); if (btn && canSend) btn.onclick = () => sendModal(c);
@@ -1448,7 +1514,7 @@ function perfil(){
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[]}); location.hash=""; route(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[]}); chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
 }
 
 /* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
@@ -1899,6 +1965,7 @@ $("#topLogin").onclick = () => { authMode = "login"; altaStep = 1; alta(); $("#t
 $("#bellBtn").onclick = showNotifs;
 $("#langBtn").onclick = () => setLang(lang === "en" ? "es" : "en");
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
+if (me.created) loadLocalChats();
 route();
 </script>
 </body>
