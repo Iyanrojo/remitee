@@ -17,7 +17,7 @@ service cloud.firestore {
     }
     // "Quiero escribirle": cada like es un documento con id "<de>_<para>"
     match /likes/{id} {
-      allow create: if verified() && request.resource.data.from == request.auth.uid
+      allow create, update: if verified() && request.resource.data.from == request.auth.uid
         && id == request.auth.uid + "_" + request.resource.data.to;
       allow get: if verified() && (id.matches(request.auth.uid + "_.*") || id.matches(".*_" + request.auth.uid));
     }

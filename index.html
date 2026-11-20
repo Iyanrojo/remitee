@@ -1008,24 +1008,44 @@ async function loadRealProfiles(){
   try {
     const snap = await FB.db.collection("profiles").orderBy("updatedAt","desc").limit(100).get();
     const reals = [];
-    snap.forEach(doc => { const d = doc.data(); if (doc.id === me.uid || !d.alias || !d.bio) return; if (people.some(x => x.uid === doc.id)) return; reals.push(toPerson(doc.id, d)); });
+    snap.forEach(doc => { const d = doc.data(); if (doc.id === me.uid || !d.alias || !d.bio) return; if (people.some(x => x.uid === doc.id)) return; const rp = toPerson(doc.id, d); if ((me.liked||[]).includes(doc.id)) { rp.seen = true; rp.myYes = now; } reals.push(rp); });
     // Los más recientes primero y, todos, por delante de los perfiles de ejemplo
     reals.sort((a,b) => b.at - a.at);
     people.unshift(...reals);
     realLoaded = true;
     await checkMutualLikes();
-    if (reals.length && location.hash.replace("#","") in {"":1,"descubrir":1} && me.created && !document.querySelector(".card")) descubrir();
+    // Si en pantalla hay un perfil de ejemplo, se sustituye por el real recién cargado
+    if (reals.some(r => !r.seen) && (location.hash.replace("#","") in {"":1,"descubrir":1}) && me.created && !document.querySelector(".overlay")) descubrir();
   } catch(e){ console.warn("Perfiles reales:", e); }
   realLoading = false;
 }
 async function likeReal(p){
-  p.myYes = now; me.liked = [...new Set([...(me.liked||[]), p.uid])]; saveLocal();
-  if (!FB || !me.uid){ toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`)); return; }
+  const already = (me.liked||[]).includes(p.uid);
+  p.myYes = now;
+  if (!FB || !me.uid){ me.liked = [...new Set([...(me.liked||[]), p.uid])]; saveLocal(); toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`)); return; }
+  const wait = L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`);
+  // 1) Guardar el «Quiero escribirle» (solo la primera vez: si ya existe, no se vuelve a escribir)
+  if (!already){
+    try {
+      await FB.db.collection("likes").doc(me.uid + "_" + p.uid).set({from:me.uid, to:p.uid, at:firebase.firestore.FieldValue.serverTimestamp()});
+    } catch(e){
+      console.warn("like", e);
+      const code = e && e.code;
+      if (code === "permission-denied"){
+        // Puede que ya existiera de otra sesión: si existe, seguimos como si nada
+        try { const mine = await FB.db.collection("likes").doc(me.uid + "_" + p.uid).get(); if (!mine.exists) throw e; }
+        catch(_){ return toast(FB.auth.currentUser && !FB.auth.currentUser.emailVerified
+          ? L("Verifica tu email para poder elegir a otras personas.","Verify your email to choose other people.")
+          : L("No se ha podido guardar tu elección. Revisa que las reglas de Firestore estén publicadas.","Couldn't save your choice. Check the Firestore rules are published.")); }
+      } else return toast(L("No se ha podido guardar tu elección. Revisa tu conexión e inténtalo de nuevo.","Couldn't save your choice. Check your connection and try again."));
+    }
+    me.liked = [...new Set([...(me.liked||[]), p.uid])]; saveMe();
+  }
+  // 2) Comprobar si la otra persona ya te había elegido
   try {
-    await FB.db.collection("likes").doc(me.uid + "_" + p.uid).set({from:me.uid, to:p.uid, at:firebase.firestore.FieldValue.serverTimestamp()});
     const back = await FB.db.collection("likes").doc(p.uid + "_" + me.uid).get();
-    if (back.exists) realMatch(p, true); else toast(L(`Si ${p.alias} también te elige, os avisaremos`,`If ${p.alias} chooses you too, we'll let you know`));
-  } catch(e){ console.warn(e); toast(L("No se ha podido guardar tu elección. Revisa que las reglas de Firestore estén publicadas.","Couldn't save your choice. Check the Firestore rules are published.")); }
+    if (back.exists) realMatch(p, true); else toast(wait);
+  } catch(e){ console.warn("like check", e); toast(wait); }
 }
 function realMatch(p, iFirst){
   if (p.matched) return; p.matched = true;
