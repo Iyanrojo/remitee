@@ -102,6 +102,7 @@ def run():
         pg.screenshot(path=str(OUT/"06-correspondencia.png"), full_page=True)
         click(pg, "#back"); time.sleep(.3)
         check(js(pg, "!!document.querySelector('.item.st-sent')"), "en Cartas aparece como Enviada (verde)")
+        check(js(pg, "(document.querySelector('.item.st-sent .rg-cap')||{}).textContent||''").startswith("plazo de"), "el anillo dice de quién es el plazo")
         pg.screenshot(path=str(OUT/"07-cartas.png"))
         # Persistencia
         pg.reload(); time.sleep(1); js(pg, "location.hash='#cartas'"); time.sleep(.4)

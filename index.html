@@ -42,6 +42,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .logo .slogan{display:block;font-family:var(--body);font-size:.68rem;font-weight:500;letter-spacing:.02em;color:var(--muted);margin-top:-2px}
 .theme-btn{width:38px;height:38px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center}
 .theme-btn svg{width:18px;height:18px}
+.theme-btn,.helpbtn{position:relative}
+.theme-btn::before,.helpbtn::before{content:"";position:absolute;inset:-4px;border-radius:50%}
 .topr{display:flex;gap:10px;align-items:center}
 .demo{font-size:.7rem;font-weight:500;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
 h2{font-family:var(--head);font-weight:600;font-size:1.35rem;margin:0 0 4px;letter-spacing:-.01em}
@@ -397,8 +399,8 @@ body.wide .app{max-width:1040px}
 .r-fill{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap}
 .rating svg{width:20px;height:15px;flex:none}
 .rating.sm svg{width:16px;height:12px}
-.r-base svg rect{fill:none;stroke:var(--line);stroke-width:1.8}
-.r-base svg .fl{fill:none;stroke:var(--line);stroke-width:1.8;stroke-linejoin:round}
+.r-base svg rect{fill:none;stroke:var(--muted);stroke-opacity:.45;stroke-width:1.8}
+.r-base svg .fl{fill:none;stroke:var(--muted);stroke-opacity:.45;stroke-width:1.8;stroke-linejoin:round}
 .r-fill svg rect{fill:var(--accent);stroke:var(--accent);stroke-width:1.8}
 .r-fill svg .fl{fill:none;stroke:var(--surface);stroke-width:1.6;stroke-linejoin:round}
 .r-txt{font-weight:500;color:var(--ink)}
@@ -554,6 +556,8 @@ body.wide .app{max-width:1040px}
 .rg-n b{font-family:var(--head);font-weight:700;font-size:.95rem;color:var(--ink);font-variant-numeric:tabular-nums}
 .rg-n small{font-size:.62rem;color:var(--muted)}
 .ring.warn .rg-n b{color:var(--warm)}
+.ringw{display:grid;justify-items:center;gap:3px;flex:none;max-width:76px}
+.rg-cap{font-size:.64rem;line-height:1.15;color:var(--muted);text-align:center;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dl.has-ring{display:flex;gap:14px;align-items:center}
 .dl.has-ring .dl-t{display:grid;gap:3px;min-width:0}
 .dl.has-ring .ring .rg-n b{font-size:1.15rem}
@@ -766,7 +770,7 @@ const myLangs = () => (me.langs && me.langs.length) ? me.langs : [lang];
 const commonLangs = p => (p.langs||[]).filter(c => myLangs().includes(c));
 function langsHTML(p, opts={}){
   const cl = commonLangs(p);
-  return `<div class="langs ${opts.left?"left":""}"><span class="lglbl">${L("Escribe en","Writes in")}</span>${(p.langs||[]).map(c=>`<span class="lg ${cl.includes(c)?"on":""}">${langName(c)}</span>`).join("")}</div>`;
+  return `<div class="langs ${opts.left?"left":""}"><span class="lglbl">${opts.self ? L("Escribes en","You write in") : L("Escribe en","Writes in")}</span>${(p.langs||[]).map(c=>`<span class="lg ${cl.includes(c)?"on":""}">${langName(c)}</span>`).join("")}</div>`;
 }
 function langPicker(id){
   const sel = myLangs();
@@ -840,7 +844,7 @@ function mapHTML(home, places, opts={}){
   const homeDot = hp ? `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="3.2" class="m-home"><title>${esc(home)}</title></circle>` : "";
   return `<div class="wmap ${opts.sm?"sm":""}">
     <svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="${L("Mapa de las cartas","Letter map")}: ${esc(uniq.join(", ")) || L("sin cartas aún","no letters yet")}"><use href="#landdots" class="m-land" width="${MAP_W}" height="${MAP_H}"/>${arcs}${pts}${homeDot}</svg>
-    ${uniq.length ? `<div class="m-legend"><span><i class="lg-home"></i>${L("Escribe desde","Writes from")} ${esc(home || "—")}</span><span><i class="lg-pt"></i>${L("Cartas enviadas y recibidas","Letters sent and received")}</span></div>` : `<div class="m-empty">${L("Todavía no ha enviado cartas. Su mapa empieza con la primera.","No letters yet. The map starts with the first one.")}</div>`}
+    ${uniq.length ? `<div class="m-legend"><span><i class="lg-home"></i>${opts.self ? L("Escribes desde","You write from") : L("Escribe desde","Writes from")} ${esc(opts.homeLabel || home || "—")}</span><span><i class="lg-pt"></i>${L("Cartas enviadas y recibidas","Letters sent and received")}</span></div>` : `<div class="m-empty">${opts.self ? L("Todavía no has enviado cartas. Tu mapa empieza con la primera.","You haven't sent any letters yet. Your map starts with the first one.") : L("Todavía no ha enviado cartas. Su mapa empieza con la primera.","No letters yet. The map starts with the first one.")}</div>`}
   </div>`;
 }
 // Bloque de prestigio: correspondencias, países y valoración
@@ -1188,13 +1192,14 @@ function ringInfo(c){
   const tone = !mine ? "them" : d <= 2 ? "warn" : "mine";
   return {d, frac, tone, mine};
 }
-function ringHTML(c, size = 44){
+function ringHTML(c, size = 44, opts = {}){
   const r = ringInfo(c); if (!r) return "";
   const R = 18, C = 2 * Math.PI * R;
   const label = r.mine ? L(`Te quedan ${r.d} ${r.d===1?"día":"días"}`,`${r.d} ${r.d===1?"day":"days"} left for you`) : L(`A ${c.p.alias} le quedan ${r.d} ${r.d===1?"día":"días"}`,`${c.p.alias} has ${r.d} ${r.d===1?"day":"days"} left`);
-  return `<span class="ring ${r.tone}" style="width:${size}px;height:${size}px" role="img" aria-label="${esc(label)}" title="${esc(label)}">
+  const ring = `<span class="ring ${r.tone}" style="width:${size}px;height:${size}px" role="img" aria-label="${esc(label)}" title="${esc(label)}">
     <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="${R}" class="rg-bg"/><circle cx="22" cy="22" r="${R}" class="rg-fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-r.frac)).toFixed(1)}" transform="rotate(-90 22 22)"/></svg>
     <span class="rg-n"><b>${r.d}</b><small>${L("d","d")}</small></span></span>`;
+  return opts.cap ? `<span class="ringw">${ring}<span class="rg-cap" aria-hidden="true">${r.mine ? L("tu plazo","your time") : L(`plazo de ${esc(c.p.alias)}`,`${esc(c.p.alias)}'s time`)}</span></span>` : ring;
 }
 
 function lastLine(c){
@@ -1226,7 +1231,7 @@ function cartas(){
   const sorted = [...chats].sort((a,b) => STATE_ORDER[chatState(a).k] - STATE_ORDER[chatState(b).k]);
   $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias, ordenadas por lo que necesita tu atención.","Your correspondences, ordered by what needs your attention.")}</p>${suspBanner()}` + (chats.length
     ? `${legendHTML()}<div class="list">${sorted.map(c=>{ const st = chatState(c);
-        return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c)}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
+        return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c, 44, {cap:true})}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
     : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = b.dataset.id; cartas(); });
   bindSim();
@@ -1500,9 +1505,9 @@ function perfil(){
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
   <div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true,self:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
-      return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces)}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
+      return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces, {self:true, homeLabel:me.zona})}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
     ${profileFields()}
     ${myGalleryHTML()}
     <div class="field"><label>${L("Tu código de buzón","Your mailbox code")}</label><span class="code-inline" style="justify-self:start;font-size:1rem">${esc(me.code)}</span><small>${L("Es lo que la gente escribe en el sobre para ti. No hace falta que lo compartas: lo ven tus matches.","It's what people write on the envelope for you. You don't need to share it: your matches can see it.")}</small></div>
