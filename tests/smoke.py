@@ -17,6 +17,11 @@ SEED = {
   "profiles/B2": {"alias":"Bruno","edad":"35–40","zona":"Sevilla","prof":"Músico","bio":"Toco el piano en un bar.","intereses":"música, mar, jazz","langs":["es"],"g":"m","code":"BRU-2002","updatedAt":200},
   "likes/A1_U1": {"from":"A1","to":"U1"},
 }
+# Usuario U1 con perfil ya creado (vuelve a la app con sesión iniciada)
+ME = {
+  "profiles/U1": {"alias":"Prueba","edad":"30–35","zona":"Cantabria","bio":"Me gusta escribir cartas largas.","intereses":"cine, viajes, poesía","langs":["es","en"],"g":"n","code":"MAR-6517","updatedAt":1},
+  "private/U1": {"dir":"Calle Mayor 1","long":"Bio larga"},
+}
 failures = []
 def check(cond, msg):
     print(("  ok  " if cond else "  FALLO ") + msg)
@@ -30,7 +35,7 @@ def serve():
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     return httpd, f"http://127.0.0.1:{httpd.server_address[1]}/"
 
-def new_page(b, url, w, h, lang="es", theme="light", seed=True, logged=False):
+def new_page(b, url, w, h, lang="es", theme="light", seed=True, logged=False, extra=None):
     ctx = b.new_context(viewport={"width":w,"height":h})
     pg = ctx.new_page(); errs = []
     pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -38,7 +43,7 @@ def new_page(b, url, w, h, lang="es", theme="light", seed=True, logged=False):
     pg.route("**/fonts.googleapis.com/**", lambda r: r.abort())
     pg.route("**/firebase-config.js", lambda r: r.fulfill(status=200, content_type="text/javascript", body=MOCK))
     init = f'localStorage.setItem("remitee-lang","{lang}");localStorage.setItem("remitee-theme","{theme}");'
-    if seed: init += 'if(!localStorage.getItem("mockdb"))localStorage.setItem("mockdb",' + json.dumps(json.dumps(SEED)) + ');'
+    if seed: init += 'if(!localStorage.getItem("mockdb"))localStorage.setItem("mockdb",' + json.dumps(json.dumps({**SEED, **(extra or {})})) + ');'
     if logged: init += 'localStorage.setItem("mockauth","1");'
     pg.add_init_script(init)
     pg.goto(url); time.sleep(.8)
@@ -110,8 +115,10 @@ def run():
         pg.context.close()
         # 5. Inglés + oscuro + escritorio
         for lang, theme, w, tag in (("en","dark",400,"en-oscuro-movil"),("es","light",1366,"es-escritorio"),("es","dark",1366,"es-oscuro-escritorio")):
-            pg, errs = new_page(b, url, w, 860, lang=lang, theme=theme, logged=True)
-            time.sleep(.6); js(pg, "location.hash='#descubrir'"); time.sleep(.5)
+            pg, errs = new_page(b, url, w, 860, lang=lang, theme=theme, logged=True, extra=ME)
+            time.sleep(1.2); js(pg, "location.hash='#descubrir'"); time.sleep(.6)
+            check(js(pg, "!document.querySelector('.land')"), f"{tag}: usuario con perfil entra directo a la app")
+            check(js(pg, "!document.querySelector('.sim [data-days]')"), f"{tag}: sin reloj de simulación en producción")
             if lang == "en": check("Discover" in js(pg, "document.body.innerText"), f"{tag}: interfaz en inglés")
             no_hscroll(pg, tag)
             pg.screenshot(path=str(OUT/f"09-{tag}.png"))

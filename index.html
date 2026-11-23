@@ -18,18 +18,18 @@
 html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 /* Layout: una sola columna estrecha tipo app móvil, barra de pestañas fija abajo, mucho aire y un único acento suave. */
 :root{
-  --bg:#f7f8fc; --surface:#ffffff; --ink:#22263a; --muted:#8a90a6; --line:#eceef5;
-  --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9;
+  --bg:#f7f8fc; --surface:#ffffff; --ink:#22263a; --muted:#6b7186; --line:#eceef5;
+  --on-accent:#fff; --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9;
   --head:"Outfit", "Segoe UI", system-ui, sans-serif;
   --body:"Inter", system-ui, -apple-system, sans-serif;
   --r:20px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
-  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}}
+  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
-  --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}
+  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 110px}
@@ -46,7 +46,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .demo{font-size:.7rem;font-weight:500;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
 h2{font-family:var(--head);font-weight:600;font-size:1.35rem;margin:0 0 4px;letter-spacing:-.01em}
 .sub{color:var(--muted);margin:0 0 20px}
-button{font-family:var(--body);font-weight:600;font-size:.95rem;border:0;border-radius:999px;padding:13px 20px;cursor:pointer;background:var(--accent);color:#fff;transition:transform .12s, opacity .12s}
+button{font-family:var(--body);font-weight:600;font-size:.95rem;border:0;border-radius:999px;padding:13px 20px;cursor:pointer;background:var(--accent);color:var(--on-accent);transition:transform .12s, opacity .12s}
 button:active{transform:scale(.97)}
 button.soft{background:var(--accent-soft);color:var(--accent)}
 button.plain{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
@@ -121,12 +121,12 @@ input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;pad
 .tabs a[aria-current="page"]{color:var(--accent)}
 .tabs svg{width:23px;height:23px}
 .tabs a.tab-main{width:74px;margin-top:-30px;padding:0 0 4px;gap:5px}
-.tabs a.tab-main svg{width:62px;height:62px;padding:16px;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 10px 24px -8px rgba(91,108,240,.65), 0 0 0 5px var(--surface);transition:transform .15s}
+.tabs a.tab-main svg{width:62px;height:62px;padding:16px;border-radius:50%;background:var(--accent);color:var(--on-accent);box-shadow:0 10px 24px -8px rgba(91,108,240,.65), 0 0 0 5px var(--surface);transition:transform .15s}
 .tabs a.tab-main:active svg{transform:scale(.94)}
 .tabs a.tab-main[aria-current="page"] svg{background:var(--accent)}
 .tabs a.tab-main .tl{font-weight:600}
 .disc-h{margin-bottom:14px}
-.tabs .badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--accent);color:#fff;font-size:.62rem;font-weight:600;min-width:17px;height:17px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
+.tabs .badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--accent);color:var(--on-accent);font-size:.62rem;font-weight:600;min-width:17px;height:17px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
 /* Fotos */
 .ph{flex:none;border-radius:50%;position:relative;overflow:hidden;display:grid;place-items:center;background-size:cover;background-position:center}
 .ph.big{width:110px;height:110px;margin:0 auto}
@@ -151,6 +151,8 @@ input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;pad
 .switch input:checked::after{left:23px}
 .sim{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding:12px 14px;border:1px dashed var(--line);border-radius:16px;font-size:.84rem;color:var(--muted)}
 .sim b{color:var(--ink);font-weight:600}
+.sim .row{gap:6px}
+html,body{overflow-x:clip}
 button.sm{padding:7px 13px;font-size:.82rem}
 .dl{border-radius:var(--r);padding:14px 16px;margin-bottom:14px;font-size:.88rem;display:grid;gap:3px}
 .dl b{font-family:var(--head);font-weight:600;font-size:1rem}
@@ -315,7 +317,7 @@ body.wide .app{max-width:1040px}
 .land{display:grid;gap:clamp(64px,10vw,120px);padding-bottom:40px}
 .hero{display:grid;gap:28px;padding-top:24px;align-items:center}
 .hero-text{display:grid;gap:18px;min-width:0}
-@media (min-width:760px){.hero{grid-template-columns:1.25fr 1fr;gap:48px}.mega.hero-title{font-size:clamp(2.8rem,5.3vw,4.9rem);text-wrap:wrap}}
+@media (min-width:760px){.hero{grid-template-columns:1.25fr 1fr;gap:48px}.mega.hero-title{font-size:clamp(2.4rem,4.2vw,3.6rem);text-wrap:wrap}.hero-title .rot{white-space:nowrap}}
 .kicker{font-size:.78rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
 .mega{font-family:var(--head);font-weight:700;font-size:clamp(2.8rem,11vw,6.4rem);line-height:.98;letter-spacing:-.035em;margin:0;text-wrap:balance}
 .mega em{font-style:normal;color:var(--accent)}
@@ -324,9 +326,9 @@ body.wide .app{max-width:1040px}
 .hero-cta{display:flex;flex-wrap:wrap;gap:10px}
 .hero-cta button{padding:15px 26px;font-size:1rem}
 .hero-note{color:var(--muted);font-size:.82rem}
-.marquee{overflow:hidden;margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));background:var(--accent);padding-block:14px}
+.marquee{overflow:hidden;margin-inline:calc(50% - 50vw);width:100vw;background:var(--accent);padding-block:14px}
 .mq{display:flex;gap:34px;width:max-content;animation:mq 110s linear infinite}
-.mq span{font-family:var(--head);font-weight:600;font-size:1.25rem;color:#fff;white-space:nowrap;display:flex;align-items:center;gap:34px}
+.mq span{font-family:var(--head);font-weight:600;font-size:1.25rem;color:var(--on-accent);white-space:nowrap;display:flex;align-items:center;gap:34px}
 .mq span::after{content:"✉︎";opacity:.6}
 @keyframes mq{to{transform:translateX(-50%)}}
 .statements{display:grid;gap:10px}
@@ -420,7 +422,7 @@ body.wide .app{max-width:1040px}
 .lg.on{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
 .lpick{display:flex;flex-wrap:wrap;gap:6px;padding-top:4px}
 .lpb{background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:7px 13px;font-size:.84rem;font-weight:500}
-.lpb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.lpb.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .wfields .lpb{background:var(--surface)}
 .wfields .lpb.on{background:var(--accent)}
 .world{display:grid;gap:26px}
@@ -433,10 +435,10 @@ body.wide .app{max-width:1040px}
 @keyframes greet{0%,100%{opacity:1}50%{opacity:.35}}
 .lcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
 .lcards>div{background:var(--surface);border-radius:24px;padding:22px;display:grid;gap:6px;align-content:start}
-.lcards>div:first-child{background:var(--accent);color:#fff}
+.lcards>div:first-child{background:var(--accent);color:var(--on-accent)}
 .lcards>div:first-child p{color:rgba(255,255,255,.85)}
 .lc-ic{font-size:1.3rem;color:var(--accent)}
-.lcards>div:first-child .lc-ic{color:#fff}
+.lcards>div:first-child .lc-ic{color:var(--on-accent)}
 .lcards h3{font-family:var(--head);font-weight:600;font-size:1.15rem;margin:4px 0 0}
 .lcards p{margin:0;color:var(--muted);font-size:.93rem}
 .salut{display:flex;flex-wrap:wrap;gap:10px}
@@ -587,7 +589,7 @@ body.wide .app{max-width:1040px}
 .item.st-incoming{border-left-color:var(--sky)} .st-incoming .stpill{background:var(--sky-soft);color:var(--sky)}
 .item.st-closed{border-left-color:var(--bad);opacity:.7} .st-closed .stpill{background:var(--bad-soft);color:var(--bad)}
 .ring.them .rg-fg{stroke:var(--ok);opacity:.8}
-.toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.88rem;font-weight:500;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:16px;font-size:.88rem;font-weight:500;max-width:min(360px, calc(100% - 32px));width:max-content;text-align:center;line-height:1.4}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -899,7 +901,7 @@ function photo(p, size, matched){
 }
 function myPhoto(size){
   if (me.foto && me.showFoto) return `<div class="ph ${size}" style="background-image:url('${me.foto}')" role="img" aria-label="${L("Tu foto","Your photo")}"></div>`;
-  return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:#fff">${esc((me.alias||"?")[0])}</span></div>`;
+  return `<div class="ph ${size}" style="background:var(--accent)"><span class="init" style="color:var(--on-accent)">${esc((me.alias||"?")[0])}</span></div>`;
 }
 let idx = 0, openId = null;
 const chats = [];
@@ -1031,6 +1033,7 @@ function checkPhases(c){
         notify(`${c.p.alias} ha valorado tu carta con ${l.ratedByThem} ${l.ratedByThem===1?"sobre":"sobres"}.`, `${c.p.alias} rated your letter ${l.ratedByThem} ${l.ratedByThem===1?"envelope":"envelopes"}.`); } } });
 }
 function sim(){
+  if (FB && !/[?&]sim\b/.test(location.search)) return "";
   return `<div class="sim"><span><b>${L("Simulación","Simulation")}</b> · ${L("Hoy es","Today is")} ${fmt(now)}</span><span class="row"><button class="soft sm" data-days="1">${L("+1 día","+1 day")}</button><button class="soft sm" data-days="7">${L("+7 días","+7 days")}</button></span></div>`;
 }
 function bindSim(){ document.querySelectorAll("[data-days]").forEach(b => b.onclick = () => { now = addD(now, +b.dataset.days); tick(); saveChats(); route(); }); }
@@ -1271,7 +1274,7 @@ function ventana(c){
   const canSend = !c.closed && c.turn==="me" && !inc;
   $("#view").innerHTML = `<button class="back" id="back">← ${L("Cartas","Letters")}</button>
     <div class="chead"><button type="button" class="phbtn" id="chPh" aria-label="${L("Ampliar foto","Enlarge photo")}">${photo(c.p,"md",true)}</button><div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
-    <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Sobre ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
+    <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Quién es ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
       <p>${esc(c.p.long || c.p.bio)}</p>
       ${(c.p.gallery||[]).length ? `<div class="sechead">${L("Fotos de sus intereses","Photos of their interests")}</div>${galleryHTML(c.p.gallery)}` : ""}
@@ -1429,7 +1432,7 @@ const G_OPTS = () => [["f",L("En femenino","Feminine")],["m",L("En masculino","M
 
 function profileFields(){
   return `
-    <div class="field"><label for="f-p">${L("Foto","Photo")}</label><div class="photo-pick">${myPhoto("sm")}<input type="file" id="f-p" accept="image/*"></div><small>${L("Opcional. Nadie la ve antes del match.","Optional. Nobody sees it before a match.")}</small></div>
+    <div class="field"><label for="f-p">${L("Foto","Photo")}</label><div class="photo-pick">${myPhoto("sm")}<label class="filebtn" for="f-p">${me.foto?L("Cambiar foto","Change photo"):L("Elegir foto","Choose photo")}</label><input type="file" id="f-p" accept="image/*" hidden></div><small>${L("Opcional. Nadie la ve antes del match.","Optional. Nobody sees it before a match.")}</small></div>
     <label class="switch" for="f-s"><span><b>${L("Mostrar mi foto tras el match","Show my photo after a match")}</b><small>${L("Si lo desactivas, solo verán tu inicial.","If you turn it off, they'll only see your initial.")}</small></span><input type="checkbox" id="f-s" ${me.showFoto?"checked":""}></label>
     <div class="field"><label for="f-a">${L("Alias","Alias")} *</label><input id="f-a" required maxlength="24" value="${esc(me.alias)}" placeholder="${L("Cómo quieres que te llamen","What should people call you")}"></div>
     <div class="field"><label for="f-pr">${L("Profesión","Occupation")}</label><input id="f-pr" value="${esc(me.prof)}" placeholder="${L("A qué te dedicas","What you do")}"></div>
@@ -1715,7 +1718,7 @@ function landing(){
     </section>
   </div>`;
   startFlow($(".privacy .flowcard")); startRotator();
-  const v = $("#heroVid"); if (v){ const show = () => { $("#vph").hidden = true; v.classList.add("ready"); };
+  const v = $("#heroVid"); if (v){ const show = () => { const ph = $("#vph"); if (ph) ph.hidden = true; v.classList.add("ready"); };
     if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
   const go = mode => { authMode = mode; altaStep = 1; alta(); window.scrollTo(0,0); };
   $("#start").onclick = () => go("signup"); $("#start2").onclick = () => go("signup"); $("#loginLink").onclick = () => go("login"); $("#how").onclick = showFlow;
