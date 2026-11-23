@@ -122,6 +122,9 @@ def run():
             check(js(pg, "!document.querySelector('.sim [data-days]')"), f"{tag}: sin reloj de simulación en producción")
             check(js(pg, "document.querySelector('#adminBtn').hidden"), f"{tag}: sin botón de administración para quien no es admin")
             if lang == "en": check("Discover" in js(pg, "document.body.innerText"), f"{tag}: interfaz en inglés")
+            if w >= 820:
+                hdr = js(pg, "(()=>{const t=document.querySelector('.top').getBoundingClientRect(), r=document.querySelector('.topr').getBoundingClientRect(), a=[...document.querySelectorAll('.tabs a')].pop().getBoundingClientRect(); return {top:t.bottom<=64, sep:r.left>=a.right}})()")
+                check(hdr["top"] and hdr["sep"], f"{tag}: logo y botones en la misma barra que las pestañas, sin solaparse")
             no_hscroll(pg, tag)
             pg.screenshot(path=str(OUT/f"09-{tag}.png"))
             check(not errs, f"{tag}: sin errores JS {errs[:1]}")
@@ -137,6 +140,10 @@ def run():
             check("Administración" in txt and "personas registradas" in txt, f"admin {tag}: resumen visible")
             check(js(pg, "[...document.querySelectorAll('.akpis b')].map(b=>b.textContent).join(',')").startswith("3,"), f"admin {tag}: cuenta 3 personas")
             pg.screenshot(path=str(OUT/f"11-admin-{tag}.png"), full_page=True)
+            if tag == "escritorio":
+                pg.set_viewport_size({"width":820,"height":860}); time.sleep(.3)
+                check(js(pg, "document.querySelector('.topr').getBoundingClientRect().left >= [...document.querySelectorAll('.tabs a')].pop().getBoundingClientRect().right"), "admin 820 px: botones de cabecera sin solaparse con las pestañas")
+                pg.set_viewport_size({"width":1366,"height":860}); time.sleep(.3)
             no_hscroll(pg, f"admin {tag}")
             if w == 1366:
                 click(pg, "[data-at=usuarios]"); time.sleep(.3)

@@ -19,6 +19,7 @@ html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 /* Layout: una sola columna estrecha tipo app móvil, barra de pestañas fija abajo, mucho aire y un único acento suave. */
 :root{
   --bg:#f7f8fc; --surface:#ffffff; --ink:#22263a; --muted:#6b7186; --line:#eceef5;
+  --tint1:#ffe3d6; --tint2:#dfe9ff; --tint3:#dff5e8; --tint4:#f3e1fb; --tint5:#fff1c9; --on-tint:#2a2e45;
   --on-accent:#fff; --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9;
   --head:"Outfit", "Segoe UI", system-ui, sans-serif;
   --body:"Inter", system-ui, -apple-system, sans-serif;
@@ -26,9 +27,11 @@ html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
+  --tint1:#4d3a35; --tint2:#33405f; --tint3:#2d4a3c; --tint4:#47375a; --tint5:#4d4330; --on-tint:#eceef6;
   --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
+  --tint1:#4d3a35; --tint2:#33405f; --tint3:#2d4a3c; --tint4:#47375a; --tint5:#4d4330; --on-tint:#eceef6;
   --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
@@ -137,7 +140,7 @@ input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;pad
 .ph.locked::before{content:"";position:absolute;inset:-12px;background:inherit;filter:blur(14px)}
 .ph .lock{position:relative;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);display:grid;place-items:center;color:#2a2e45}
 .ph .lock svg{width:17px;height:17px}
-.ph .init{font-family:var(--head);font-weight:600;color:#2a2e45;font-size:1.2rem;position:relative}
+.ph .init{font-family:var(--head);font-weight:600;color:var(--on-tint);font-size:1.2rem;position:relative}
 .ph.big .init{font-size:2rem}
 .phnote{font-size:.78rem;color:var(--muted);margin-top:8px}
 .common{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center;font-size:.8rem;color:var(--muted)}
@@ -545,6 +548,16 @@ body.wide .app{max-width:1040px}
   .tabs a.tab-main[aria-current="page"] svg{background:none}
   .tabs .badge{top:2px;left:auto;right:6px}
   .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+  /* Una sola barra arriba: logo a la izquierda, pestañas en el centro y botones a la derecha */
+  body:has(.tabs:not([hidden])) .top{position:fixed;top:0;left:0;right:0;z-index:11;height:calc(61px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) max(24px,calc((100vw - 1120px)/2)) 0;pointer-events:none}
+  body:has(.tabs:not([hidden])) .top>*{pointer-events:auto}
+  body:has(.tabs:not([hidden])) #view{padding-top:32px}
+}
+@media (min-width:820px) and (max-width:1079px){
+  body:has(.tabs:not([hidden])) .helpbtn{width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center}
+  body:has(.tabs:not([hidden])) .helpbtn .hl{display:none}
+  body:has(.tabs:not([hidden])) .helpbtn .hq{display:inline;font-weight:700}
+  body:has(.tabs:not([hidden])) .tabs .in{max-width:none;padding:0 250px 0 170px}
 }
 .ring{position:relative;display:inline-grid;place-items:center;flex:none}
 .ring svg{position:absolute;inset:0;width:100%;height:100%}
@@ -762,7 +775,8 @@ if (FB) FB.auth.onAuthStateChanged(async u => {
 });
 
 loadMe();
-const tints = ["#ffe3d6","#dfe9ff","#dff5e8","#f3e1fb","#fff1c9"];
+// Fondos pastel de los avatares: variables de :root para que en oscuro no deslumbren
+const tints = ["var(--tint1)","var(--tint2)","var(--tint3)","var(--tint4)","var(--tint5)"];
 // "Fotos" de ejemplo: degradados en lugar de retratos reales. showFoto = la persona decide si la enseña tras el match.
 const shots = [
   "radial-gradient(circle at 35% 30%,#ffd2b8 0 22%,transparent 23%),radial-gradient(ellipse at 50% 95%,#e8956f 0 38%,transparent 39%),linear-gradient(160deg,#ffe9dc,#f6b99a)",
@@ -892,7 +906,10 @@ function mapHTML(home, places, opts={}){
   const hp = H ? proj(H[0], H[1]) : null;
   const arcs = hp ? uniq.map(c => { const [x,y] = proj(CITIES[c][0], CITIES[c][1]); const mx = (hp[0]+x)/2, my = Math.min(hp[1], y) - Math.max(8, Math.abs(x-hp[0])*.22);
     return `<path d="M${hp[0].toFixed(1)} ${hp[1].toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}" class="m-arc"/>`; }).join("") : "";
-  const pts = uniq.map((c,i) => { const [x,y] = proj(CITIES[c][0], CITIES[c][1]); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" class="m-pt" style="animation-delay:${(i*.35).toFixed(2)}s"><title>${esc(c)}</title></circle>`; }).join("");
+  const pts = uniq.map((c,i) => { let [x,y] = proj(CITIES[c][0], CITIES[c][1]);
+    // Si la ciudad está casi encima de casa (p. ej. Bilbao y Santander), se separa un poco para que se vean los dos puntos
+    if (hp){ const dx = x-hp[0], dy = y-hp[1], dd = Math.hypot(dx,dy), MIN = 6.5; if (dd < MIN){ const ux = dd ? dx/dd : 1, uy = dd ? dy/dd : 0; x = hp[0]+ux*MIN; y = hp[1]+uy*MIN; } }
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" class="m-pt" style="animation-delay:${(i*.35).toFixed(2)}s"><title>${esc(c)}</title></circle>`; }).join("");
   const homeDot = hp ? `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="3.2" class="m-home"><title>${esc(home)}</title></circle>` : "";
   return `<div class="wmap ${opts.sm?"sm":""}">
     <svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="${L("Mapa de las cartas","Letter map")}: ${esc(uniq.join(", ")) || L("sin cartas aún","no letters yet")}"><use href="#landdots" class="m-land" width="${MAP_W}" height="${MAP_H}"/>${arcs}${pts}${homeDot}</svg>
@@ -1262,7 +1279,8 @@ function lastLine(c){
   if (c.turn==="me") return c.letters.length ? L(`Te toca escribir · quedan ${d} días`,`Your turn to write · ${d} days left`) : L(`Escribes tú primero · quedan ${d} días`,`You write first · ${d} days left`);
   if (!c.letters.length) return L(`${c.p.alias} escribe primero`,`${c.p.alias} writes first`);
   const l = c.letters[c.letters.length-1];
-  return L("Tu carta","Your letter") + ` · ${PHASES()[stage(l)].toLowerCase()}`;
+  const k = stage(l);
+  return L("Tu carta","Your letter") + ` · ${PHASES()[k].toLowerCase()} · ${fmt(phaseDate(l,k))}`;
 }
 
 /* ---- Estado de cada correspondencia, con color ---- */

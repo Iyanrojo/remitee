@@ -2,6 +2,21 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 3 · 23 nov 2026
+
+**Qué vi.** Pruebas en verde (53/53). En escritorio seguía la cabecera doble: barra de pestañas arriba y, debajo, otra fila con el logo y los botones, que empujaba el contenido unos 90 px. En modo oscuro los avatares sin foto (círculos pastel con candado o inicial) eran manchas casi blancas que deslumbraban sobre el fondo oscuro. En el Perfil, cuando una carta iba a una ciudad muy cercana a la tuya (Santander–Bilbao), su punto quedaba tapado por el de casa. En Cartas la segunda línea repetía la etiqueta («Enviada · le toca a Ana» / «Tu carta · enviada») sin aportar nada.
+
+**Qué cambié.**
+- Escritorio: una sola barra fija arriba con el logo a la izquierda, las pestañas en el centro y los botones a la derecha. Entre 820 y 1079 px «Cómo funciona» pasa a «?» y las pestañas se centran en el hueco libre para no solaparse (también con el botón de administración).
+- Avatares sin foto con fondos en variables (`--tint1`…`--tint5`, `--on-tint`): pastel en claro y tonos apagados con inicial clara en oscuro.
+- Mapa de cartas: si una ciudad cae casi encima de casa, su punto se separa unos píxeles para que se vean los dos.
+- Cartas: la línea de una carta tuya enviada incluye la fecha de su fase («Tu carta · enviada · 23 nov»).
+- Pruebas: la cabecera de escritorio está en una sola barra y los botones no se solapan con las pestañas, también a 820 px con administración (56/56).
+
+**Pendiente.** El arco del mapa hacia una ciudad desplazada sigue apuntando a su posición real (es casi invisible, pero se podría unificar). En el Perfil, con 0 correspondencias puede salir «1 país» (pendiente de la decisión de abajo). Los fondos pastel de las animaciones de «Cómo funciona» (`.fl-them`, `.pp-them`) siguen fijos; revisar en oscuro.
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1) y decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta, para que contador y mapa coincidan (ronda 2).
+
 ## Panel de administración · 23 nov 2026 (encargo de Iyán)
 
 Nuevo panel `#admin` con resumen, personas, buzón central (código → dirección) y matches; moderación para ocultar perfiles en Descubrir; fecha de alta (`createdAt`) en los perfiles nuevos. **Reglas nuevas en `firestore.rules`: Iyán tiene que publicarlas en Firebase.** Pruebas añadidas (panel en móvil y escritorio, buzón, match, ocultar perfil).
