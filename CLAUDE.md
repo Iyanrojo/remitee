@@ -13,6 +13,7 @@ Propietario: Iyán Rojo. Idioma de trabajo: español.
 - `hero.mp4`, `favicon.svg`: recursos de la landing.
 - `tests/smoke.py`: pruebas automáticas con Firebase simulado (`tests/fbmock.js`). Capturas en `tests/out/` (no se suben).
 - `REVIEW_LOG.md`: registro de cada ronda de revisión.
+- Panel de administración (`#admin`, funciones `admin()`, `loadAdmin()`, `admUser()`): solo para el email de `ADMIN_EMAILS` o cuentas con documento `admins/{uid}`. Muestra datos personales (email y dirección): no lo enseñes en capturas públicas ni relajes sus reglas.
 
 ## Convenciones del código
 

@@ -2,6 +2,10 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Panel de administración · 23 nov 2026 (encargo de Iyán)
+
+Nuevo panel `#admin` con resumen, personas, buzón central (código → dirección) y matches; moderación para ocultar perfiles en Descubrir; fecha de alta (`createdAt`) en los perfiles nuevos. **Reglas nuevas en `firestore.rules`: Iyán tiene que publicarlas en Firebase.** Pruebas añadidas (panel en móvil y escritorio, buzón, match, ocultar perfil).
+
 ## Ronda 2 · 23 nov 2026
 
 **Qué vi.** Pruebas en verde (34/34). En el Perfil propio los textos salían en tercera persona («Escribe en», «Escribe desde Santander») y el mapa decía Santander mientras los datos decían Cantabria. En Cartas el anillo («19 d») no decía de quién era el plazo, y con «le toca a Ana» al lado se podía leer como plazo propio. Los botones redondos de la cabecera miden 38 px, por debajo de los 44 px táctiles recomendados. Los sobres vacíos de la valoración apenas se veían (trazo con el color de las líneas de separación).

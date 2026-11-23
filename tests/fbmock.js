@@ -18,7 +18,7 @@
   const query = c => ({ get: async()=>{ const db=load();
     const docs=Object.keys(db).filter(k=>k.startsWith(c+"/")).map(k=>({id:k.slice(c.length+1), data:()=>{ const d=clone(db[k]); const t=d.updatedAt||0; d.updatedAt={toMillis:()=>t}; return d; }}));
     return {forEach:f=>docs.forEach(f)}; } });
-  const fs = () => ({ collection:c=>({ doc:id=>doc(c,id), orderBy:()=>({limit:()=>query(c)}) }) });
+  const fs = () => ({ collection:c=>({ doc:id=>doc(c,id), orderBy:()=>({limit:()=>query(c)}), get:()=>query(c).get() }) });
   fs.FieldValue = { serverTimestamp:()=>({__ts:1}) };
   window.firebase = { initializeApp(){}, auth:Object.assign(()=>auth,{GoogleAuthProvider:function(){}}), firestore:fs };
   window.REMITEE_FIREBASE = {apiKey:"test"};

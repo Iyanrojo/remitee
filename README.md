@@ -74,6 +74,17 @@ Qué se guarda:
 
 Pendiente: mostrar en Descubrir los perfiles reales, matches entre usuarios, fotos (Firebase Storage) y envío real de emails.
 
+## Panel de administración
+
+Botón con icono de gráfica en la cabecera, solo para administradores (`#admin`):
+
+- **Resumen:** personas registradas, altas de los últimos 7 días, «Quiero escribirle», matches, quién tiene dirección y foto, altas por semana, zonas, idiomas, edades, intereses y una lista de cosas a revisar.
+- **Personas:** tabla con buscador; cada ficha muestra email, dirección, galería y permite ocultar o volver a mostrar el perfil en Descubrir.
+- **Buzón central:** escribe el código del sobre interior y te da la dirección a la que reenviarlo.
+- **Matches:** parejas con match mutuo.
+
+Quién es administrador: el email `iyanrojo@gmail.com` (en `ADMIN_EMAILS` de `index.html` y en `firestore.rules`) y cualquier cuenta para la que crees a mano un documento `admins/{uid}` en Firestore. Hay que publicar las reglas de `firestore.rules`.
+
 ## Email de bienvenida («¿Y ahora qué?»)
 
 Al crear el perfil, la web deja el email en la colección `mail` de Firestore. La extensión **Trigger Email from Firestore** de Firebase lo envía. Plantilla: `emails/welcome.js` (vistas previas en `emails/bienvenida-es.html` y `emails/welcome-en.html`).

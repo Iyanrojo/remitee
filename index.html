@@ -595,12 +595,61 @@ body.wide .app{max-width:1040px}
 .ring.them .rg-fg{stroke:var(--ok);opacity:.8}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:16px;font-size:.88rem;font-weight:500;max-width:min(360px, calc(100% - 32px));width:max-content;text-align:center;line-height:1.4}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Panel de administración */
+.ahead{display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left}
+.ahead h3{margin:0;font-family:var(--head)}
+.atabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 16px}
+.atabs button{background:var(--surface);color:var(--muted);border:1px solid var(--line);padding:8px 14px;font-size:.86rem}
+.atabs button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.akpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.akpis>div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:2px}
+.akpis b{font-family:var(--head);font-size:1.7rem;font-weight:600;color:var(--ink)}
+.akpis span{font-size:.8rem;color:var(--muted)}
+.akpis .warn{border-color:var(--warm);background:var(--warm-soft)}
+.agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.apanel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 18px;min-width:0}
+.apanel h3{font-family:var(--head);font-weight:600;font-size:1rem;margin:0 0 12px}
+.abars{display:grid;gap:7px}
+.abar{display:grid;grid-template-columns:minmax(0,7.5rem) minmax(0,1fr) 2rem;align-items:center;gap:10px;font-size:.84rem}
+.abar-k{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abar-t{height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
+.abar-t i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.abar b{text-align:right;font-variant-numeric:tabular-nums}
+.acols{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;height:140px;align-items:end}
+.acols>div{display:grid;grid-template-rows:1fr auto auto;height:100%;text-align:center;font-size:.68rem;color:var(--muted);gap:2px}
+.acols i{align-self:end;background:var(--accent-soft);border-top:3px solid var(--accent);border-radius:6px 6px 2px 2px;min-height:3px}
+.acols b{color:var(--ink);font-size:.8rem}
+.alist{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.88rem}
+.alist.big{list-style:none;padding:0}.alist.big li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.alist small{color:var(--muted);margin-left:6px}
+button.link{background:none;color:var(--accent);padding:0;border-radius:0;font-size:inherit}
+.asearch,.arow input{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:11px 16px}
+.asearch{margin-bottom:12px}
+.asearch:focus,.arow input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.atable-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.atable{width:100%;border-collapse:collapse;font-size:.86rem;min-width:720px}
+.atable th{text-align:left;font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
+.atable td{padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.atable tbody tr{cursor:pointer}.atable tbody tr:hover,.atable tbody tr:focus-visible{background:var(--accent-soft)}
+.atable tr:last-child td{border-bottom:0}
+.status.bad{background:var(--bad-soft);color:var(--bad)}
+.arow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.arow input{flex:1;min-width:0}
+.aaddr{margin-top:14px;padding:16px;border-radius:16px;background:var(--bg);display:grid;gap:6px}
+.apanel .hint{text-align:left}.aaddr button{justify-self:start}
+.aaddr pre{font-family:var(--body);font-size:1rem;white-space:pre-wrap;margin:4px 0}
+.aerr{background:var(--bad-soft);color:var(--bad);padding:12px 16px;border-radius:14px;margin:12px 0;font-size:.88rem}
+.amodal{max-width:520px;text-align:left;max-height:calc(100vh - 40px);overflow:auto}
+.aph{width:56px;height:56px;border-radius:50%;object-fit:cover;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--head);font-weight:600;font-size:1.4rem;flex:none}
+.amodal .ahead{justify-content:flex-start}
+.adl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:.88rem}
+.adl dt{color:var(--muted)}.adl dd{margin:0;overflow-wrap:anywhere}
+.agal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.agal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
 </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="top"><h1 class="logo"><a href="#" id="logoHome" aria-label="Remitee">remitee<span>.</span></a><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="soft sm" id="topLogin" hidden>Entrar</button><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
+  <div class="top"><h1 class="logo"><a href="#" id="logoHome" aria-label="Remitee">remitee<span>.</span></a><small class="slogan">Mensajería a fuego lento</small></h1><div class="topr"><span class="demo">Prototipo</span><button class="soft sm" id="topLogin" hidden>Entrar</button><button class="theme-btn" id="adminBtn" hidden aria-label="Administración" title="Administración"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button><button class="helpbtn" id="helpBtn">Cómo funciona</button><button class="theme-btn bell" id="bellBtn" hidden aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="nbadge" id="nBadge" hidden></span></button><button class="theme-btn langbtn" id="langBtn">EN</button><button class="theme-btn" id="themeBtn" aria-label="Cambiar a modo oscuro"></button></div></div>
   <main id="view"></main>
 </div>
 
@@ -625,6 +674,7 @@ async function cloudSave(){
   if (!FB || !me.uid) return;
   const pub = {}; PUBLIC_FIELDS.forEach(k => pub[k] = me[k] ?? null);
   pub.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+  if (!me.hasCreatedAt){ pub.createdAt = pub.updatedAt; me.hasCreatedAt = true; }
   // Cada documento se guarda por separado: si uno falla, los demás (y la foto) se guardan igualmente
   const jobs = [
     ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, liked:me.liked||[], nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true})],
@@ -647,7 +697,7 @@ async function queueWelcome(){
 async function cloudLoad(uid){
   const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
   if (!a.exists) return false;
-  const pub = a.data(); delete pub.updatedAt;
+  const pub = a.data(); delete pub.updatedAt; me.hasCreatedAt = !!pub.createdAt; delete pub.createdAt; delete pub.hidden;
   const priv = b.exists ? b.data() : {};
   const cloudChats = priv.chats, cloudNow = priv.simNow; delete priv.chats; delete priv.simNow;
   if (!priv.foto) delete priv.foto;
@@ -699,6 +749,8 @@ if (FB) FB.auth.onAuthStateChanged(async u => {
     try {
       const localFoto = me.foto, localGal = me.gallery;
       const had = await cloudLoad(u.uid);
+      await checkAdmin();
+      if (had && me.admin && location.hash === "#admin") { route(); return; }
       // Si en la nube no hay foto pero en este navegador sí, se sube (recupera fotos que no llegaron a guardarse)
       let restored = false;
       if (had && !me.foto && localFoto && !fresh){ me.foto = localFoto; restored = true; }
@@ -1067,7 +1119,7 @@ async function loadRealProfiles(){
   try {
     const snap = await FB.db.collection("profiles").orderBy("updatedAt","desc").limit(100).get();
     const reals = [];
-    snap.forEach(doc => { const d = doc.data(); if (doc.id === me.uid || !d.alias || !d.bio) return; if (people.some(x => x.uid === doc.id)) return; const rp = toPerson(doc.id, d); if ((me.liked||[]).includes(doc.id)) { rp.seen = true; rp.myYes = now; } reals.push(rp); });
+    snap.forEach(doc => { const d = doc.data(); if (doc.id === me.uid || !d.alias || !d.bio || d.hidden) return; if (people.some(x => x.uid === doc.id)) return; const rp = toPerson(doc.id, d); if ((me.liked||[]).includes(doc.id)) { rp.seen = true; rp.myYes = now; } reals.push(rp); });
     // Los más recientes primero y, todos, por delante de los perfiles de ejemplo
     reals.sort((a,b) => b.at - a.at);
     people.unshift(...reals);
@@ -1522,7 +1574,7 @@ function perfil(){
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[]}); chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false}); ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
 }
 
 /* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
@@ -1924,19 +1976,126 @@ function como(){
   startFlow($(".art .flowcard")); startPrep($("#prepcard"));
 }
 
-const views = {descubrir, cartas, perfil, como};
+/* ---- Panel de administración: visión general de Remitee ----
+   Solo lo ven las cuentas administradoras (email en ADMIN_EMAILS o documento admins/{uid} en Firestore).
+   La seguridad real la ponen las reglas de firestore.rules: sin ellas nadie puede leer estos datos. */
+const ADMIN_EMAILS = ["iyanrojo@gmail.com"];
+async function checkAdmin(){
+  if (!FB || !me.uid) { me.admin = false; return; }
+  let ok = ADMIN_EMAILS.includes(String(me.email||"").toLowerCase());
+  if (!ok) { try { ok = (await FB.db.collection("admins").doc(me.uid).get()).exists; } catch(e){ ok = false; } }
+  me.admin = ok; const b = $("#adminBtn"); if (b) b.hidden = !ok || !me.created;
+}
+let ADM = null, admTab = "resumen", admQ = "";
+const tsMs = v => v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0);
+async function loadAdmin(){
+  const all = async c => { const out = {}; try { (await FB.db.collection(c).get()).forEach(d => out[d.id] = d.data()); } catch(e){ console.warn("admin", c, e); out.__err = true; } return out; };
+  const [profiles, priv, likes] = await Promise.all([all("profiles"), all("private"), all("likes")]);
+  const err = profiles.__err || priv.__err || likes.__err; delete profiles.__err; delete priv.__err; delete likes.__err;
+  const users = Object.entries(profiles).map(([uid, d]) => {
+    const p = priv[uid] || {};
+    return {uid, alias:d.alias||"—", code:d.code||"", zona:d.zona||"", edad:d.edad||"", prof:d.prof||"", bio:d.bio||"", long:d.long||"", intereses:d.intereses||"", langs:d.langs||[], hidden:!!d.hidden,
+      created:tsMs(d.createdAt), updated:tsMs(d.updatedAt), email:p.email||"", dir:p.dir||"", foto:p.foto||null, sent:0, got:0, matches:0, complete:!!(d.alias && d.bio)};
+  });
+  const byUid = Object.fromEntries(users.map(u => [u.uid, u]));
+  const L2 = Object.values(likes).filter(l => l.from && l.to);
+  const set = new Set(L2.map(l => l.from + "_" + l.to)), pairs = [];
+  L2.forEach(l => { if (byUid[l.from]) byUid[l.from].sent++; if (byUid[l.to]) byUid[l.to].got++;
+    if (l.from < l.to && set.has(l.to + "_" + l.from)) { pairs.push([l.from, l.to]); if (byUid[l.from]) byUid[l.from].matches++; if (byUid[l.to]) byUid[l.to].matches++; } });
+  ADM = {users, byUid, likes:L2.length, pairs, err, at:Date.now()};
+}
+function admBars(rows, max){ max = max || Math.max(1, ...rows.map(r => r[1]));
+  return `<div class="abars">${rows.map(([k,v]) => `<div class="abar"><span class="abar-k">${esc(k)}</span><span class="abar-t"><i style="width:${Math.round(v/max*100)}%"></i></span><b>${v}</b></div>`).join("") || `<p class="hint">${L("Sin datos todavía.","No data yet.")}</p>`}</div>`; }
+function admCount(list, key){ const m = {}; list.forEach(u => [].concat(key(u)).filter(Boolean).forEach(k => m[k] = (m[k]||0) + 1)); return Object.entries(m).sort((a,b) => b[1]-a[1]); }
+const admDate = ms => ms ? new Date(ms).toLocaleDateString(lang === "en" ? "en-GB" : "es-ES", {day:"numeric", month:"short", year:"2-digit"}) : "—";
+const LANG_NAMES = () => ({es:L("Español","Spanish"), en:L("Inglés","English"), fr:L("Francés","French"), pt:L("Portugués","Portuguese"), it:L("Italiano","Italian"), de:L("Alemán","German")});
+async function admin(){
+  if (!me.admin){ location.hash = "#descubrir"; return; }
+  document.body.classList.add("wide");
+  if (!ADM){ $("#view").innerHTML = `<h2>${L("Administración","Admin")}</h2><p class="sub">${L("Cargando datos…","Loading data…")}</p>`; await loadAdmin(); if (location.hash !== "#admin") return; }
+  const U = ADM.users, day = 864e5, t = Date.now(), alta = u => u.created || u.updated;
+  const new7 = U.filter(u => t - alta(u) < 7*day).length, withDir = U.filter(u => u.dir).length, withFoto = U.filter(u => u.foto).length, hidden = U.filter(u => u.hidden).length;
+  const weeks = Array.from({length:8}, (_,i) => { const end = t - (7-i)*7*day; const d0 = new Date(end - 6*day); return [d0.getDate() + "/" + (d0.getMonth()+1), U.filter(u => alta(u) > end - 7*day && alta(u) <= end).length]; });
+  const tabs = [["resumen",L("Resumen","Overview")],["usuarios",L("Personas","People")],["buzon",L("Buzón central","Central mailbox")],["matches",L("Matches","Matches")]];
+  let body = "";
+  if (admTab === "resumen") body = `
+    <div class="akpis">
+      <div><b>${U.length}</b><span>${L("personas registradas","registered people")}</span></div>
+      <div><b>${new7}</b><span>${L("nuevas en 7 días","new in 7 days")}</span></div>
+      <div><b>${ADM.likes}</b><span>${L("«Quiero escribirle»","“I want to write”")}</span></div>
+      <div><b>${ADM.pairs.length}</b><span>${L("matches","matches")}</span></div>
+      <div class="${withDir < U.length ? "warn" : ""}"><b>${withDir}/${U.length}</b><span>${L("con dirección postal","with a postal address")}</span></div>
+      <div><b>${withFoto}</b><span>${L("con foto","with a photo")}${hidden ? ` · ${hidden} ${L("ocultas","hidden")}` : ""}</span></div>
+    </div>
+    <div class="agrid">
+      <section class="apanel"><h3>${L("Altas por semana","Sign-ups per week")}</h3><div class="acols">${weeks.map(([k,v]) => `<div><i style="height:${Math.round(v/Math.max(1,...weeks.map(w=>w[1]))*100)}%"></i><b>${v}</b><span>${esc(k)}</span></div>`).join("")}</div></section>
+      <section class="apanel"><h3>${L("Zonas","Areas")}</h3>${admBars(admCount(U, u => u.zona).slice(0,6))}</section>
+      <section class="apanel"><h3>${L("Idiomas de correspondencia","Correspondence languages")}</h3>${admBars(admCount(U, u => (u.langs.length ? u.langs : ["es"]).map(x => LANG_NAMES()[x] || x)))}</section>
+      <section class="apanel"><h3>${L("Edades","Ages")}</h3>${admBars(admCount(U, u => u.edad).sort((a,b) => a[0].localeCompare(b[0])))}</section>
+      <section class="apanel"><h3>${L("Intereses más repetidos","Most common interests")}</h3>${admBars(admCount(U, u => u.intereses.split(",").map(x => x.trim().toLowerCase())).slice(0,8))}</section>
+      <section class="apanel"><h3>${L("A revisar","To review")}</h3><ul class="alist">
+        ${U.filter(u => !u.dir).map(u => `<li><button class="link" data-u="${u.uid}">${esc(u.alias)}</button> · ${L("sin dirección: no se le pueden reenviar cartas","no address: letters can't be forwarded")}</li>`).join("")}
+        ${U.filter(u => !u.complete).map(u => `<li><button class="link" data-u="${u.uid}">${esc(u.alias)}</button> · ${L("perfil incompleto: no sale en Descubrir","incomplete profile: not shown in Discover")}</li>`).join("")}
+        ${U.filter(u => u.hidden).map(u => `<li><button class="link" data-u="${u.uid}">${esc(u.alias)}</button> · ${L("oculto por moderación","hidden by moderation")}</li>`).join("")}
+      </ul>${U.every(u => u.dir && u.complete && !u.hidden) ? `<p class="hint">${L("Todo en orden.","All in order.")}</p>` : ""}</section>
+    </div>
+    <p class="hint">${L("Las cartas todavía se guardan solo en el dispositivo de cada persona. Cuando se compartan en la nube, aquí aparecerá su recorrido por la oficina.","Letters are still stored only on each person's device. Once they're shared in the cloud, their journey through the office will appear here.")}</p>`;
+  if (admTab === "usuarios"){
+    const q = admQ.trim().toLowerCase();
+    const rows = U.filter(u => !q || [u.alias,u.code,u.zona,u.email,u.prof].join(" ").toLowerCase().includes(q)).sort((a,b) => alta(b) - alta(a));
+    body = `<input class="asearch" id="aq" type="search" placeholder="${L("Buscar por alias, código, zona o email","Search by alias, code, area or email")}" value="${esc(admQ)}">
+    <div class="atable-wrap"><table class="atable"><thead><tr><th>${L("Alias","Alias")}</th><th>${L("Código","Code")}</th><th>${L("Zona","Area")}</th><th>${L("Edad","Age")}</th><th>${L("Alta","Joined")}</th><th title="${L("Enviados / recibidos","Sent / received")}">${L("Elecciones","Choices")}</th><th>${L("Matches","Matches")}</th><th>${L("Dirección","Address")}</th><th>${L("Estado","Status")}</th></tr></thead><tbody>
+    ${rows.map(u => `<tr data-u="${u.uid}" tabindex="0"><td><b>${esc(u.alias)}</b></td><td><code>${esc(u.code)}</code></td><td>${esc(u.zona)}</td><td>${esc(u.edad)}</td><td>${admDate(alta(u))}</td><td>${u.sent} / ${u.got}</td><td>${u.matches}</td><td>${u.dir ? "✓" : `<span class="status way">${L("Falta","Missing")}</span>`}</td><td>${u.hidden ? `<span class="status bad">${L("Oculto","Hidden")}</span>` : `<span class="status ok">${L("Visible","Visible")}</span>`}</td></tr>`).join("")}
+    </tbody></table></div>${rows.length ? "" : `<p class="hint">${L("Nadie coincide con la búsqueda.","Nobody matches the search.")}</p>`}`;
+  }
+  if (admTab === "buzon") body = `<section class="apanel"><h3>${L("Resolver un código de buzón","Resolve a mailbox code")}</h3>
+    <p class="hint">${L("Escribe el código del sobre interior para saber a qué dirección reenviarlo. Solo lo ve la oficina.","Type the code on the inner envelope to see where to forward it. Only the office sees this.")}</p>
+    <form class="arow" id="acode"><input id="acin" placeholder="LUNA-4821" autocomplete="off" style="text-transform:uppercase"><button type="submit">${L("Buscar","Look up")}</button></form><div id="acout"></div></section>`;
+  if (admTab === "matches") body = ADM.pairs.length ? `<ul class="alist big">${ADM.pairs.map(([a,b]) => { const A = ADM.byUid[a], B = ADM.byUid[b]; return `<li><button class="link" data-u="${a}">${esc(A ? A.alias : a)}</button> <span aria-hidden="true">✉</span> <button class="link" data-u="${b}">${esc(B ? B.alias : b)}</button> <small>${esc(A ? A.code : "")} · ${esc(B ? B.code : "")}</small></li>`; }).join("")}</ul>` : `<p class="hint">${L("Todavía no hay matches entre personas reales.","No matches between real people yet.")}</p>`;
+  $("#view").innerHTML = `<div class="ahead"><div><h2>${L("Administración","Admin")}</h2><p class="sub">${L("Visión general de Remitee","Remitee at a glance")} · ${L("datos de","data from")} ${new Date(ADM.at).toLocaleTimeString(lang === "en" ? "en-GB" : "es-ES", {hour:"2-digit", minute:"2-digit"})}</p></div><button class="soft sm" id="areload">${L("Actualizar","Refresh")}</button></div>
+    ${ADM.err ? `<div class="aerr">${L("No se han podido leer todos los datos. Publica las reglas nuevas de firestore.rules en Firebase (Firestore → Reglas).","Couldn't read all the data. Publish the new firestore.rules in Firebase (Firestore → Rules).")}</div>` : ""}
+    <nav class="atabs" role="tablist">${tabs.map(([k,l]) => `<button role="tab" class="${k===admTab?"on":""}" aria-selected="${k===admTab}" data-at="${k}">${l}</button>`).join("")}</nav>${body}`;
+  $("#areload").onclick = async () => { ADM = null; admin(); };
+  document.querySelectorAll("[data-at]").forEach(b => b.onclick = () => { admTab = b.dataset.at; admin(); });
+  document.querySelectorAll("#view [data-u]").forEach(el => { el.onclick = () => admUser(el.dataset.u); if (el.tagName === "TR") el.onkeydown = e => { if (e.key === "Enter") admUser(el.dataset.u); }; });
+  const aq = $("#aq"); if (aq){ aq.oninput = () => { admQ = aq.value; const pos = aq.selectionStart; admin(); const n = $("#aq"); n.focus(); n.setSelectionRange(pos, pos); }; }
+  const f = $("#acode"); if (f) f.onsubmit = e => { e.preventDefault(); const c = $("#acin").value.trim().toUpperCase(); const u = U.find(x => x.code.toUpperCase() === c);
+    $("#acout").innerHTML = !c ? "" : u ? `<div class="aaddr"><div class="kicker">${L("Reenviar a","Forward to")}</div><b>${esc(u.alias)}</b> <code>${esc(u.code)}</code>${u.dir ? `<pre>${esc(u.dir)}</pre><button class="soft sm" id="acopy">${L("Copiar dirección","Copy address")}</button>` : `<p class="status way">${L("Esta persona no ha guardado su dirección.","This person hasn't saved an address.")}</p>`}</div>` : `<p class="hint">${L("Ningún perfil tiene ese código. Revisa el sobre o apártalo como carta sin código válido.","No profile has that code. Check the envelope or set it aside as a letter without a valid code.")}</p>`;
+    const cp = $("#acopy"); if (cp) cp.onclick = () => { navigator.clipboard.writeText(u.dir).then(() => toast(L("Dirección copiada","Address copied")), () => toast(L("No se ha podido copiar","Couldn't copy"))); }; };
+}
+async function admUser(uid){
+  const u = ADM.byUid[uid]; if (!u) return;
+  const o = document.createElement("div"); o.className = "overlay";
+  o.innerHTML = `<div class="modal amodal" role="dialog" aria-label="${esc(u.alias)}">
+    <div class="ahead">${u.foto ? `<img class="aph" src="${u.foto}" alt="">` : `<div class="aph">${esc(u.alias[0]||"?")}</div>`}<div><h3>${esc(u.alias)}</h3><small>${esc([u.prof,u.edad,u.zona].filter(Boolean).join(" · "))}</small></div></div>
+    <dl class="adl"><dt>${L("Código","Code")}</dt><dd><code>${esc(u.code)}</code></dd><dt>Email</dt><dd>${esc(u.email||"—")}</dd><dt>${L("Dirección","Address")}</dt><dd>${u.dir ? esc(u.dir).replace(/\n/g,"<br>") : "—"}</dd>
+    <dt>${L("Alta","Joined")}</dt><dd>${admDate(u.created || u.updated)}${u.created ? "" : " " + L("(aprox.)","(approx.)")}</dd><dt>${L("Elecciones","Choices")}</dt><dd>${u.sent} ${L("enviadas","sent")} · ${u.got} ${L("recibidas","received")} · ${u.matches} matches</dd>
+    <dt>${L("Intereses","Interests")}</dt><dd>${esc(u.intereses||"—")}</dd><dt>${L("Biografía","Bio")}</dt><dd>${esc(u.bio||"—")}</dd>${u.long ? `<dt>${L("Biografía extensa","Long bio")}</dt><dd>${esc(u.long)}</dd>` : ""}</dl>
+    <div id="agal"></div>
+    <div class="arow"><button class="${u.hidden ? "" : "soft"}" id="ahide">${u.hidden ? L("Volver a mostrar en Descubrir","Show again in Discover") : L("Ocultar en Descubrir","Hide from Discover")}</button><button class="soft" id="aclose">${L("Cerrar","Close")}</button></div></div>`;
+  document.body.appendChild(o);
+  o.onclick = e => { if (e.target === o) o.remove(); }; o.querySelector("#aclose").onclick = () => o.remove();
+  o.querySelector("#ahide").onclick = async () => {
+    try { await FB.db.collection("profiles").doc(uid).set({hidden:!u.hidden}, {merge:true}); u.hidden = !u.hidden; o.remove(); admin();
+      toast(u.hidden ? L(`${u.alias} ya no aparece en Descubrir`,`${u.alias} no longer appears in Discover`) : L(`${u.alias} vuelve a aparecer en Descubrir`,`${u.alias} appears in Discover again`)); }
+    catch(e){ toast(L("No se ha podido cambiar. Revisa que las reglas nuevas estén publicadas.","Couldn't change it. Check the new rules are published.")); } };
+  try { const g = await FB.db.collection("gallery").doc(uid).get(); const items = g.exists ? (g.data().items||[]) : [];
+    if (items.length) o.querySelector("#agal").innerHTML = `<div class="sechead">${L("Galería","Gallery")}</div><div class="agal">${items.map(it => `<img src="${it.src}" alt="${esc(it.cap||"")}" title="${esc(it.cap||"")}">`).join("")}</div>`; } catch(e){}
+}
+const views = {descubrir, cartas, perfil, como, admin};
 function route(){
-  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#bellBtn").hidden = onb; $("#topLogin").hidden = !onb || altaStep !== 0;
+  const onb = !me.created; document.querySelector(".tabs").hidden = onb; $("#bellBtn").hidden = onb; $("#topLogin").hidden = !onb || altaStep !== 0; $("#adminBtn").hidden = onb || !me.admin; $("#adminBtn").setAttribute("aria-label", L("Administración","Admin")); $("#adminBtn").title = L("Administración","Admin");
   if (onb && location.hash === "#como"){ document.body.classList.remove("wide"); como(); window.scrollTo(0,0); return; }
   if (onb){ alta(); window.scrollTo(0,0); return; }
   document.body.classList.remove("wide");
-  const v = (location.hash || "#descubrir").slice(1), name = views[v] ? v : "descubrir";
+  const v = (location.hash || "#descubrir").slice(1), name = views[v] && (v !== "admin" || me.admin) ? v : "descubrir";
   if (name !== "cartas") openId = null;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v===name ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
   views[name](); window.scrollTo(0,0);
 }
 document.querySelector('.tabs a[data-v="cartas"]').addEventListener("click", () => { openId = null; if (location.hash==="#cartas") route(); });
 window.addEventListener("hashchange", route);
+$("#adminBtn").onclick = () => { location.hash = "#admin"; };
 
 /* ---- Textos fijos de la cabecera y las pestañas ---- */
 function applyStatic(){
