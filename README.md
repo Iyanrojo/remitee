@@ -82,6 +82,7 @@ Botón con icono de gráfica en la cabecera, solo para administradores (`#admin`
 - **Personas:** tabla con buscador; cada ficha muestra email, dirección, galería y permite ocultar o volver a mostrar el perfil en Descubrir.
 - **Buzón central:** escribe el código del sobre interior y te da la dirección a la que reenviarlo.
 - **Matches:** parejas con match mutuo.
+- **Remitee Plus:** desde la ficha de cada persona se activa o se quita la suscripción (perfiles ilimitados y tick azul). Mientras no haya pagos, se activa a mano.
 
 Quién es administrador: el email `iyanrojo@gmail.com` (en `ADMIN_EMAILS` de `index.html` y en `firestore.rules`) y cualquier cuenta para la que crees a mano un documento `admins/{uid}` en Firestore. Hay que publicar las reglas de `firestore.rules`.
 

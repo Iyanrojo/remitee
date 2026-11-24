@@ -2,6 +2,10 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Remitee Plus con tick azul · 24 nov 2026 (encargo de Iyán)
+
+El aviso «Email verificado / Identidad verificada con Google» del Perfil sale solo la primera vez que se entra tras verificar (se guarda `vSeen`). Remitee Plus pasa a ser una suscripción mensual con perfiles ilimitados y tick azul junto al alias (Descubrir, Cartas, correspondencia, Perfil y panel de administración); tarjeta en el Perfil y ventana explicativa. Sin pagos todavía: en la web real lo activa administración desde la ficha de cada persona; en el prototipo se simula. **Reglas nuevas: el dueño no puede ponerse `plus` ni quitarse `hidden`; hay que publicarlas en Firebase.**
+
 ## Ronda 4 · 24 nov 2026
 
 **Qué vi.** Pruebas en verde (57/57). Tras enviar una carta, la ventana de correspondencia decía «Le toca a Ana» junto a «Tu plazo queda en pausa…», mientras el anillo mostraba el plazo de Ana: dos plazos distintos en la misma caja y ninguna fecha. El aviso «Perfil creado. Tu código de buzón es ROCA-8450» partía el código en dos líneas y desaparecía a los 3 s, poco para apuntar un dato importante; además el aviso no se anunciaba a lectores de pantalla. Los selectores (Edad, Cómo quieres que te presentemos) y los desplegables «Quién es Ana» no tenían anillo de foco con teclado. En «Cómo funciona» los personajes de la otra persona seguían con pastel y texto fijos (pendiente de la ronda 3).

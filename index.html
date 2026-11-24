@@ -20,7 +20,7 @@ html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 :root{
   --bg:#f7f8fc; --surface:#ffffff; --ink:#22263a; --muted:#6b7186; --line:#eceef5;
   --tint1:#ffe3d6; --tint2:#dfe9ff; --tint3:#dff5e8; --tint4:#f3e1fb; --tint5:#fff1c9; --on-tint:#2a2e45;
-  --on-accent:#fff; --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9;
+  --on-accent:#fff; --accent:#5b6cf0; --accent-soft:#eceefe; --ok:#2fa36b; --ok-soft:#e5f6ee; --warm:#d98a1e; --warm-soft:#fdf2e4; --bad:#d64c4c; --bad-soft:#fdeaea; --sky:#2f8fb5; --sky-soft:#e3f3f9; --tick:#1d8cf0; --on-tick:#fff;
   --head:"Outfit", "Segoe UI", system-ui, sans-serif;
   --body:"Inter", system-ui, -apple-system, sans-serif;
   --r:20px;
@@ -28,11 +28,11 @@ html{color-scheme:light}body{margin:0}[hidden]{display:none!important}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
   --tint1:#4d3a35; --tint2:#33405f; --tint3:#2d4a3c; --tint4:#47375a; --tint5:#4d4330; --on-tint:#eceef6;
-  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}}
+  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; --tick:#4aa8ff; --on-tick:#0d1420; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12141c; --surface:#1b1e29; --ink:#eceef6; --muted:#878ca3; --line:#272b3a;
   --tint1:#4d3a35; --tint2:#33405f; --tint3:#2d4a3c; --tint4:#47375a; --tint5:#4d4330; --on-tint:#eceef6;
-  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; color-scheme:dark}
+  --on-accent:#12141c; --accent:#8d99ff; --accent-soft:#252a4a; --ok:#5cc792; --ok-soft:#1d3329; --warm:#f2b46a; --warm-soft:#3a2e1f; --bad:#f08080; --bad-soft:#3b2224; --sky:#6cc3e3; --sky-soft:#1b2f38; --tick:#4aa8ff; --on-tick:#0d1420; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 110px}
@@ -658,6 +658,19 @@ button.link{background:none;color:var(--accent);padding:0;border-radius:0;font-s
 .adl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:.88rem}
 .adl dt{color:var(--muted)}.adl dd{margin:0;overflow-wrap:anywhere}
 .agal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.agal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+/* Remitee Plus y tick azul */
+.vtick{width:1.05em;height:1.05em;vertical-align:-.15em;margin-left:.3em;flex:none;display:inline-block}
+.vtick .vt-b{fill:var(--tick)}
+.vtick .vt-c{fill:none;stroke:var(--on-tick);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pluscard{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.pluscard .pc-t{display:grid;gap:2px}.pluscard small{color:var(--muted);font-weight:400}
+.pluscard .vtick{width:1.6rem;height:1.6rem}
+.pluscard.on{border-color:var(--tick)}
+.plusm{text-align:left}.plusm h2{margin:0}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.plist li{display:grid;gap:2px;padding-left:14px;border-left:3px solid var(--tick)}
+.plist span{color:var(--muted);font-size:.88rem}
+.pprev{font-family:var(--head);font-weight:600;font-size:1.3rem;background:var(--bg);border-radius:14px;padding:12px 16px;justify-self:start}
 </style>
 </head>
 <body>
@@ -691,7 +704,7 @@ async function cloudSave(){
   if (!me.hasCreatedAt){ pub.createdAt = pub.updatedAt; me.hasCreatedAt = true; }
   // Cada documento se guarda por separado: si uno falla, los demás (y la foto) se guardan igualmente
   const jobs = [
-    ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, liked:me.liked||[], nEmail:me.nEmail!==false, nApp:me.nApp!==false}, {merge:true})],
+    ["private", () => FB.db.collection("private").doc(me.uid).set({email:me.email||"", dir:me.dir||"", foto:me.foto||null, liked:me.liked||[], nEmail:me.nEmail!==false, nApp:me.nApp!==false, vSeen:!!me.vSeen}, {merge:true})],
     ["profiles", () => FB.db.collection("profiles").doc(me.uid).set(pub, {merge:true})],
     ["gallery", () => FB.db.collection("gallery").doc(me.uid).set({items:(me.gallery||[]).map(g => ({src:g.src, cap:g.cap||""}))})]
   ];
@@ -711,7 +724,7 @@ async function queueWelcome(){
 async function cloudLoad(uid){
   const [a, b] = await Promise.all([FB.db.collection("profiles").doc(uid).get(), FB.db.collection("private").doc(uid).get()]);
   if (!a.exists) return false;
-  const pub = a.data(); delete pub.updatedAt; me.hasCreatedAt = !!pub.createdAt; delete pub.createdAt; delete pub.hidden;
+  const pub = a.data(); delete pub.updatedAt; me.hasCreatedAt = !!pub.createdAt; delete pub.createdAt; delete pub.hidden; me.plus = !!pub.plus; delete pub.plus;
   const priv = b.exists ? b.data() : {};
   const cloudChats = priv.chats, cloudNow = priv.simNow; delete priv.chats; delete priv.simNow;
   if (!priv.foto) delete priv.foto;
@@ -800,7 +813,7 @@ const shots = [
 const people = [
   {id:1, alias:"Lince", zona:"Asturias", edad:"30–35", prof:"Bibliotecaria", code:"LUNA-4821", long:"Trabajo en una biblioteca municipal y paso el día rodeada de historias ajenas. Me crié en un pueblo de la montaña asturiana y sigo subiendo cada fin de semana que puedo. Tengo un álbum de sellos que empezó mi abuelo y que voy completando con cartas como estas. Me gusta escribir con pluma, aunque me mancho los dedos. Busco a alguien con quien contarnos la vida despacio.", likesMe:true,  showFoto:true,  bio:"Colecciono sellos de países que no he pisado. Me gustan las cartas largas y las posdatas más largas todavía.", tags:["sellos","viajes","montaña"]},
   {id:2, alias:"Marea", zona:"Cádiz", edad:"25–30", prof:"Profesora de música", code:"SAL-0316", long:"Doy clases de música en un instituto y por las tardes toco en una banda pequeña. Vivo cerca del mar y salgo a caminar por la playa casi todos los días. Cocino mucho para los demás.", likesMe:false, showFoto:true,  bio:"Te cuento qué suena en mi barrio si tú me cuentas qué se ve desde tu ventana.", tags:["música","mar","cocina"]},
-  {id:3, alias:"Ciprés", zona:"Girona", edad:"40–45", prof:"Carpintero", code:"OLMO-7720", long:"Soy carpintero, como mi padre. Tengo un taller pequeño y un jardín que ocupa más tiempo del que debería. Escuchar jazz mientras trabajo es lo único que me hace perder la noción del tiempo. Me separé hace unos años y me apetece volver a tener conversaciones largas, aunque sea por carta.", likesMe:true,  showFoto:false, bio:"Escribo a mano desde niño y echo de menos abrir el buzón con ganas. Prometo buena letra.", tags:["caligrafía","poesía","plantas"]},
+  {id:3, plus:true, alias:"Ciprés", zona:"Girona", edad:"40–45", prof:"Carpintero", code:"OLMO-7720", long:"Soy carpintero, como mi padre. Tengo un taller pequeño y un jardín que ocupa más tiempo del que debería. Escuchar jazz mientras trabajo es lo único que me hace perder la noción del tiempo. Me separé hace unos años y me apetece volver a tener conversaciones largas, aunque sea por carta.", likesMe:true,  showFoto:false, bio:"Escribo a mano desde niño y echo de menos abrir el buzón con ganas. Prometo buena letra.", tags:["caligrafía","poesía","plantas"]},
   {id:4, alias:"Noria", zona:"Madrid", edad:"30–35", prof:"Diseñadora de interfaces", code:"VELA-2054", long:"Diseño aplicaciones para una empresa de Madrid, así que vivo pegada a una pantalla. Por eso me atrae tanto lo contrario: el papel, la espera, abrir un sobre. Voy a la filmoteca casi cada semana, escribo poemas que no enseño a nadie y me muevo por la ciudad en bici. Revelo mis propias fotos en un cuarto oscuro improvisado en el baño.", likesMe:true,  showFoto:true,  bio:"Trabajo con pantallas todo el día. Quiero algo que tarde en llegar y se pueda guardar en una caja.", tags:["cine","fotografía","bici"]},
   {id:5, alias:"Grulla", zona:"Lugo", edad:"55–60", prof:"Enfermera jubilada", code:"NUBE-6631", long:"He sido enfermera durante cuarenta años. Ahora tengo tiempo para lo que siempre dejé para después: recopilar las recetas de mi madre y escuchar las historias de la gente mayor del pueblo antes de que se pierdan.", likesMe:false, showFoto:true,  bio:"Jubilada y curiosa. Me encantan las recetas heredadas y las historias de pueblo.", tags:["recetas","historia","punto"]}
 ];
@@ -1058,9 +1071,10 @@ const DAY = 864e5; let now = new Date(); now.setHours(10,0,0,0);
 const addD = (d,n) => new Date(+d + n*DAY);
 const daysLeft = d => Math.max(0, Math.ceil((d - now)/DAY));
 const replyAfter = {1:4, 3:null, 4:6};
-const VIEW_LIMIT = 5; let viewsUsed = 0, viewDay = now.toDateString(), plus = false;
+const VIEW_LIMIT = 5; let viewsUsed = 0, viewDay = now.toDateString();
+const isPlus = () => !!me.plus;
 const passedStack = [];
-function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; passedStack.length = 0; } return plus ? Infinity : VIEW_LIMIT - viewsUsed; }
+function viewsLeft(){ if (viewDay !== now.toDateString()){ viewDay = now.toDateString(); viewsUsed = 0; passedStack.length = 0; } return isPlus() ? Infinity : VIEW_LIMIT - viewsUsed; }
 const suspended = () => me.suspendedUntil && now < me.suspendedUntil;
 
 /* ---- Cartas: fases de cada envío ---- */
@@ -1133,14 +1147,32 @@ function bindBack(){
   const b = $("#prevp"); if (!b) return;
   b.onclick = () => { const q = passedStack.pop(); if (!q) return; q.seen = false;
     const i = people.indexOf(q); people.splice(i,1); people.unshift(q);
-    if (!plus) viewsUsed = Math.max(0, viewsUsed-1); descubrir(); };
+    if (!isPlus()) viewsUsed = Math.max(0, viewsUsed-1); descubrir(); };
 }
 /* ---- Perfiles reales: se cargan de Firestore y van siempre antes que los de ejemplo ---- */
 let realLoaded = false, realLoading = false;
+// Tick azul de perfil verificado: lo tienen las personas con Remitee Plus
+const TICK = () => `<svg class="vtick" viewBox="0 0 24 24" role="img" aria-label="${L("Perfil verificado · Remitee Plus","Verified profile · Remitee Plus")}"><title>${L("Perfil verificado · Remitee Plus","Verified profile · Remitee Plus")}</title><path class="vt-b" d="M12 1.8l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.2l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/><path class="vt-c" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>`;
+const nameHTML = p => esc(p.alias) + (p.plus ? TICK() : "");
+function plusModal(after){
+  const o = document.createElement("div"); o.className = "overlay";
+  const on = isPlus();
+  o.innerHTML = `<div class="modal plusm" role="dialog" aria-label="Remitee Plus"><div class="kicker">Remitee Plus</div>
+    <h2>${on ? L("Ya eres de Remitee Plus","You're on Remitee Plus") : L("Escribe a más gente, con sello propio","Write to more people, with your own seal")}</h2>
+    <ul class="plist"><li><b>${L("Perfiles ilimitados","Unlimited profiles")}</b><span>${L(`Sin el límite de ${VIEW_LIMIT} perfiles al día.`,`No limit of ${VIEW_LIMIT} profiles a day.`)}</span></li>
+    <li><b>${L("Tick azul de perfil verificado","Blue verified tick")}</b><span>${L("Aparece junto a tu alias en Descubrir, en los matches y en las cartas.","Shown next to your alias in Discover, matches and letters.")}</span></li>
+    <li><b>${L("Suscripción mensual","Monthly subscription")}</b><span>${L("Se renueva cada mes y puedes cancelarla cuando quieras.","Renews monthly and you can cancel any time.")}</span></li></ul>
+    <div class="pprev">${esc(me.alias || L("Tu alias","Your alias"))}${TICK()}</div>
+    ${on ? "" : FB ? `<p class="note">${L("Los pagos se abrirán muy pronto. Mientras tanto, la suscripción la activa el equipo de Remitee.","Payments open very soon. Meanwhile, the Remitee team activates the subscription.")}</p>` : `<button id="plusGo">${L("Suscribirme","Subscribe")}</button><small class="note">${L("Prototipo: no se cobra nada.","Prototype: nothing is charged.")}</small>`}
+    <button class="soft" id="plusX">${L("Cerrar","Close")}</button></div>`;
+  document.body.appendChild(o);
+  const close = () => o.remove(); o.onclick = e => { if (e.target === o) close(); }; o.querySelector("#plusX").onclick = close;
+  const go = o.querySelector("#plusGo"); if (go) go.onclick = () => { me.plus = true; saveLocal(); close(); toast(L("Ya eres de Remitee Plus: perfiles ilimitados y tick azul","You're on Remitee Plus: unlimited profiles and blue tick")); if (after) after(); };
+}
 function toPerson(uid, d){
   const tags = String(d.intereses||"").split(",").map(x => x.trim()).filter(Boolean).slice(0,3);
   return {id:"r_"+uid, uid, real:true, alias:d.alias||"—", edad:d.edad||"", zona:d.zona||"", prof:d.prof||"", bio:d.bio||"", long:d.long||"", tags,
-    langs:(d.langs && d.langs.length) ? d.langs : ["es"], g:d.g||"n", showFoto:d.showFoto !== false, code:d.code||"", corr:d.corr||0, rAvg:d.rAvg||0, rN:d.rN||0,
+    langs:(d.langs && d.langs.length) ? d.langs : ["es"], g:d.g||"n", plus:!!d.plus, showFoto:d.showFoto !== false, code:d.code||"", corr:d.corr||0, rAvg:d.rAvg||0, rN:d.rN||0,
     places:[], gallery:[], home:homeOf(d.zona), at:(d.updatedAt && d.updatedAt.toMillis) ? d.updatedAt.toMillis() : 0};
 }
 async function loadRealProfiles(){
@@ -1203,19 +1235,19 @@ function descubrir(){
   if (FB && me.uid && !realLoaded) loadRealProfiles();
   const left = pending();
   const head = `<h2 class="disc-h">${L("Descubrir","Discover")}</h2>${suspBanner()}`;
-  if (!plus && viewsLeft()<=0){
-    $("#view").innerHTML = head + `${backBtn()}<div class="paywall"><b>${L(`Ya has visto tus ${VIEW_LIMIT} perfiles de hoy`,`You've seen your ${VIEW_LIMIT} profiles for today`)}</b><p>${L(`Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.`,`Tomorrow you'll see ${VIEW_LIMIT} more. To meet more people now, subscribe to Remitee Plus.`)}</p><button id="sub">${L("Suscribirme a Remitee Plus","Subscribe to Remitee Plus")}</button><small>${L("Simulación: no se cobra nada.","Simulation: nothing is charged.")}</small></div>${sim()}`;
-    bindSim(); bindBack(); $("#sub").onclick = () => { plus = true; toast(L("Ya eres de Remitee Plus: perfiles ilimitados","You're on Remitee Plus: unlimited profiles")); descubrir(); }; return;
+  if (!isPlus() && viewsLeft()<=0){
+    $("#view").innerHTML = head + `${backBtn()}<div class="paywall"><b>${L(`Ya has visto tus ${VIEW_LIMIT} perfiles de hoy`,`You've seen your ${VIEW_LIMIT} profiles for today`)}</b><p>${L(`Mañana podrás ver ${VIEW_LIMIT} más. Si quieres conocer a más personas ahora, suscríbete a Remitee Plus.`,`Tomorrow you'll see ${VIEW_LIMIT} more. To meet more people now, subscribe to Remitee Plus.`)}</p><button id="sub">${L("Suscribirme a Remitee Plus","Subscribe to Remitee Plus")}</button><small>${L("Incluye perfiles ilimitados y el tick azul de perfil verificado.","Includes unlimited profiles and the blue verified tick.")}</small></div>${sim()}`;
+    bindSim(); bindBack(); $("#sub").onclick = () => plusModal(descubrir); return;
   }
   if (!left.length){ $("#view").innerHTML = head + `<div class="empty">${L("Has visto todos los perfiles disponibles.<br>Vuelve pronto: llegan personas nuevas.","You've seen every available profile.<br>Come back soon: new people are joining.")}</div>${backBtn()}${sim()}`; bindSim(); bindBack(); return; }
   const p = left[0];
   const shared = common(p);
   $("#view").innerHTML = head + `
-    <div class="views">${backBtn()}<span>${plus?L("Remitee Plus · perfiles ilimitados","Remitee Plus · unlimited profiles"):L(`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`,`Profile ${viewsUsed+1} of ${VIEW_LIMIT} today`)}</span>${plus?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
+    <div class="views">${backBtn()}<span>${isPlus()?L("Remitee Plus · perfiles ilimitados","Remitee Plus · unlimited profiles"):L(`Perfil ${viewsUsed+1} de ${VIEW_LIMIT} hoy`,`Profile ${viewsUsed+1} of ${VIEW_LIMIT} today`)}</span>${isPlus()?"":`<span class="vbar">${Array.from({length:VIEW_LIMIT},(_,i)=>`<i class="${i<viewsUsed?"used":i===viewsUsed?"now":""}"></i>`).join("")}</span>`}</div>
     <article class="card swipe">
       <div class="sw-top">
         ${photo(p,"big",false)}
-        <div class="sw-id"><p class="name">${esc(p.alias)}</p>
+        <div class="sw-id"><p class="name">${nameHTML(p)}</p>
           <div class="where">${esc(p.edad)} ${L("años","years old")} · ${esc(p.zona)}</div>
           ${p.real ? "" : `<span class="exbadge">${L("Perfil de ejemplo","Example profile")}</span>`}</div>
       </div>
@@ -1237,7 +1269,7 @@ function descubrir(){
     </article>
     <p class="hint">${L("Si los dos os elegís, hay match. Escribe primero quien completa el match.","If you both choose each other, it's a match. Whoever completes the match writes first.")}</p>${sim()}`;
   bindSim(); bindBack();
-  const used = () => { if (!plus) viewsUsed++; p.seen = true; };
+  const used = () => { if (!isPlus()) viewsUsed++; p.seen = true; };
   $("#no").onclick = () => { used(); passedStack.push(p); descubrir(); };
   $("#yes").onclick = () => {
     used();
@@ -1313,7 +1345,7 @@ function cartas(){
   const sorted = [...chats].sort((a,b) => STATE_ORDER[chatState(a).k] - STATE_ORDER[chatState(b).k]);
   $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias, ordenadas por lo que necesita tu atención.","Your correspondences, ordered by what needs your attention.")}</p>${suspBanner()}` + (chats.length
     ? `${legendHTML()}<div class="list">${sorted.map(c=>{ const st = chatState(c);
-        return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${esc(c.p.alias)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c, 44, {cap:true})}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
+        return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${nameHTML(c.p)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c, 44, {cap:true})}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
     : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = b.dataset.id; cartas(); });
   bindSim();
@@ -1360,7 +1392,7 @@ function ventana(c){
   const inc = incoming(c);
   const canSend = !c.closed && c.turn==="me" && !inc;
   $("#view").innerHTML = `<button class="back" id="back">← ${L("Cartas","Letters")}</button>
-    <div class="chead"><button type="button" class="phbtn" id="chPh" aria-label="${L("Ampliar foto","Enlarge photo")}">${photo(c.p,"md",true)}</button><div><div class="n">${esc(c.p.alias)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
+    <div class="chead"><button type="button" class="phbtn" id="chPh" aria-label="${L("Ampliar foto","Enlarge photo")}">${photo(c.p,"md",true)}</button><div><div class="n">${nameHTML(c.p)}</div><div class="s">${esc(c.p.prof)} · ${esc(c.p.zona)}</div><div class="rate-row sm">${ratingHTML(c.p.rAvg, c.p.rN, {sm:true})}</div><div class="trust sm">${trust(c.p)}</div></div></div>
     <details class="about" ${c.letters.length?"":"open"}><summary>${L(`Quién es ${esc(c.p.alias)}`,`About ${esc(c.p.alias)}`)}</summary>
       <div class="chips" style="margin:10px 0">${c.p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
       <p>${esc(c.p.long || c.p.bio)}</p>
@@ -1582,17 +1614,23 @@ function readForm(){
   const lg = readLangPicker("f-langs"); if (lg.length) me.langs = lg;
 }
 
+let vShowSession = false;
 function perfil(){
+  // El aviso «Email verificado» solo se enseña la primera vez que entras al perfil tras verificar
+  if (!me.vSeen && (me.verified || me.provider !== "email")) { vShowSession = true; me.vSeen = true; saveLocal(); if (FB) cloudSave().catch(() => {}); }
+  const showV = vShowSession;
   const [ra, rn] = myRating();
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
-  <div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>
+  ${showV ? `<div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>` : ""}
   <form class="form" id="pf">
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${esc(me.alias)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true,self:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${nameHTML(me)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true,self:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
       return `<div class="sechead">${L("Tu mapa de cartas","Your letter map")}</div>${statsHTML(myCorr, myPlaces, ra, rn)}${mapHTML(homeOf(me.zona), myPlaces, {self:true, homeLabel:me.zona})}<div class="sechead">${L("Tus datos","Your details")}</div>`; })()}
     ${profileFields()}
     ${myGalleryHTML()}
     <div class="field"><label>${L("Tu código de buzón","Your mailbox code")}</label><span class="code-inline" style="justify-self:start;font-size:1rem">${esc(me.code)}</span><small>${L("Es lo que la gente escribe en el sobre para ti. No hace falta que lo compartas: lo ven tus matches.","It's what people write on the envelope for you. You don't need to share it: your matches can see it.")}</small></div>
+    <div class="sechead">Remitee Plus</div>
+    <button type="button" class="pluscard ${isPlus()?"on":""}" id="plusCard"><span class="pc-t"><b>${isPlus() ? L("Remitee Plus activo","Remitee Plus active") : L("Hazte Remitee Plus","Get Remitee Plus")}</b><small>${isPlus() ? L("Perfiles ilimitados y tick azul en tu perfil.","Unlimited profiles and a blue tick on your profile.") : L("Suscripción mensual: perfiles ilimitados y tick azul de perfil verificado.","Monthly subscription: unlimited profiles and the blue verified tick.")}</small></span>${TICK()}</button>
     <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
     <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
     <label class="switch" for="f-na"><span><b>${L("En la app","In the app")}</b><small>${L("Notificaciones en el móvil","Notifications on your phone")}</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
@@ -1600,11 +1638,12 @@ function perfil(){
     <button type="button" class="plain" id="logout">${L("Cerrar sesión","Sign out")}</button>
   </form>`;
   bindProfile(perfil); bindMyGallery(perfil);
+  $("#plusCard").onclick = () => plusModal(perfil);
   const myPh = document.querySelector(".form > div .ph"); if (myPh && me.foto){ myPh.style.cursor = "zoom-in"; myPh.onclick = () => openLightbox([{src:me.foto, cap:me.alias}, ...(me.gallery||[])]); }
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false}); ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false, plus:false, vSeen:false}); vShowSession = false; ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
 }
 
 /* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
@@ -2027,7 +2066,7 @@ async function loadAdmin(){
   const err = profiles.__err || priv.__err || likes.__err; delete profiles.__err; delete priv.__err; delete likes.__err;
   const users = Object.entries(profiles).map(([uid, d]) => {
     const p = priv[uid] || {};
-    return {uid, alias:d.alias||"—", code:d.code||"", zona:d.zona||"", edad:d.edad||"", prof:d.prof||"", bio:d.bio||"", long:d.long||"", intereses:d.intereses||"", langs:d.langs||[], hidden:!!d.hidden,
+    return {uid, alias:d.alias||"—", code:d.code||"", zona:d.zona||"", edad:d.edad||"", prof:d.prof||"", bio:d.bio||"", long:d.long||"", intereses:d.intereses||"", langs:d.langs||[], hidden:!!d.hidden, plus:!!d.plus,
       created:tsMs(d.createdAt), updated:tsMs(d.updatedAt), email:p.email||"", dir:p.dir||"", foto:p.foto||null, sent:0, got:0, matches:0, complete:!!(d.alias && d.bio)};
   });
   const byUid = Object.fromEntries(users.map(u => [u.uid, u]));
@@ -2058,6 +2097,7 @@ async function admin(){
       <div><b>${ADM.likes}</b><span>${L("«Quiero escribirle»","“I want to write”")}</span></div>
       <div><b>${ADM.pairs.length}</b><span>${L("matches","matches")}</span></div>
       <div class="${withDir < U.length ? "warn" : ""}"><b>${withDir}/${U.length}</b><span>${L("con dirección postal","with a postal address")}</span></div>
+      <div><b>${U.filter(u => u.plus).length}</b><span>Remitee Plus</span></div>
       <div><b>${withFoto}</b><span>${L("con foto","with a photo")}${hidden ? ` · ${hidden} ${L("ocultas","hidden")}` : ""}</span></div>
     </div>
     <div class="agrid">
@@ -2078,7 +2118,7 @@ async function admin(){
     const rows = U.filter(u => !q || [u.alias,u.code,u.zona,u.email,u.prof].join(" ").toLowerCase().includes(q)).sort((a,b) => alta(b) - alta(a));
     body = `<input class="asearch" id="aq" type="search" placeholder="${L("Buscar por alias, código, zona o email","Search by alias, code, area or email")}" value="${esc(admQ)}">
     <div class="atable-wrap"><table class="atable"><thead><tr><th>${L("Alias","Alias")}</th><th>${L("Código","Code")}</th><th>${L("Zona","Area")}</th><th>${L("Edad","Age")}</th><th>${L("Alta","Joined")}</th><th title="${L("Enviados / recibidos","Sent / received")}">${L("Elecciones","Choices")}</th><th>${L("Matches","Matches")}</th><th>${L("Dirección","Address")}</th><th>${L("Estado","Status")}</th></tr></thead><tbody>
-    ${rows.map(u => `<tr data-u="${u.uid}" tabindex="0"><td><b>${esc(u.alias)}</b></td><td><code>${esc(u.code)}</code></td><td>${esc(u.zona)}</td><td>${esc(u.edad)}</td><td>${admDate(alta(u))}</td><td>${u.sent} / ${u.got}</td><td>${u.matches}</td><td>${u.dir ? "✓" : `<span class="status way">${L("Falta","Missing")}</span>`}</td><td>${u.hidden ? `<span class="status bad">${L("Oculto","Hidden")}</span>` : `<span class="status ok">${L("Visible","Visible")}</span>`}</td></tr>`).join("")}
+    ${rows.map(u => `<tr data-u="${u.uid}" tabindex="0"><td><b>${nameHTML(u)}</b></td><td><code>${esc(u.code)}</code></td><td>${esc(u.zona)}</td><td>${esc(u.edad)}</td><td>${admDate(alta(u))}</td><td>${u.sent} / ${u.got}</td><td>${u.matches}</td><td>${u.dir ? "✓" : `<span class="status way">${L("Falta","Missing")}</span>`}</td><td>${u.hidden ? `<span class="status bad">${L("Oculto","Hidden")}</span>` : `<span class="status ok">${L("Visible","Visible")}</span>`}</td></tr>`).join("")}
     </tbody></table></div>${rows.length ? "" : `<p class="hint">${L("Nadie coincide con la búsqueda.","Nobody matches the search.")}</p>`}`;
   }
   if (admTab === "buzon") body = `<section class="apanel"><h3>${L("Resolver un código de buzón","Resolve a mailbox code")}</h3>
@@ -2100,14 +2140,18 @@ async function admUser(uid){
   const u = ADM.byUid[uid]; if (!u) return;
   const o = document.createElement("div"); o.className = "overlay";
   o.innerHTML = `<div class="modal amodal" role="dialog" aria-label="${esc(u.alias)}">
-    <div class="ahead">${u.foto ? `<img class="aph" src="${u.foto}" alt="">` : `<div class="aph">${esc(u.alias[0]||"?")}</div>`}<div><h3>${esc(u.alias)}</h3><small>${esc([u.prof,u.edad,u.zona].filter(Boolean).join(" · "))}</small></div></div>
+    <div class="ahead">${u.foto ? `<img class="aph" src="${u.foto}" alt="">` : `<div class="aph">${esc(u.alias[0]||"?")}</div>`}<div><h3>${nameHTML(u)}</h3><small>${esc([u.prof,u.edad,u.zona].filter(Boolean).join(" · "))}</small></div></div>
     <dl class="adl"><dt>${L("Código","Code")}</dt><dd><code>${esc(u.code)}</code></dd><dt>Email</dt><dd>${esc(u.email||"—")}</dd><dt>${L("Dirección","Address")}</dt><dd>${u.dir ? esc(u.dir).replace(/\n/g,"<br>") : "—"}</dd>
     <dt>${L("Alta","Joined")}</dt><dd>${admDate(u.created || u.updated)}${u.created ? "" : " " + L("(aprox.)","(approx.)")}</dd><dt>${L("Elecciones","Choices")}</dt><dd>${u.sent} ${L("enviadas","sent")} · ${u.got} ${L("recibidas","received")} · ${u.matches} matches</dd>
     <dt>${L("Intereses","Interests")}</dt><dd>${esc(u.intereses||"—")}</dd><dt>${L("Biografía","Bio")}</dt><dd>${esc(u.bio||"—")}</dd>${u.long ? `<dt>${L("Biografía extensa","Long bio")}</dt><dd>${esc(u.long)}</dd>` : ""}</dl>
     <div id="agal"></div>
-    <div class="arow"><button class="${u.hidden ? "" : "soft"}" id="ahide">${u.hidden ? L("Volver a mostrar en Descubrir","Show again in Discover") : L("Ocultar en Descubrir","Hide from Discover")}</button><button class="soft" id="aclose">${L("Cerrar","Close")}</button></div></div>`;
+    <div class="arow"><button class="soft" id="aplus">${u.plus ? L("Quitar Remitee Plus","Remove Remitee Plus") : L("Activar Remitee Plus","Activate Remitee Plus")}</button><button class="${u.hidden ? "" : "soft"}" id="ahide">${u.hidden ? L("Volver a mostrar en Descubrir","Show again in Discover") : L("Ocultar en Descubrir","Hide from Discover")}</button><button class="soft" id="aclose">${L("Cerrar","Close")}</button></div></div>`;
   document.body.appendChild(o);
   o.onclick = e => { if (e.target === o) o.remove(); }; o.querySelector("#aclose").onclick = () => o.remove();
+  o.querySelector("#aplus").onclick = async () => {
+    try { await FB.db.collection("profiles").doc(uid).set({plus:!u.plus}, {merge:true}); u.plus = !u.plus; o.remove(); admin();
+      toast(u.plus ? L(`${u.alias} ya tiene Remitee Plus y tick azul`,`${u.alias} now has Remitee Plus and the blue tick`) : L(`${u.alias} ya no tiene Remitee Plus`,`${u.alias} no longer has Remitee Plus`)); }
+    catch(e){ toast(L("No se ha podido cambiar. Revisa que las reglas nuevas estén publicadas.","Couldn't change it. Check the new rules are published.")); } };
   o.querySelector("#ahide").onclick = async () => {
     try { await FB.db.collection("profiles").doc(uid).set({hidden:!u.hidden}, {merge:true}); u.hidden = !u.hidden; o.remove(); admin();
       toast(u.hidden ? L(`${u.alias} ya no aparece en Descubrir`,`${u.alias} no longer appears in Discover`) : L(`${u.alias} vuelve a aparecer en Descubrir`,`${u.alias} appears in Discover again`)); }

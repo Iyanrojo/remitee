@@ -28,7 +28,7 @@ Propietario: Iyán Rojo. Idioma de trabajo: español.
 
 ## Reglas de producto que no se cambian sin permiso del propietario
 
-Match mutuo por intereses e idiomas · escribe primero quien completa el match · doble sobre y dos sellos con reenvío por la oficina de Remitee · plazos (7 días la primera carta, 14 para responder) y suspensión de 3 días · 5 perfiles al día (más con Remitee Plus) · valoración de 0 a 5 sobres · solo mayores de 25 · foto, biografía extensa, galería y mapa solo tras el match · verificación del email obligatoria · eslogan «Mensajería a fuego lento».
+Match mutuo por intereses e idiomas · escribe primero quien completa el match · doble sobre y dos sellos con reenvío por la oficina de Remitee · plazos (7 días la primera carta, 14 para responder) y suspensión de 3 días · 5 perfiles al día; Remitee Plus (suscripción mensual) da perfiles ilimitados y tick azul de perfil verificado, y solo lo activa administración (campo `plus`, protegido en las reglas) · valoración de 0 a 5 sobres · solo mayores de 25 · foto, biografía extensa, galería y mapa solo tras el match · verificación del email obligatoria · eslogan «Mensajería a fuego lento».
 
 ## Cómo trabajar en cada ronda
 

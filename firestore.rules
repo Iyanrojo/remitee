@@ -16,10 +16,12 @@ service cloud.firestore {
     }
     match /profiles/{uid} {
       allow read: if verified();
-      // Su dueño no puede crear ni quitarse la marca "hidden" (moderación): eso solo lo hace administración
-      allow create: if verified() && request.auth.uid == uid && !("hidden" in request.resource.data);
+      // Su dueño no puede tocar "hidden" (moderación) ni "plus" (Remitee Plus y tick azul): eso solo lo hace administración
+      allow create: if verified() && request.auth.uid == uid
+        && !("hidden" in request.resource.data) && !("plus" in request.resource.data);
       allow update: if (verified() && request.auth.uid == uid
-          && request.resource.data.get("hidden", false) == resource.data.get("hidden", false))
+          && request.resource.data.get("hidden", false) == resource.data.get("hidden", false)
+          && request.resource.data.get("plus", false) == resource.data.get("plus", false))
         || isAdmin();
     }
     match /private/{uid} {
