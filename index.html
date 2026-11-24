@@ -57,6 +57,7 @@ button.soft{background:var(--accent-soft);color:var(--accent)}
 button.plain{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 button:disabled{opacity:.5;cursor:default}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.modal[tabindex="-1"]:focus,.modal[tabindex="-1"]:focus-visible{outline:none}
 .avatar{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:600;font-size:1.1rem;color:var(--ink)}
 .chip{font-size:.78rem;background:var(--bg);border:1px solid var(--line);padding:4px 11px;border-radius:999px;color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -671,6 +672,13 @@ button.link{background:none;color:var(--accent);padding:0;border-radius:0;font-s
 .pluscard .pc-t{display:grid;gap:2px}.pluscard small{color:var(--muted);font-weight:400}
 .pluscard .vtick{width:1.6rem;height:1.6rem}
 .pluscard.on{border-color:var(--tick)}
+/* Sin Plus, el tick sale apagado y con flecha: es una invitación, no un estado */
+.pluscard:not(.on) .vtick{filter:grayscale(1);opacity:.4}
+.pluscard .pc-go{display:flex;align-items:center;gap:6px;flex:none;color:var(--accent);font-weight:600;font-size:1.3rem;line-height:1}
+/* Áreas táctiles de 44 px en enlaces de texto pequeños sin mover el diseño */
+.back,.backp,.dotb,.pnav button.sm{position:relative}
+.back::after,.backp::after,.pnav button.sm::after{content:"";position:absolute;inset:-10px -8px}
+.dotb::after{content:"";position:absolute;inset:-18px -3px}
 .plusm{text-align:left}.plusm h2{margin:0}
 .plist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .plist li{display:grid;gap:2px;padding-left:14px;border-left:3px solid var(--tick)}
@@ -1642,7 +1650,7 @@ function perfil(){
     ${myGalleryHTML()}
     <div class="field"><label>${L("Tu código de buzón","Your mailbox code")}</label><span class="code-inline" style="justify-self:start;font-size:1rem">${esc(me.code)}</span><small>${L("Es lo que la gente escribe en el sobre para ti. No hace falta que lo compartas: lo ven tus matches.","It's what people write on the envelope for you. You don't need to share it: your matches can see it.")}</small></div>
     <div class="sechead">Remitee Plus</div>
-    <button type="button" class="pluscard ${isPlus()?"on":""}" id="plusCard"><span class="pc-t"><b>${isPlus() ? L("Remitee Plus activo","Remitee Plus active") : L("Hazte Remitee Plus","Get Remitee Plus")}</b><small>${isPlus() ? L("Perfiles ilimitados y tick azul en tu perfil.","Unlimited profiles and a blue tick on your profile.") : L("Suscripción mensual: perfiles ilimitados y tick azul de perfil verificado.","Monthly subscription: unlimited profiles and the blue verified tick.")}</small></span>${TICK()}</button>
+    <button type="button" class="pluscard ${isPlus()?"on":""}" id="plusCard"><span class="pc-t"><b>${isPlus() ? L("Remitee Plus activo","Remitee Plus active") : L("Hazte Remitee Plus","Get Remitee Plus")}</b><small>${isPlus() ? L("Perfiles ilimitados y tick azul en tu perfil.","Unlimited profiles and a blue tick on your profile.") : L("Suscripción mensual: perfiles ilimitados y tick azul de perfil verificado.","Monthly subscription: unlimited profiles and the blue verified tick.")}</small></span><span class="pc-go">${TICK()}<span aria-hidden="true">›</span></span></button>
     <div class="sechead">${L("Avisos cuando una carta cambia de fase","Notifications when a letter changes stage")}</div>
     <label class="switch" for="f-ne"><span><b>${L("Por email","By email")}</b><small>${esc(me.email||"")}</small></span><input type="checkbox" id="f-ne" ${me.nEmail!==false?"checked":""}></label>
     <label class="switch" for="f-na"><span><b>${L("En la app","In the app")}</b><small>${L("Notificaciones en el móvil","Notifications on your phone")}</small></span><input type="checkbox" id="f-na" ${me.nApp!==false?"checked":""}></label>
@@ -2222,6 +2230,34 @@ $("#topLogin").onclick = () => { authMode = "login"; altaStep = 1; alta(); $("#t
 $("#bellBtn").onclick = showNotifs;
 $("#langBtn").onclick = () => setLang(lang === "en" ? "es" : "en");
 $("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
+/* ---- Ventanas accesibles con teclado: foco dentro, Tab no se escapa, Esc cierra y el foco vuelve a su sitio ---- */
+const FOCUSABLE = 'button:not([disabled]),[href],input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
+const topOverlay = () => { const all = document.querySelectorAll(".overlay"); return all[all.length-1] || null; };
+function prepOverlay(o){
+  const m = o.querySelector(".modal"); if (!m) return;
+  m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true");
+  if (!m.hasAttribute("aria-label")){ const h = m.querySelector("h2,h3"); if (h) m.setAttribute("aria-label", h.textContent.trim()); }
+  if (!m.contains(document.activeElement)){ m.setAttribute("tabindex", "-1"); m.focus({preventScroll:true}); }
+}
+new MutationObserver(ms => ms.forEach(r => {
+  r.addedNodes.forEach(n => { if (n.nodeType === 1 && n.classList.contains("overlay")){ n._back = document.activeElement; prepOverlay(n);
+    new MutationObserver(() => prepOverlay(n)).observe(n, {childList:true}); } });
+  r.removedNodes.forEach(n => { if (n.nodeType === 1 && n.classList.contains("overlay") && !topOverlay()){ const b = n._back; if (b && b.isConnected && b !== document.body) b.focus({preventScroll:true}); } });
+})).observe(document.body, {childList:true});
+document.addEventListener("keydown", e => {
+  const o = topOverlay(); if (!o || document.querySelector(".lightbox")) return;
+  if (e.key === "Escape" && !o.classList.contains("wiz")){
+    // Usa el botón de cerrar de cada ventana (Cerrar, Más tarde, Cancelar, Entendido) para que haga su limpieza
+    const c = o.querySelector("#plusX,#n-ok,#later,#s-x,#fl-ok,#aclose,[data-close]");
+    if (c) c.click(); else o.remove(); e.preventDefault(); return;
+  }
+  if (e.key === "Tab"){
+    const f = [...o.querySelectorAll(FOCUSABLE)].filter(x => x.offsetParent !== null); if (!f.length) return;
+    const first = f[0], last = f[f.length-1];
+    if (e.shiftKey && (document.activeElement === first || !o.contains(document.activeElement))){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (document.activeElement === last || !o.contains(document.activeElement))){ e.preventDefault(); first.focus(); }
+  }
+});
 if (me.created) loadLocalChats();
 route();
 </script>

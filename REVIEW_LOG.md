@@ -2,6 +2,20 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 5 · 24 nov 2026
+
+**Qué vi.** Pruebas en verde (67/67). En el Perfil, la tarjeta «Hazte Remitee Plus» mostraba el tick azul a todo color aunque no tengas Plus: parecía que ya estaba activo. Ninguna ventana (Plus, Avisos, Match, Enviar carta, Cómo funciona, ficha de administración) se cerraba con Esc, el foco se quedaba detrás de la ventana y con Tab se salía a la página; solo dos tenían `role="dialog"`. Varios controles táctiles se quedaban muy por debajo de 44 px: «← Anterior» en Descubrir (24 px de alto), «← Volver»/«← Cartas» (27 px), «Anterior/Siguiente» de la animación del sobre (30 px) y los puntos de paso (8 × 8 px). Faltaba la captura de «Cómo funciona» en oscuro (pendiente de la ronda 4): revisada, se ve bien.
+
+**Qué cambié.**
+- Tarjeta de Remitee Plus: sin suscripción, el tick sale apagado en gris y con una flecha «›», así se lee como invitación; con Plus sigue en azul.
+- Ventanas: al abrirse reciben el foco, se marcan con `role="dialog"`, `aria-modal` y el título como nombre; Tab y Mayús+Tab no salen de la ventana; Esc la cierra usando su propio botón (Cerrar, Más tarde, Cancelar, Entendido) y el foco vuelve al botón que la abrió. El tutorial de alta no se cierra con Esc y la foto ampliada mantiene su propio Esc.
+- Áreas táctiles ampliadas con un pseudoelemento invisible (sin mover el diseño) en «Anterior», «Volver», los botones de la animación y los puntos de paso.
+- Pruebas: tick apagado sin Plus, foco dentro de la ventana, Tab atrapado, Esc cierra y devuelve el foco, Esc en «Cómo funciona», área táctil de los puntos y captura `10c-como-oscuro.png` (77/77). Quitado del repositorio `tests/__pycache__` y añadido a `.gitignore`.
+
+**Pendiente.** El arco del mapa hacia una ciudad desplazada sigue apuntando a su posición real. El alias de la vista previa de la ventana Plus («Prueba ✓») se podría quitar en pantallas muy bajas. Revisar con lector de pantalla real (VoiceOver/TalkBack) el anuncio de las ventanas.
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1) y decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta (ronda 2). Nueva: en la web real la ventana de Remitee Plus no tiene ningún botón para pedirlo (solo «Cerrar»); hasta que haya pagos, ¿añadimos un «Quiero Plus» que avise a administración por email?
+
 ## Remitee Plus con tick azul · 24 nov 2026 (encargo de Iyán)
 
 El aviso «Email verificado / Identidad verificada con Google» del Perfil sale solo la primera vez que se entra tras verificar (se guarda `vSeen`). Remitee Plus pasa a ser una suscripción mensual con perfiles ilimitados y tick azul junto al alias (Descubrir, Cartas, correspondencia, Perfil y panel de administración); tarjeta en el Perfil y ventana explicativa. Sin pagos todavía: en la web real lo activa administración desde la ficha de cada persona; en el prototipo se simula. **Reglas nuevas: el dueño no puede ponerse `plus` ni quitarse `hidden`; hay que publicarlas en Firebase.**
