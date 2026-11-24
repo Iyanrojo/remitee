@@ -135,6 +135,9 @@ def run():
             pg, errs = new_page(b, url, w, 900, logged=True, extra=ADM_SEED)
             time.sleep(1.2)
             check(js(pg, "!document.querySelector('#adminBtn').hidden"), f"admin {tag}: botón visible")
+            if w == 1366:
+                r = pg.evaluate("""async()=>{ let n=0; const u={sendEmailVerification:async(o)=>{ n++; if(o) throw {code:'auth/unauthorized-continue-uri'}; }}; const e=await sendVerify(u); return [e,n]; }""")
+                check(r == ["", 2], f"email de verificación: si falla la URL de vuelta se reenvía sin ella {r}")
             click(pg, "#adminBtn"); time.sleep(.8)
             txt = js(pg, "document.querySelector('#view').innerText")
             check("Administración" in txt and "personas registradas" in txt, f"admin {tag}: resumen visible")

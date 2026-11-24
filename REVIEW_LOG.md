@@ -2,6 +2,10 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Email de verificación · 24 nov 2026 (aviso de Iyán: «no les llega el email»)
+
+El envío fallaba en silencio: si Firebase rechazaba la URL de vuelta (dominio no autorizado) o el límite de envíos, no se avisaba a nadie. Ahora, si la URL falla, se reenvía sin ella; la pantalla «Revisa tu email» avisa si no se pudo enviar, indica el remitente (noreply@remitee-c36cf.firebaseapp.com) y sugiere mirar en spam. Pendiente en la consola de Firebase: comprobar dominios autorizados y personalizar la plantilla del email.
+
 ## Ronda 3 · 23 nov 2026
 
 **Qué vi.** Pruebas en verde (53/53). En escritorio seguía la cabecera doble: barra de pestañas arriba y, debajo, otra fila con el logo y los botones, que empujaba el contenido unos 90 px. En modo oscuro los avatares sin foto (círculos pastel con candado o inicial) eran manchas casi blancas que deslumbraban sobre el fondo oscuro. En el Perfil, cuando una carta iba a una ciudad muy cercana a la tuya (Santander–Bilbao), su punto quedaba tapado por el de casa. En Cartas la segunda línea repetía la etiqueta («Enviada · le toca a Ana» / «Tu carta · enviada») sin aportar nada.

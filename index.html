@@ -732,7 +732,18 @@ async function emailAuth(email, pass, login){
   return cloudLoad(u.uid);
 }
 const verifySettings = () => ({ url: location.origin + location.pathname });
-async function sendVerify(u){ try { FB.auth.languageCode = lang; await u.sendEmailVerification(verifySettings()); return true; } catch(e){ console.warn(e); return false; } }
+// Envía el email de verificación. Si Firebase rechaza la URL de vuelta (dominio no autorizado),
+// lo reenvía sin ella para que el email llegue igualmente. Devuelve "" si ha ido bien o el código de error.
+async function sendVerify(u){
+  FB.auth.languageCode = lang;
+  try { await u.sendEmailVerification(verifySettings()); me.verifyErr = ""; return ""; }
+  catch(e){
+    console.warn("verify", e);
+    if (e && e.code === "auth/too-many-requests") { me.verifyErr = e.code; return e.code; }
+    try { await u.sendEmailVerification(); me.verifyErr = ""; return ""; }
+    catch(e2){ console.warn("verify-retry", e2); me.verifyErr = (e2 && e2.code) || "error"; return me.verifyErr; }
+  }
+}
 function authError(e){
   const c = (e && e.code) || "";
   const M = {
@@ -1863,7 +1874,8 @@ function verifyScreen(){
     <p class="sub">${L(`Te hemos enviado un enlace de confirmación a <b>${esc(me.email)}</b>. Pulsa en él para verificar tu cuenta y vuelve aquí.`,`We've sent a confirmation link to <b>${esc(me.email)}</b>. Click it to verify your account, then come back here.`)}</p>
     <button id="vdone">${L("Ya lo he verificado","I've verified it")}</button>
     <button class="plain" id="vresend">${L("Reenviar el email","Resend the email")}</button>
-    <p class="note">${L("¿No lo encuentras? Mira en la carpeta de spam o promociones.","Can't find it? Check your spam or promotions folder.")}</p>
+    ${me.verifyErr ? `<div class="aerr" role="alert">${me.verifyErr === "auth/too-many-requests" ? L("Has pedido varios emails seguidos. Espera unos minutos y pulsa «Reenviar el email».","You've asked for several emails in a row. Wait a few minutes and tap “Resend the email”.") : L("No hemos podido enviar el email de confirmación. Pulsa «Reenviar el email» y, si sigue fallando, escríbenos.","We couldn't send the confirmation email. Tap “Resend the email” and, if it still fails, contact us.")}</div>` : ""}
+    <p class="note">${L("Suele tardar menos de un minuto. Llega desde <b>noreply@remitee-c36cf.firebaseapp.com</b>: mira también en spam o promociones y márcalo como «No es spam».","It usually arrives within a minute from <b>noreply@remitee-c36cf.firebaseapp.com</b>: check spam or promotions too and mark it as “Not spam”.")}</p>
     ${FB ? "" : `<p class="note" style="margin:0">${L("Prototipo: «Ya lo he verificado» simula que has pulsado el enlace.","Prototype: “I've verified it” simulates clicking the link.")}</p>`}
     <button class="linkbtn" id="vout" style="justify-self:center">${L("Usar otra cuenta","Use another account")}</button>
   </div>`;
@@ -1881,8 +1893,10 @@ function verifyScreen(){
   $("#vresend").onclick = async () => {
     if (!FB) return toast(L(`Email reenviado a ${me.email}`,`Email resent to ${me.email}`));
     const u = FB.auth.currentUser; if (!u) return;
-    const ok = await sendVerify(u);
-    toast(ok ? L(`Email reenviado a ${me.email}`,`Email resent to ${me.email}`) : L("Espera un poco antes de pedir otro email.","Wait a moment before requesting another email."));
+    $("#vresend").disabled = true;
+    const err = await sendVerify(u);
+    $("#vresend").disabled = false;
+    toast(!err ? L(`Email reenviado a ${me.email}`,`Email resent to ${me.email}`) : err === "auth/too-many-requests" ? L("Has pedido varios emails seguidos. Espera unos minutos.","Too many requests. Wait a few minutes.") : L("No se ha podido enviar el email. Inténtalo más tarde.","Couldn't send the email. Try again later."));
   };
   $("#vout").onclick = () => { if (FB) FB.auth.signOut(); Object.assign(me, {uid:null, email:"", verified:false}); altaStep = 1; alta(); };
 }
