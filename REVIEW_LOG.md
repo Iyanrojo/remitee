@@ -2,6 +2,21 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 4 · 24 nov 2026
+
+**Qué vi.** Pruebas en verde (57/57). Tras enviar una carta, la ventana de correspondencia decía «Le toca a Ana» junto a «Tu plazo queda en pausa…», mientras el anillo mostraba el plazo de Ana: dos plazos distintos en la misma caja y ninguna fecha. El aviso «Perfil creado. Tu código de buzón es ROCA-8450» partía el código en dos líneas y desaparecía a los 3 s, poco para apuntar un dato importante; además el aviso no se anunciaba a lectores de pantalla. Los selectores (Edad, Cómo quieres que te presentemos) y los desplegables «Quién es Ana» no tenían anillo de foco con teclado. En «Cómo funciona» los personajes de la otra persona seguían con pastel y texto fijos (pendiente de la ronda 3).
+
+**Qué cambié.**
+- Correspondencia, carta enviada y aún en camino: «Tu carta va camino de nuestra oficina y tu plazo queda en pausa hasta que llegue. Ana tiene hasta el 13 dic para responder.» (coincide con el anillo).
+- Avisos (toast): `role="status"` para lectores de pantalla, los códigos de buzón no se parten y la duración crece con la longitud del texto (de 3,2 a 7 s).
+- Anillo de foco también en `select`, `summary` y elementos con `tabindex`.
+- «Cómo funciona»: la figura de la otra persona usa `--tint1` y `--on-tint`, y la inicial propia `--on-accent`, así que se adaptan al modo oscuro.
+- Pruebas: aviso anunciable con el código sin partir y aviso de plazo con fecha tras enviar (59/59).
+
+**Pendiente.** El arco del mapa hacia una ciudad desplazada sigue apuntando a su posición real. Los intereses los escribe cada persona y salen en su idioma también con la app en inglés (es contenido de usuario; no se traduce). No hay captura de «Cómo funciona» en oscuro en las pruebas: convendría añadirla.
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1) y decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta (en el Perfil sale «0 correspondencias · 1 país»).
+
 ## Email de verificación · 24 nov 2026 (aviso de Iyán: «no les llega el email»)
 
 El envío fallaba en silencio: si Firebase rechazaba la URL de vuelta (dominio no autorizado) o el límite de envíos, no se avisaba a nadie. Ahora, si la URL falla, se reenvía sin ella; la pantalla «Revisa tu email» avisa si no se pudo enviar, indica el remitente (noreply@remitee-c36cf.firebaseapp.com) y sugiere mirar en spam. Pendiente en la consola de Firebase: comprobar dominios autorizados y personalizar la plantilla del email.

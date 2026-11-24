@@ -80,6 +80,7 @@ def run():
         pg.fill("#w-d","Calle Mayor 1, 39001 Santander"); click(pg, "#wn")
         click(pg, "#wn"); time.sleep(.8)
         check(js(pg, "location.hash") == "#descubrir", "tras el alta se llega a Descubrir")
+        check(js(pg, "document.querySelector('#toast').getAttribute('role')") == "status" and js(pg, "!!document.querySelector('#toast .nowrap')"), "aviso anunciable y con el código de buzón sin partir")
         db = json.loads(js(pg, "localStorage.getItem('mockdb')"))
         check("profiles/U1" in db and "private/U1" in db, "perfil guardado en Firestore (simulado)")
         # 3. Descubrir: perfiles reales primero
@@ -100,6 +101,7 @@ def run():
         click(pg, "#sent"); click(pg, "#s-ex"); click(pg, "#s-ok"); time.sleep(.4)
         check(js(pg, "document.querySelectorAll('.lcard').length") >= 1, "carta marcada como enviada")
         pg.screenshot(path=str(OUT/"06-correspondencia.png"), full_page=True)
+        check(js(pg, "(document.querySelector('.dl.them')||{}).textContent||''").find("tiene hasta el") > 0, "tras enviar, el aviso dice hasta cuándo tiene la otra persona para responder")
         click(pg, "#back"); time.sleep(.3)
         check(js(pg, "!!document.querySelector('.item.st-sent')"), "en Cartas aparece como Enviada (verde)")
         check(js(pg, "(document.querySelector('.item.st-sent .rg-cap')||{}).textContent||''").startswith("plazo de"), "el anillo dice de quién es el plazo")

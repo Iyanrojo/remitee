@@ -56,7 +56,7 @@ button:active{transform:scale(.97)}
 button.soft{background:var(--accent-soft);color:var(--accent)}
 button.plain{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 button:disabled{opacity:.5;cursor:default}
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .avatar{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:600;font-size:1.1rem;color:var(--ink)}
 .chip{font-size:.78rem;background:var(--bg);border:1px solid var(--line);padding:4px 11px;border-radius:999px;color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -210,9 +210,9 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .fl-line{stroke:var(--line);stroke-width:2;stroke-dasharray:4 5;fill:none}
 .fl-arc{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 5;fill:none;opacity:0;transition:opacity .4s}
 .fl-arc.show{opacity:.7}
-.fl-me{fill:var(--accent)} .fl-them{fill:#ffe3d6}
-.fl-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:#2a2e45}
-.fl-me + .fl-init{fill:#fff}
+.fl-me{fill:var(--accent)} .fl-them{fill:var(--tint1)}
+.fl-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:var(--on-tint)}
+.fl-me + .fl-init{fill:var(--on-accent)}
 .fl-off{fill:var(--accent-soft)} .fl-house{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
 #fl-office{transition:opacity .4s} #fl-office.dim{opacity:.3}
 .fl-lbl{font-size:11px;text-anchor:middle;fill:var(--muted);font-family:var(--body)}
@@ -285,7 +285,7 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .pp-tag{font-size:10px;font-weight:600;text-anchor:middle;fill:var(--ok);font-family:var(--body)}
 .pp-stamp{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2;stroke-dasharray:2 1.5} .pp-stampi{fill:var(--accent)}
 .pp-off{fill:var(--accent-soft)} .pp-house{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
-.pp-them{fill:#ffe3d6} .pp-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:#2a2e45}
+.pp-them{fill:var(--tint1)} .pp-init{font-family:var(--head);font-weight:600;font-size:13px;text-anchor:middle;fill:var(--on-tint)}
 .sc.on .pp-drop{animation:ppDrop 1.1s ease both}
 .sc.on .pp-drop2{animation:ppDrop 1.1s .5s ease both}
 .sc.on .pp-in{animation:ppIn 1.1s ease both}
@@ -607,6 +607,7 @@ body.wide .app{max-width:1040px}
 .item.st-closed{border-left-color:var(--bad);opacity:.7} .st-closed .stpill{background:var(--bad-soft);color:var(--bad)}
 .ring.them .rg-fg{stroke:var(--ok);opacity:.8}
 .toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:16px;font-size:.88rem;font-weight:500;max-width:min(360px, calc(100% - 32px));width:max-content;text-align:center;line-height:1.4}
+.toast .nowrap{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* Panel de administración */
 .ahead{display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left}
@@ -671,7 +672,7 @@ button.link{background:none;color:var(--accent);padding:0;border-radius:0;font-s
   <a href="#descubrir" data-v="descubrir" class="tab-main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg><span class="tl">Descubrir</span></a>
   <a href="#perfil" data-v="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.3-3.6 4.2-5.3 7.5-5.3s6.2 1.7 7.5 5.3"/></svg><span class="tl">Perfil</span></a>
 </div></nav>
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
 const CENTRAL = "Remitee · Apartado 123 · 39080 Santander";
@@ -995,7 +996,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const hashId = id => typeof id === "number" ? id - 1 : [...String(id)].reduce((a,c) => (a*31 + c.charCodeAt(0)) >>> 0, 7);
 const tint = p => tints[hashId(p.id) % tints.length];
 const fmt = d => d.toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"short"});
-function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200)}
+function toast(m){const t=$("#toast");t.textContent="";String(m).split(/([A-Z]{2,}-\d{3,})/).forEach((x,i)=>{if(!x)return;if(i%2){const c=document.createElement("span");c.className="nowrap";c.textContent=x;t.append(c)}else t.append(x)});t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,Math.min(7000,Math.max(3200,String(m).length*55)))}
 const notifs = [];
 // Los avisos guardan los dos idiomas para mostrarse en el idioma activo
 function notify(es, en){
@@ -1333,7 +1334,7 @@ function deadlineBoxInner(c){
   }
   if (!c.letters.length) return `<div class="dl them"><b>${L(`${esc(c.p.alias)} escribe primero`,`${esc(c.p.alias)} writes first`)}</b>${L(`Completó el match, así que tiene hasta el ${fmt(c.deadline)} para enviarte la primera carta. Tú solo tienes que esperar.`,`They completed the match, so they have until ${fmt(c.deadline)} to send you the first letter. You just have to wait.`)}</div>`;
   const l = c.letters[c.letters.length-1], k = stage(l);
-  return `<div class="dl them"><b>${L(`Le toca a ${esc(c.p.alias)}`,`${esc(c.p.alias)}'s turn`)}</b>${k===0?L("Tu plazo queda en pausa hasta que la carta llegue a nuestra oficina.","Your deadline is paused until the letter reaches our office."):k<3?L("Tu carta ya está en nuestras manos. Plazo cumplido.","Your letter is in our hands. Deadline met."):L(`Tu carta ya ha llegado. Tiene hasta el ${fmt(c.deadline)} para responder.`,`Your letter has arrived. They have until ${fmt(c.deadline)} to reply.`)}</div>`;
+  return `<div class="dl them"><b>${L(`Le toca a ${esc(c.p.alias)}`,`${esc(c.p.alias)}'s turn`)}</b>${k===0?L(`Tu carta va camino de nuestra oficina y tu plazo queda en pausa hasta que llegue. ${esc(c.p.alias)} tiene hasta el ${fmt(c.deadline)} para responder.`,`Your letter is on its way to our office; your deadline is paused until it arrives. ${esc(c.p.alias)} has until ${fmt(c.deadline)} to reply.`):k<3?L("Tu carta ya está en nuestras manos. Plazo cumplido.","Your letter is in our hands. Deadline met."):L(`Tu carta ya ha llegado. Tiene hasta el ${fmt(c.deadline)} para responder.`,`Your letter has arrived. They have until ${fmt(c.deadline)} to reply.`)}</div>`;
 }
 
 function rateBox(c, l, i){
