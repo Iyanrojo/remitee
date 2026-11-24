@@ -189,6 +189,11 @@ button.google{background:var(--surface);color:var(--ink);border:1px solid var(--
 .verified{display:flex;gap:12px;align-items:center;background:var(--ok-soft);border-radius:var(--r);padding:12px 14px;margin-bottom:16px}
 .verified b{display:block;font-size:.92rem;color:var(--ok)}
 .verified small{color:var(--muted);font-size:.8rem}
+.vpop{position:fixed;inset:0;display:grid;place-items:center;padding:20px;z-index:70;background:rgba(18,20,30,.28);opacity:0;transition:opacity .45s ease;cursor:pointer}
+.vpop.in{opacity:1}
+.vpop .verified{background:var(--surface);box-shadow:0 18px 40px -16px rgba(20,30,80,.45);margin:0;padding:18px 22px;max-width:360px;transform:translateY(8px) scale(.98);transition:transform .45s ease}
+.vpop.in .verified{transform:none}
+@media (prefers-reduced-motion:reduce){.vpop,.vpop .verified{transition:none}}
 .vdot{width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
 .wmodal{text-align:left;gap:12px;max-height:calc(100% - 20px);overflow:auto}
 .wtop{display:grid;gap:8px}
@@ -1614,14 +1619,21 @@ function readForm(){
   const lg = readLangPicker("f-langs"); if (lg.length) me.langs = lg;
 }
 
-let vShowSession = false;
+// Aviso «Email verificado»: ventana con fundido que sale una sola vez, la primera vez que entras al perfil tras verificar
+function verifiedPop(){
+  const o = document.createElement("div"); o.className = "vpop"; o.setAttribute("role", "status");
+  o.innerHTML = `<div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>`;
+  document.body.appendChild(o);
+  requestAnimationFrame(() => o.classList.add("in"));
+  const close = () => { o.classList.remove("in"); setTimeout(() => o.remove(), 450); };
+  o.onclick = close; setTimeout(close, 3200);
+}
 function perfil(){
   // El aviso «Email verificado» solo se enseña la primera vez que entras al perfil tras verificar
-  if (!me.vSeen && (me.verified || me.provider !== "email")) { vShowSession = true; me.vSeen = true; saveLocal(); if (FB) cloudSave().catch(() => {}); }
-  const showV = vShowSession;
+  const firstV = !me.vSeen && (me.verified || me.provider !== "email");
+  if (firstV) { me.vSeen = true; saveLocal(); if (FB) cloudSave().catch(() => {}); }
   const [ra, rn] = myRating();
   $("#view").innerHTML = `<h2>${L("Perfil","Profile")}</h2><p class="sub">${L("Esto es lo que ven los demás. Tu email nunca se muestra.","This is what others see. Your email is never shown.")}</p>
-  ${showV ? `<div class="verified"><span class="vdot">✓</span><div><b>${me.provider==="email" ? (me.verified ? L("Email verificado","Email verified") : L("Cuenta con email · revisa tu bandeja para verificarlo","Email account · check your inbox to verify it")) : L("Identidad verificada con Google","Identity verified with Google")}</b><small>${esc(me.email||"")}</small></div></div>` : ""}
   <form class="form" id="pf">
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:4px">${myPhoto("md")}<div><div style="font-family:var(--head);font-weight:600;font-size:1.15rem">${nameHTML(me)}</div><div style="color:var(--muted);font-size:.84rem">${esc([me.prof,me.edad,me.zona].filter(Boolean).join(" · "))}</div><div class="rate-row sm">${ratingHTML(ra, rn, {sm:true})}</div>${langsHTML({langs:myLangs()},{left:true,self:true})}<div class="trust sm">${trust({corr:chats.filter(c=>c.letters.length>1).length, g:me.g, onTime:false, ghosts:me.ghosts||0})}</div></div></div>
     ${(() => { const myPlaces = chats.filter(c=>c.letters.length).map(c=>c.p.home).filter(Boolean); const myCorr = chats.filter(c=>c.letters.length>1).length;
@@ -1639,11 +1651,12 @@ function perfil(){
   </form>`;
   bindProfile(perfil); bindMyGallery(perfil);
   $("#plusCard").onclick = () => plusModal(perfil);
+  if (firstV) verifiedPop();
   const myPh = document.querySelector(".form > div .ph"); if (myPh && me.foto){ myPh.style.cursor = "zoom-in"; myPh.onclick = () => openLightbox([{src:me.foto, cap:me.alias}, ...(me.gallery||[])]); }
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
   $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false, plus:false, vSeen:false}); vShowSession = false; ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
+  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false, plus:false, vSeen:false}); ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
 }
 
 /* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
