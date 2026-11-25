@@ -478,7 +478,11 @@ body.wide .app{max-width:1040px}
 .or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.8rem}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .emailform{display:grid;gap:10px;text-align:left}
-.emailform .field{padding:12px 14px}
+.emailform .field{padding:12px 14px;position:relative}
+.emailform #f-pass{padding-right:84px}
+.pwtog{position:absolute;right:8px;bottom:6px;min-height:44px;padding:0 12px;background:transparent;color:var(--accent);font-size:.82rem;font-weight:600;border-radius:999px}
+.pwtog:hover{background:var(--accent-soft)}
+.emailform .field:has([aria-invalid=true]){box-shadow:inset 0 0 0 2px var(--bad)}
 .emailform button[type=submit]{width:100%;padding:14px}
 .loginlink{justify-self:start;padding:0;font-size:.9rem}
 #topLogin{padding:9px 14px}
@@ -942,11 +946,13 @@ function mapHTML(home, places, opts={}){
   ensureLandSymbol();
   const H = CITIES[home], uniq = [...new Set(places)].filter(c => CITIES[c]);
   const hp = H ? proj(H[0], H[1]) : null;
-  const arcs = hp ? uniq.map(c => { const [x,y] = proj(CITIES[c][0], CITIES[c][1]); const mx = (hp[0]+x)/2, my = Math.min(hp[1], y) - Math.max(8, Math.abs(x-hp[0])*.22);
-    return `<path d="M${hp[0].toFixed(1)} ${hp[1].toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}" class="m-arc"/>`; }).join("") : "";
-  const pts = uniq.map((c,i) => { let [x,y] = proj(CITIES[c][0], CITIES[c][1]);
-    // Si la ciudad está casi encima de casa (p. ej. Bilbao y Santander), se separa un poco para que se vean los dos puntos
+  // Posición de cada ciudad; si cae casi encima de casa (p. ej. Bilbao y Santander), se separa un poco para que se vean los dos puntos y el arco llegue a su punto
+  const pos = uniq.map(c => { let [x,y] = proj(CITIES[c][0], CITIES[c][1]);
     if (hp){ const dx = x-hp[0], dy = y-hp[1], dd = Math.hypot(dx,dy), MIN = 6.5; if (dd < MIN){ const ux = dd ? dx/dd : 1, uy = dd ? dy/dd : 0; x = hp[0]+ux*MIN; y = hp[1]+uy*MIN; } }
+    return [x,y]; });
+  const arcs = hp ? pos.map(([x,y]) => { const mx = (hp[0]+x)/2, my = Math.min(hp[1], y) - Math.max(8, Math.abs(x-hp[0])*.22);
+    return `<path d="M${hp[0].toFixed(1)} ${hp[1].toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}" class="m-arc"/>`; }).join("") : "";
+  const pts = uniq.map((c,i) => { const [x,y] = pos[i];
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" class="m-pt" style="animation-delay:${(i*.35).toFixed(2)}s"><title>${esc(c)}</title></circle>`; }).join("");
   const homeDot = hp ? `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="3.2" class="m-home"><title>${esc(home)}</title></circle>` : "";
   return `<div class="wmap ${opts.sm?"sm":""}">
@@ -1025,9 +1031,9 @@ const fmt = d => d.toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric"
 function toast(m){const t=$("#toast");t.textContent="";String(m).split(/([A-Z]{2,}-\d{3,})/).forEach((x,i)=>{if(!x)return;if(i%2){const c=document.createElement("span");c.className="nowrap";c.textContent=x;t.append(c)}else t.append(x)});t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,Math.min(7000,Math.max(3200,String(m).length*55)))}
 const notifs = [];
 // Los avisos guardan los dos idiomas para mostrarse en el idioma activo
-function notify(es, en){
+function notify(es, en, quiet){
   const ch = []; if (me.nEmail !== false) ch.push("Email"); if (me.nApp !== false) ch.push("App");
-  notifs.unshift({at:new Date(+now), es, en:en||es, ch, read:false}); toast(L(es, en||es)); nBadge();
+  notifs.unshift({at:new Date(+now), es, en:en||es, ch, read:false}); if (!quiet) toast(L(es, en||es)); nBadge();
 }
 function nBadge(){ const n = notifs.filter(x=>!x.read).length, b = $("#nBadge"); if (!b) return; b.textContent = n; b.hidden = !n; }
 function showNotifs(){
@@ -1106,7 +1112,7 @@ function tick(){
     if (p.myYes && p.matchAt && !p.matched && now >= p.matchAt){
       p.matched = true;
       chats.unshift({p, letters:[], unread:true, turn:"them", firstByThem:true, deadline:addD(p.matchAt, FIRST_DAYS), replyAt:addD(p.matchAt, 2), closed:null});
-      notify(`Match con ${p.alias}. Completó el match, así que te escribirá primero.`, `Match with ${p.alias}. They completed the match, so they'll write first.`);
+      notify(`Match con ${p.alias}. Completó el match, así que te escribirá primero.`, `Match with ${p.alias}. They completed the match, so they'll write first.`, true);
       matchModal(p, false);
     }
   });
@@ -1235,7 +1241,7 @@ async function likeReal(p){
 function realMatch(p, iFirst){
   if (p.matched) return; p.matched = true;
   chats.unshift({p, letters:[], unread:true, turn:iFirst?"me":"them", deadline:addD(now, FIRST_DAYS), closed:null}); badge();
-  notify(`Match con ${p.alias}.`, `Match with ${p.alias}.`); matchModal(p, iFirst);
+  notify(`Match con ${p.alias}.`, `Match with ${p.alias}.`, true); matchModal(p, iFirst);
 }
 async function checkMutualLikes(){
   for (const uid of (me.liked||[])){
@@ -1880,13 +1886,13 @@ function alta(){
     $("#view").innerHTML = `<div class="welcome">
       <button class="back" id="toLand" style="justify-self:start">← ${L("Volver","Back")}</button>
       <h2>${login ? L("Entra en Remitee","Sign in to Remitee") : L("Crea tu cuenta","Create your account")}</h2>
-      <div class="seg" role="tablist"><button role="tab" class="${login?"":"on"}" data-mode="signup">${L("Crear cuenta","Create account")}</button><button role="tab" class="${login?"on":""}" data-mode="login">${L("Ya tengo cuenta","I have an account")}</button></div>
+      <div class="seg" role="tablist"><button role="tab" aria-selected="${!login}" class="${login?"":"on"}" data-mode="signup">${L("Crear cuenta","Create account")}</button><button role="tab" aria-selected="${login}" class="${login?"on":""}" data-mode="login">${L("Ya tengo cuenta","I have an account")}</button></div>
       ${login ? "" : `<ul class="perks"><li>${L("Tu dirección nunca se comparte","Your address is never shared")}</li><li>${L("Foto y biografía completa solo tras el match","Photo and full bio only after a match")}</li><li>${L("Cuentas verificadas: nada de perfiles falsos","Verified accounts: no fake profiles")}</li><li>${L("Solo para mayores de 25 años","Over 25s only")}</li></ul>`}
       <button class="google" id="g"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.5z"/><path fill="#34A853" d="M12 23.5c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.4 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3A11.5 11.5 0 0 0 12 23.5z"/><path fill="#FBBC05" d="M5.6 14.2a6.9 6.9 0 0 1 0-4.4v-3H1.8a11.5 11.5 0 0 0 0 10.4z"/><path fill="#EA4335" d="M12 5c1.7 0 3.2.6 4.4 1.7l3.3-3.3A11.5 11.5 0 0 0 1.8 6.8l3.8 3C6.5 7 9 5 12 5z"/></svg>${L("Continuar con Google","Continue with Google")}</button>
       <div class="or"><span>${L("o con tu email","or with your email")}</span></div>
       <form class="emailform" id="ef" novalidate>
         <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" autocomplete="email" placeholder="${L("nombre@correo.com","name@email.com")}"></div>
-        <div class="field"><label for="f-pass">${L("Contraseña","Password")}</label><input id="f-pass" type="password" autocomplete="${login?"current-password":"new-password"}" placeholder="${login?"":L("Mínimo 8 caracteres","At least 8 characters")}"></div>
+        <div class="field"><label for="f-pass">${L("Contraseña","Password")}</label><input id="f-pass" type="password" autocomplete="${login?"current-password":"new-password"}" placeholder="${login?"":L("Mínimo 8 caracteres","At least 8 characters")}"><button type="button" class="pwtog" id="pwt" aria-pressed="false" aria-controls="f-pass" aria-label="${L("Mostrar contraseña","Show password")}">${L("Mostrar","Show")}</button></div>
         <button type="submit" id="eok">${login ? L("Entrar","Sign in") : L("Crear cuenta con email","Create account with email")}</button>
         ${login ? `<button type="button" class="linkbtn" id="forgot" style="justify-self:center">${L("He olvidado mi contraseña","I forgot my password")}</button>` : ""}
       </form>
@@ -1908,16 +1914,19 @@ function alta(){
     };
     $("#ef").onsubmit = e => { e.preventDefault();
       const email = $("#f-email").value.trim(), pass = $("#f-pass").value;
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast(L("Escribe un email válido","Enter a valid email"));
-      if (!login && pass.length < 8) return toast(L("La contraseña necesita al menos 8 caracteres","Your password needs at least 8 characters"));
-      if (login && !pass) return toast(L("Escribe tu contraseña","Enter your password"));
+      const bad = (id, msg) => { const f = $(id); f.setAttribute("aria-invalid","true"); f.focus(); toast(msg); };
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return bad("#f-email", L("Escribe un email válido","Enter a valid email"));
+      if (!login && pass.length < 8) return bad("#f-pass", L("La contraseña necesita al menos 8 caracteres","Your password needs at least 8 characters"));
+      if (login && !pass) return bad("#f-pass", L("Escribe tu contraseña","Enter your password"));
       if (!FB){ me.email = email; me.provider = "email"; me.verified = false; return after("verify"); }
       const btn = $("#eok"), txt = btn.textContent; busy(btn, true, L("Un momento…","One moment…"));
       emailAuth(email, pass, login).then(after).catch(err => { busy(btn, false, txt); toast(authError(err)); });
     };
+    ["#f-email","#f-pass"].forEach(id => $(id).addEventListener("input", e => e.target.removeAttribute("aria-invalid")));
+    $("#pwt").onclick = () => { const f = $("#f-pass"), show = f.type === "password"; f.type = show ? "text" : "password"; const b = $("#pwt"); b.setAttribute("aria-pressed", show); b.textContent = show ? L("Ocultar","Hide") : L("Mostrar","Show"); b.setAttribute("aria-label", show ? L("Ocultar contraseña","Hide password") : L("Mostrar contraseña","Show password")); };
     const fg = $("#forgot"); if (fg) fg.onclick = () => {
       const email = $("#f-email").value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast(L("Escribe primero tu email arriba","Type your email above first"));
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ const f = $("#f-email"); f.setAttribute("aria-invalid","true"); f.focus(); return toast(L("Escribe primero tu email arriba","Type your email above first")); }
       if (!FB) return toast(L("Prototipo: en la web publicada te llegaría un email para cambiarla","Prototype: on the published site you'd get a reset email"));
       FB.auth.sendPasswordResetEmail(email).then(() => toast(L(`Te hemos enviado un email a ${email} para cambiar la contraseña`,`We've sent a reset link to ${email}`))).catch(err => toast(authError(err)));
     };

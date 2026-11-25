@@ -2,6 +2,22 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 6 · 25 nov 2026
+
+**Qué vi.** Pruebas en verde (77/77). En la pantalla de acceso no había forma de ver la contraseña al escribirla (en móvil es fácil equivocarse y el alta exige 8 caracteres). Los errores del formulario («Escribe un email válido», «La contraseña necesita…») solo salían en un aviso flotante: el campo no se marcaba, el foco se quedaba en el botón y un lector de pantalla no sabía qué campo fallaba. Las pestañas «Crear cuenta / Ya tengo cuenta» tenían `role="tab"` pero no indicaban cuál estaba activa. Al hacer match, detrás de la ventana «¡Es mutuo!» aparecía además el aviso flotante «Match con Ana.», que repetía lo mismo. Seguía pendiente desde la ronda 3 que el arco del mapa hacia una ciudad desplazada (Bilbao junto a Santander) apuntaba a su posición real y no a su punto.
+
+**Qué cambié.**
+- Contraseña: botón «Mostrar / Ocultar» dentro del campo (área táctil de 44 px, `aria-pressed` y nombre accesible bilingüe).
+- Formulario de acceso: si un dato no vale, ese campo se marca con borde `--bad`, `aria-invalid` y recibe el foco; la marca se quita al corregirlo. También en «He olvidado mi contraseña» sin email.
+- Pestañas del acceso con `aria-selected`.
+- Match: el aviso se sigue guardando en Avisos (campana) pero ya no sale flotando detrás de la ventana del match (`notify(…, quiet)`).
+- Mapa: punto y arco usan la misma posición, así que el arco llega al punto separado.
+- Pruebas: pestaña activa anunciada, mostrar/ocultar contraseña y su área táctil, campo con error marcado y enfocado, marca que se quita al corregir, match sin aviso duplicado pero guardado en Avisos y arcos que terminan en su punto (86/86).
+
+**Pendiente.** El alias de la vista previa de la ventana Plus («Prueba ✓») se podría quitar en pantallas muy bajas. Revisar con lector de pantalla real (VoiceOver/TalkBack) el anuncio de las ventanas. En escritorio la imagen del hero de la landing se ve muy lavada en la captura (parece el póster del vídeo con velo claro); comprobar en la web real si es intencionado.
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1); decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta (ronda 2); y un botón «Quiero Plus» que avise a administración mientras no haya pagos (ronda 5). Esta última pesa más ahora: al agotar los 5 perfiles del día, «Suscribirme a Remitee Plus» abre una ventana que solo tiene «Cerrar».
+
 ## Ronda 5 · 24 nov 2026
 
 **Qué vi.** Pruebas en verde (67/67). En el Perfil, la tarjeta «Hazte Remitee Plus» mostraba el tick azul a todo color aunque no tengas Plus: parecía que ya estaba activo. Ninguna ventana (Plus, Avisos, Match, Enviar carta, Cómo funciona, ficha de administración) se cerraba con Esc, el foco se quedaba detrás de la ventana y con Tab se salía a la página; solo dos tenían `role="dialog"`. Varios controles táctiles se quedaban muy por debajo de 44 px: «← Anterior» en Descubrir (24 px de alto), «← Volver»/«← Cartas» (27 px), «Anterior/Siguiente» de la animación del sobre (30 px) y los puntos de paso (8 × 8 px). Faltaba la captura de «Cómo funciona» en oscuro (pendiente de la ronda 4): revisada, se ve bien.
