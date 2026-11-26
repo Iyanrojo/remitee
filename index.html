@@ -89,6 +89,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .item .s{color:var(--muted);font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
 .empty{background:var(--surface);border-radius:var(--r);padding:34px 22px;text-align:center;color:var(--muted)}
+.empty-cta{display:block;margin:18px auto 0;min-height:44px;padding:12px 24px}
 
 /* Ventana de correspondencia */
 .back{background:none;color:var(--accent);padding:4px 0;margin-bottom:10px;font-weight:600}
@@ -484,7 +485,8 @@ body.wide .app{max-width:1040px}
 .pwtog:hover{background:var(--accent-soft)}
 .emailform .field:has([aria-invalid=true]){box-shadow:inset 0 0 0 2px var(--bad)}
 .emailform button[type=submit]{width:100%;padding:14px}
-.loginlink{justify-self:start;padding:0;font-size:.9rem}
+.loginlink{justify-self:start;padding:0;font-size:.9rem;position:relative}
+.loginlink::after{content:"";position:absolute;inset:-14px -6px}
 #topLogin{padding:9px 14px}
 .maplock{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:14px;padding:10px 12px;font-size:.78rem;color:var(--muted)}
 .maplock .lock{width:26px;height:26px;flex:none}
@@ -536,7 +538,7 @@ body.wide .app{max-width:1040px}
 .sw-id{display:grid;justify-items:center;gap:2px}
 .sw-id .name{font-size:1.7rem}
 .more{border-top:1px solid var(--line);padding-top:10px;text-align:center}
-.more summary{cursor:pointer;list-style:none;font-weight:600;font-size:.88rem;color:var(--accent);padding:4px}
+.more summary{cursor:pointer;list-style:none;font-weight:600;font-size:.88rem;color:var(--accent);padding:12px 4px;margin:-8px 0}
 .more summary::-webkit-details-marker{display:none}
 .more summary::after{content:" ▾";font-size:.8em}
 .more[open] summary::after{content:" ▴"}
@@ -616,7 +618,7 @@ body.wide .app{max-width:1040px}
 .item.st-incoming{border-left-color:var(--sky)} .st-incoming .stpill{background:var(--sky-soft);color:var(--sky)}
 .item.st-closed{border-left-color:var(--bad);opacity:.7} .st-closed .stpill{background:var(--bad-soft);color:var(--bad)}
 .ring.them .rg-fg{stroke:var(--ok);opacity:.8}
-.toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:16px;font-size:.88rem;font-weight:500;max-width:min(360px, calc(100% - 32px));width:max-content;text-align:center;line-height:1.4}
+.toast{z-index:60;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:16px;font-size:.88rem;font-weight:500;max-width:min(360px, calc(100% - 32px));width:max-content;text-align:center;line-height:1.4;cursor:pointer}
 .toast .nowrap{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* Panel de administración */
@@ -1028,7 +1030,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const hashId = id => typeof id === "number" ? id - 1 : [...String(id)].reduce((a,c) => (a*31 + c.charCodeAt(0)) >>> 0, 7);
 const tint = p => tints[hashId(p.id) % tints.length];
 const fmt = d => d.toLocaleDateString(lang==="en"?"en-GB":"es-ES",{day:"numeric",month:"short"});
-function toast(m){const t=$("#toast");t.textContent="";String(m).split(/([A-Z]{2,}-\d{3,})/).forEach((x,i)=>{if(!x)return;if(i%2){const c=document.createElement("span");c.className="nowrap";c.textContent=x;t.append(c)}else t.append(x)});t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,Math.min(7000,Math.max(3200,String(m).length*55)))}
+function toast(m){const t=$("#toast");t.onclick=()=>{t.hidden=true;clearTimeout(t._h)};t.textContent="";String(m).split(/([A-Z]{2,}-\d{3,})/).forEach((x,i)=>{if(!x)return;if(i%2){const c=document.createElement("span");c.className="nowrap";c.textContent=x;t.append(c)}else t.append(x)});t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,Math.min(7000,Math.max(3200,String(m).length*55)))}
 const notifs = [];
 // Los avisos guardan los dos idiomas para mostrarse en el idioma activo
 function notify(es, en, quiet){
@@ -1365,7 +1367,8 @@ function cartas(){
   $("#view").innerHTML = `<h2>${L("Cartas","Letters")}</h2><p class="sub">${L("Tus correspondencias, ordenadas por lo que necesita tu atención.","Your correspondences, ordered by what needs your attention.")}</p>${suspBanner()}` + (chats.length
     ? `${legendHTML()}<div class="list">${sorted.map(c=>{ const st = chatState(c);
         return `<button class="item st-${st.k}" data-id="${c.p.id}">${photo(c.p,"sm",true)}<div class="txt"><div class="n">${nameHTML(c.p)}</div><span class="stpill">${st.t}</span><div class="s">${esc(lastLine(c))}</div></div>${ringHTML(c, 44, {cap:true})}${c.unread?`<span class="dot" aria-label="${L("Novedad","New")}"></span>`:""}</button>`; }).join("")}</div>`
-    : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}</div>`) + sim();
+    : `<div class="empty">${L("Aún no tienes correspondencias.<br>Cuando haya un match mutuo, aparecerá aquí.","You don't have any correspondences yet.<br>When you get a mutual match, it will appear here.")}<button id="toDisc" class="empty-cta">${L("Descubrir perfiles","Discover profiles")}</button></div>`) + sim();
+  const td = $("#toDisc"); if (td) td.onclick = () => { location.hash = "#descubrir"; };
   document.querySelectorAll(".item").forEach(b => b.onclick = () => { openId = b.dataset.id; cartas(); });
   bindSim();
 }
@@ -1872,6 +1875,8 @@ function landing(){
   </div>`;
   startFlow($(".privacy .flowcard")); startRotator();
   const v = $("#heroVid"); if (v){ const show = () => { const ph = $("#vph"); if (ph) ph.hidden = true; v.classList.add("ready"); };
+    // Con «reducir movimiento» el vídeo no se reproduce en bucle: se queda quieto en su primer fotograma
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches){ v.removeAttribute("autoplay"); v.loop = false; v.pause(); v.dataset.still = "1"; }
     if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
   const go = mode => { authMode = mode; altaStep = 1; alta(); window.scrollTo(0,0); };
   $("#start").onclick = () => go("signup"); $("#start2").onclick = () => go("signup"); $("#loginLink").onclick = () => go("login"); $("#how").onclick = showFlow;

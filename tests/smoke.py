@@ -65,6 +65,7 @@ def run():
             check(js(pg, "!!document.querySelector('.hero-title')"), f"landing {tag}: titular visible")
             no_hscroll(pg, f"landing {tag}")
             pg.screenshot(path=str(OUT/f"01-landing-{tag}.png"), full_page=(tag=="movil"))
+            check(js(pg, "(()=>{const e=document.querySelector('#loginLink'), r=e.getBoundingClientRect(); return document.elementFromPoint(r.x+r.width/2, r.y+r.height/2-14)===e})()"), f"landing {tag}: «¿Ya tienes cuenta?» tiene área táctil amplia")
             check(not errs, f"landing {tag}: sin errores JS {errs[:1]}")
             pg.context.close()
         # 2. Registro completo con Google (simulado) + tutorial
@@ -208,6 +209,25 @@ def run():
         pg, errs = new_page(b, url, 400, 860, logged=True, extra={**ME, "profiles/A1": {**SEED["profiles/A1"], "hidden": True}})
         time.sleep(1.2); js(pg, "location.hash='#descubrir'"); time.sleep(.5)
         check("Ana" not in js(pg, "document.querySelector('#view').innerText"), "perfil oculto no aparece en Descubrir")
+        pg.context.close()
+        # 5d. Movimiento reducido: el vídeo del hero no se reproduce en bucle
+        ctx = b.new_context(viewport={"width":400,"height":860}, reduced_motion="reduce"); pg = ctx.new_page()
+        pg.route("**/www.gstatic.com/**", lambda r: r.fulfill(status=200, content_type="text/javascript", body=""))
+        pg.route("**/fonts.googleapis.com/**", lambda r: r.abort())
+        pg.route("**/firebase-config.js", lambda r: r.fulfill(status=200, content_type="text/javascript", body=MOCK))
+        pg.goto(url); time.sleep(1)
+        check(js(pg, "(()=>{const v=document.querySelector('#heroVid'); return v.dataset.still==='1' && !v.loop && !v.hasAttribute('autoplay')})()"), "con «reducir movimiento» el vídeo del hero se queda quieto")
+        ctx.close()
+        # 5e. Cartas sin correspondencias: botón para ir a Descubrir; el aviso flotante se cierra al tocarlo
+        pg, errs = new_page(b, url, 400, 860, logged=True, extra=ME)
+        time.sleep(1.2); close_overlays(pg); js(pg, "location.hash='#cartas'"); time.sleep(.4)
+        check(js(pg, "!!document.querySelector('.empty #toDisc')"), "Cartas vacía: botón «Descubrir perfiles»")
+        click(pg, "#toDisc"); time.sleep(.4)
+        check(js(pg, "location.hash") == "#descubrir", "Cartas vacía: el botón lleva a Descubrir")
+        js(pg, "toast('Prueba de aviso')"); click(pg, "#toast")
+        check(js(pg, "document.querySelector('#toast').hidden"), "el aviso flotante se cierra al tocarlo")
+        check(js(pg, "document.querySelector('#more summary').getBoundingClientRect().height") >= 44, "Descubrir: «Ver perfil completo» tiene 44 px de alto")
+        check(not errs, f"Cartas vacía: sin errores JS {errs[:1]}")
         pg.context.close()
         # 6. Cómo funciona
         pg, errs = new_page(b, url, 400, 860)

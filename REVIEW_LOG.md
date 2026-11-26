@@ -2,6 +2,21 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 7 · 26 nov 2026
+
+**Qué vi.** Pruebas en verde (86/86). La pantalla Cartas vacía (lo primero que ve quien aún no tiene match) solo decía «Aún no tienes correspondencias» sin ninguna acción: callejón sin salida. El vídeo del hero se reproduce en bucle infinito aunque el sistema pida «reducir movimiento» y no tiene botón de pausa. El enlace «¿Ya tienes cuenta? Entra» de la landing medía 17 px de alto y «Ver perfil completo» en Descubrir 30 px. Los avisos flotantes tapan contenido (en Descubrir, justo la explicación del match) durante hasta 7 s y no se podían quitar. Lo de la imagen lavada del hero en escritorio (pendiente de la ronda 6) no es un fallo: el vídeo entra con un fundido de 2,5 s y la captura lo pilla a medias.
+
+**Qué cambié.**
+- Cartas sin correspondencias: botón «Descubrir perfiles / Discover profiles» que lleva a Descubrir.
+- Vídeo del hero con «reducir movimiento»: no se reproduce en bucle; se queda quieto en su primer fotograma.
+- Áreas táctiles: «¿Ya tienes cuenta? Entra» ampliada con pseudoelemento invisible (sin mover el diseño) y «Ver perfil completo» a 44 px de alto.
+- Avisos flotantes: se cierran al tocarlos.
+- Pruebas: área táctil del enlace de acceso (móvil y escritorio), vídeo quieto con movimiento reducido, botón de Cartas vacía y su destino, aviso que se cierra al tocarlo y altura de «Ver perfil completo» (94/94).
+
+**Pendiente.** El alias de la vista previa de la ventana Plus: comprobado a 360 × 640 y cabe entero, se puede dar por cerrado. Revisar con lector de pantalla real (VoiceOver/TalkBack) el anuncio de las ventanas. Los campos del formulario del Perfil miden 27 px de alto, aunque toda la tarjeta con su etiqueta es pulsable; valorar si basta. Un control visible de pausa para el vídeo del hero (WCAG 2.2.2) para quien no tenga activado «reducir movimiento».
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1); decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta (ronda 2); y un botón «Quiero Plus» que avise a administración mientras no haya pagos (rondas 5 y 6): en la web real, al agotar los 5 perfiles, «Suscribirme a Remitee Plus» abre una ventana que solo dice que lo activa el equipo, sin forma de pedirlo.
+
 ## Ronda 6 · 25 nov 2026
 
 **Qué vi.** Pruebas en verde (77/77). En la pantalla de acceso no había forma de ver la contraseña al escribirla (en móvil es fácil equivocarse y el alta exige 8 caracteres). Los errores del formulario («Escribe un email válido», «La contraseña necesita…») solo salían en un aviso flotante: el campo no se marcaba, el foco se quedaba en el botón y un lector de pantalla no sabía qué campo fallaba. Las pestañas «Crear cuenta / Ya tengo cuenta» tenían `role="tab"` pero no indicaban cuál estaba activa. Al hacer match, detrás de la ventana «¡Es mutuo!» aparecía además el aviso flotante «Match con Ana.», que repetía lo mismo. Seguía pendiente desde la ronda 3 que el arco del mapa hacia una ciudad desplazada (Bilbao junto a Santander) apuntaba a su posición real y no a su punto.
