@@ -119,6 +119,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .field label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 input,textarea{font:inherit;color:var(--ink);background:transparent;border:0;padding:2px 0;width:100%;resize:vertical}
 .field small{color:var(--muted);font-size:.8rem}
+/* Con cambios sin guardar, «Guardar cambios» se queda pegado abajo, encima de la barra de pestañas */
+.form button[type=submit].dirty{position:sticky;bottom:calc(108px + env(safe-area-inset-bottom,0px));z-index:5;box-shadow:0 10px 26px -10px var(--accent)}
+.cnt{font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* Tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
@@ -364,6 +367,10 @@ body.wide .app{max-width:1040px}
 @media (min-width:760px){.hero-video{aspect-ratio:4/5}}
 .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2.5s ease}
 .hero-video video.ready{opacity:1}
+.vtog{position:absolute;right:12px;bottom:12px;width:44px;height:44px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--ink);box-shadow:0 4px 14px -6px rgba(0,0,0,.45);opacity:.92;z-index:2}
+.vtog[hidden]{display:none}
+.vtog:hover{opacity:1}
+.vtog svg{width:18px;height:18px;fill:currentColor}
 .vph{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;text-align:center;padding:20px;
   background:linear-gradient(160deg,var(--accent-soft),var(--surface));border:1.5px dashed var(--line);border-radius:28px}
 .vph b{font-family:var(--head);font-weight:600;font-size:1.05rem}
@@ -560,6 +567,7 @@ body.wide .app{max-width:1040px}
   .tabs a.tab-main[aria-current="page"] svg{background:none}
   .tabs .badge{top:2px;left:auto;right:6px}
   .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+  .form button[type=submit].dirty{bottom:20px}
   /* Una sola barra arriba: logo a la izquierda, pestañas en el centro y botones a la derecha */
   body:has(.tabs:not([hidden])) .top{position:fixed;top:0;left:0;right:0;z-index:11;height:calc(61px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) max(24px,calc((100vw - 1120px)/2)) 0;pointer-events:none}
   body:has(.tabs:not([hidden])) .top>*{pointer-events:auto}
@@ -1581,8 +1589,8 @@ function profileFields(){
     <div class="field"><label for="f-g">${L("Cómo quieres que te presentemos","How should we introduce you")}</label><select id="f-g" class="sel">${G_OPTS().map(([v,t])=>`<option value="${v}" ${me.g===v?"selected":""}>${t}</option>`).join("")}</select></div>
     ${langPicker("f-langs")}
     <div class="field"><label for="f-z">${L("Escribes desde","Writing from")} *</label><input id="f-z" required value="${esc(me.zona)}" placeholder="${L("Región o provincia","Region or county")}"><small>${L("Nunca tu dirección.","Never your address.")}</small></div>
-    <div class="field"><label for="f-b">${L("Biografía breve","Short bio")} *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="${L("Lo primero que leerán de ti","The first thing people will read about you")}">${esc(me.bio)}</textarea><small>${L("La ve todo el mundo en Descubrir. Máximo 200 caracteres.","Everyone sees it in Discover. Up to 200 characters.")}</small></div>
-    <div class="field"><label for="f-l">${L("Biografía extensa","Long bio")}</label><textarea id="f-l" rows="5" maxlength="800" placeholder="${L("Cuéntate con más calma","Tell your story at your own pace")}">${esc(me.long)}</textarea><small>${L("Solo la ven las personas con las que haces match. Máximo 800 caracteres.","Only your matches see it. Up to 800 characters.")}</small></div>
+    <div class="field"><label for="f-b">${L("Biografía breve","Short bio")} *</label><textarea id="f-b" required rows="3" maxlength="200" placeholder="${L("Lo primero que leerán de ti","The first thing people will read about you")}">${esc(me.bio)}</textarea><small>${L("La ve todo el mundo en Descubrir.","Everyone sees it in Discover.")} <span class="cnt" id="f-bc">${(me.bio||"").length}/200</span></small></div>
+    <div class="field"><label for="f-l">${L("Biografía extensa","Long bio")}</label><textarea id="f-l" rows="5" maxlength="800" placeholder="${L("Cuéntate con más calma","Tell your story at your own pace")}">${esc(me.long)}</textarea><small>${L("Solo la ven las personas con las que haces match.","Only your matches see it.")} <span class="cnt" id="f-lc">${(me.long||"").length}/800</span></small></div>
     <div class="field"><label for="f-i">${L("3 intereses","3 interests")} *</label><input id="f-i" required value="${esc(me.intereses)}" placeholder="${L("cine, montaña, poesía","film, hiking, poetry")}"><small>${L("Separados por comas. Se usan para el match.","Separated by commas. Used for matching.")}</small></div>
     <div class="field"><label for="f-d">${L("Dirección postal","Postal address")} *</label><input id="f-d" required value="${esc(me.dir||"")}" placeholder="${L("Calle, número, código postal, ciudad","Street, number, postcode, city")}"><small>${L("Privada. Nadie la ve: solo se usa para reenviarte las cartas.","Private. Nobody sees it: it's only used to forward your letters.")}</small></div>`;
 }
@@ -1645,7 +1653,18 @@ function verifiedPop(){
   const close = () => { o.classList.remove("in"); setTimeout(() => o.remove(), 450); };
   o.onclick = close; setTimeout(close, 3200);
 }
+// Cambios del perfil sin guardar: el botón se queda a la vista y, si te vas a otra pestaña, se guardan solos
+let pfDirty = false;
+function markDirty(){ pfDirty = true; const b = document.querySelector('#pf button[type=submit]'); if (b) b.classList.add("dirty"); }
+function flushProfile(){
+  const f = $("#pf"); if (!pfDirty || !f) { pfDirty = false; return; }
+  pfDirty = false;
+  if (!f.checkValidity()) return toast(L("No se han guardado los cambios del perfil: falta algún dato obligatorio.","Your profile changes weren't saved: a required field is empty."));
+  readForm(); saveMe(); toast(L("Cambios del perfil guardados","Profile changes saved"));
+}
 function perfil(){
+  // Si se vuelve a pintar (idioma, foto…) con cambios a medias, se conservan
+  const carry = pfDirty && $("#pf"); if (carry) readForm(); else pfDirty = false;
   // El aviso «Email verificado» solo se enseña la primera vez que entras al perfil tras verificar
   const firstV = !me.vSeen && (me.verified || me.provider !== "email");
   if (firstV) { me.vSeen = true; saveLocal(); if (FB) cloudSave().catch(() => {}); }
@@ -1669,11 +1688,16 @@ function perfil(){
   bindProfile(perfil); bindMyGallery(perfil);
   $("#plusCard").onclick = () => plusModal(perfil);
   if (firstV) verifiedPop();
+  if (carry) markDirty();
+  $("#pf").addEventListener("input", e => { const t = e.target; if (t.id === "f-ne" || t.id === "f-na" || t.type === "file" || t.classList.contains("gal-capin")) return; markDirty(); });
+  $("#f-langs").addEventListener("click", e => { if (e.target.closest(".lpb")) markDirty(); });
+  $("#f-b").addEventListener("input", e => $("#f-bc").textContent = e.target.value.length + "/200");
+  $("#f-l").addEventListener("input", e => $("#f-lc").textContent = e.target.value.length + "/800");
   const myPh = document.querySelector(".form > div .ph"); if (myPh && me.foto){ myPh.style.cursor = "zoom-in"; myPh.onclick = () => openLightbox([{src:me.foto, cap:me.alias}, ...(me.gallery||[])]); }
   $("#f-ne").onchange = e => { me.nEmail = e.target.checked; saveMe(); };
   $("#f-na").onchange = e => { me.nApp = e.target.checked; saveMe(); };
-  $("#pf").onsubmit = e => { e.preventDefault(); readForm(); saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
-  $("#logout").onclick = () => { if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false, plus:false, vSeen:false}); ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
+  $("#pf").onsubmit = e => { e.preventDefault(); readForm(); pfDirty = false; saveMe(); toast(L("Perfil guardado","Profile saved")); perfil(); };
+  $("#logout").onclick = () => { pfDirty = false; if (FB) FB.auth.signOut(); try { localStorage.removeItem("remitee-me"); } catch(e){} Object.assign(me, {created:false, uid:null, email:"", alias:"", prof:"", zona:"", bio:"", long:"", intereses:"", dir:"", foto:null, showFoto:true, ratings:[], admin:false, plus:false, vSeen:false}); ADM = null; chats.length = 0; people.forEach(x => { x.matched = false; x.seen = false; }); location.hash=""; route(); };
 }
 
 /* ---- Animación «Cómo funciona»: dos personas hacen match y la carta viaja ---- */
@@ -1820,6 +1844,7 @@ function landing(){
       </div>
       <div class="hero-video">
           <video id="heroVid" muted loop playsinline autoplay preload="metadata"><source src="hero.mp4" type="video/mp4"></video>
+          <button type="button" class="vtog" id="vtog" hidden></button>
           <div class="vph" id="vph"><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><b>${L("Aquí va el vídeo","The video goes here")}</b><small>${L("Sube un archivo hero.mp4 y se reproduce solo, en bucle y sin sonido.","Upload a hero.mp4 file and it plays on its own, looped and muted.")}</small></div>
         </div>
     </section>
@@ -1877,7 +1902,13 @@ function landing(){
   const v = $("#heroVid"); if (v){ const show = () => { const ph = $("#vph"); if (ph) ph.hidden = true; v.classList.add("ready"); };
     // Con «reducir movimiento» el vídeo no se reproduce en bucle: se queda quieto en su primer fotograma
     if (matchMedia("(prefers-reduced-motion: reduce)").matches){ v.removeAttribute("autoplay"); v.loop = false; v.pause(); v.dataset.still = "1"; }
-    if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, {once:true}); }
+    // Botón visible para pausar o reanudar el vídeo (WCAG 2.2.2)
+    const tg = $("#vtog"), PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>', PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+    const sync = () => { const p = v.paused; tg.innerHTML = p ? PLAY : PAUSE; tg.setAttribute("aria-label", p ? L("Reproducir vídeo","Play video") : L("Pausar vídeo","Pause video")); tg.title = tg.getAttribute("aria-label"); };
+    tg.onclick = () => { if (v.paused){ v.loop = true; delete v.dataset.still; v.play().catch(() => {}); } else v.pause(); };
+    v.addEventListener("play", sync); v.addEventListener("pause", sync); sync();
+    const show2 = () => { show(); tg.hidden = false; sync(); };
+    if (v.readyState >= 2) show2(); else v.addEventListener("loadeddata", show2, {once:true}); }
   const go = mode => { authMode = mode; altaStep = 1; alta(); window.scrollTo(0,0); };
   $("#start").onclick = () => go("signup"); $("#start2").onclick = () => go("signup"); $("#loginLink").onclick = () => go("login"); $("#how").onclick = showFlow;
 }
@@ -2202,6 +2233,7 @@ function route(){
   document.body.classList.remove("wide");
   const v = (location.hash || "#descubrir").slice(1), name = views[v] && (v !== "admin" || me.admin) ? v : "descubrir";
   if (name !== "cartas") openId = null;
+  if (name !== "perfil") flushProfile();
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v===name ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
   views[name](); window.scrollTo(0,0);
 }

@@ -2,6 +2,21 @@
 
 Cada ronda del agente revisor se añade arriba: fecha, qué se observó, qué se cambió y qué queda pendiente.
 
+## Ronda 8 · 27 nov 2026
+
+**Qué vi.** Pruebas en verde (94/94) y la auditoría de nombres accesibles, etiquetas y áreas táctiles salió limpia en Descubrir, Cartas, Perfil, landing y acceso (es/en). El problema serio estaba en el Perfil: los cambios solo se guardaban con «Guardar cambios», que está al final de un formulario muy largo (unos 3.000 px en móvil). Si cambiabas la profesión arriba y tocabas otra pestaña, o cambiabas de idioma, lo escrito se perdía sin avisar. Las biografías decían «Máximo 200/800 caracteres» sin contador, aunque el tutorial de alta sí lo tiene. Seguía pendiente un control visible para pausar el vídeo del hero (WCAG 2.2.2).
+
+**Qué cambié.**
+- Perfil con cambios sin guardar: «Guardar cambios» se queda pegado abajo (encima de la barra de pestañas en móvil; abajo del todo en escritorio) hasta que guardas.
+- Si te vas a otra pestaña con cambios, se guardan solos y sale «Cambios del perfil guardados»; si falta un dato obligatorio no se guarda nada y se avisa. Cambiar de idioma conserva lo que estabas escribiendo. Los interruptores de avisos y los pies de foto siguen guardándose al momento, como antes.
+- Biografía breve y extensa con contador en vivo («4/200», «0/800»).
+- Vídeo del hero: botón redondo de 44 px para pausar o reproducir, con nombre bilingüe («Pausar vídeo / Pause video»). Con «reducir movimiento» empieza quieto y el botón ofrece reproducirlo.
+- Pruebas: botón del vídeo y su cambio de estado, contador, botón pegado sin pisar las pestañas, idioma que no borra, guardado al salir y no guardado con un obligatorio vacío (103/103).
+
+**Pendiente.** Revisar con lector de pantalla real (VoiceOver/TalkBack) el anuncio de las ventanas. Los campos del Perfil siguen midiendo 27 px de alto (la tarjeta entera no enfoca el campo al tocar el relleno); valorar que tocar la tarjeta lleve al campo. Al volver a pintar el Perfil tras subir una foto, «Guardar cambios» puede seguir pegado aunque los datos ya se guardaron con la foto (inofensivo).
+
+**Propuesta para Iyán.** Siguen abiertas: retomar el tutorial al iniciar sesión sin haberlo terminado (ronda 1); decidir si «correspondencias» cuenta desde la primera carta enviada o solo con respuesta (ronda 2); y un botón «Quiero Plus» que avise a administración mientras no haya pagos (rondas 5–7). Nueva, menor: confirmar que te parece bien el guardado automático del Perfil al cambiar de pestaña (la alternativa sería preguntar antes de salir).
+
 ## Ronda 7 · 26 nov 2026
 
 **Qué vi.** Pruebas en verde (86/86). La pantalla Cartas vacía (lo primero que ve quien aún no tiene match) solo decía «Aún no tienes correspondencias» sin ninguna acción: callejón sin salida. El vídeo del hero se reproduce en bucle infinito aunque el sistema pida «reducir movimiento» y no tiene botón de pausa. El enlace «¿Ya tienes cuenta? Entra» de la landing medía 17 px de alto y «Ver perfil completo» en Descubrir 30 px. Los avisos flotantes tapan contenido (en Descubrir, justo la explicación del match) durante hasta 7 s y no se podían quitar. Lo de la imagen lavada del hero en escritorio (pendiente de la ronda 6) no es un fallo: el vídeo entra con un fundido de 2,5 s y la captura lo pilla a medias.
